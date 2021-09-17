@@ -1,5 +1,27 @@
 # blockchain-developer-bootcamp-final-project
 
+## Threads
+
+Threads allows groups of people to write a story together, and have it preserved as an NFT. 
+
+1. The first write submits a text NFT as the start of the story
+2. Other writers can then submit their potential next parts of the story as NFTs. 
+3. Those writers that have already had their entry selected as part of the story can then vote on the next possible story blocks
+4. The story block is then passed and forms the next part of the story if it receives either
+	*  51% of the previous writers votes
+	*  The most votes after X time has passed
+
+The application will be formed from a frontend app that can submit text and mint an NFT from it. As well as vote on the current story rounds options.
+
+
+## Elevate
+
+Elevate is a simple karma app, for everyone in the world, with pretty 'flair' awards.
+Every ethereum address can allocate each one of its fixed number of weekly votes amongst every
+other address on the network. At the end of the week, the highest ranked address are 
+assigned a unique NFT depending on where they rank.  
+
+
 
 The culmination of this course will be your final project, which will be a distributed application (or dapp) running on the Ethereum network (mainnet or testnet) with an interactive web-based frontend.
 
@@ -36,6 +58,7 @@ To be sure, the project will be coded in all sorts of amazing languages using aw
 Exercise Parts
 The exercise is divided into two parts:
 
+
 1. Brainstorm on Your Idea In the Discord, or during Office Hours or a study session, we want you to share ideas that you have for a final project. Here are a few things to keep in mind when thinking on and discussing your idea with others:
 
     Explain in a very simple way what you'd like your project to do. It's easy to get complicated with ideas, but the real mental exercise is to dissolve an idea down into its essence. When discussing your idea with people, try to find a few concepts underpinning your idea.
@@ -53,4 +76,4 @@ Voting Contract Example Workflow
 
 4. They can't vote twice for a single campaign 
 
-2. Upload it to Github Once you have a general sense of your project (Remember: it should be very simple and not complicated!), we'd like you to setup a Github repository for your project and submit your project idea in the repository's README.md file. 
+2. Upload it to Github Once you have a general sense of your project (Remember: it should be very simple and not complicated!), we'd like you to setup a Github repository for your project and submit your project idea in the repository's README.md file. Th
