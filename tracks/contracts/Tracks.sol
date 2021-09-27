@@ -32,7 +32,7 @@ contract Tracks {
     event TrackClosed();
     event TrackOpened(string trackId, string trackDesc);
     event TrackListed();
-    event TrackCreated(string indexed name);
+    event TrackCreated(uint indexed trackId);
 
     /**
      * @dev Check if the address is the owner of the entry
@@ -67,7 +67,7 @@ contract Tracks {
 		    return tracks[_id];
 		}
 
-    function getEntryVotes(uint  _id) public returns (uint){
+    function getEntryVotes(uint  _id) public view returns (uint){
         return votes[_id];
     }
 
@@ -84,7 +84,7 @@ contract Tracks {
 	            state: State.TrackNominating
 	       });
 	    trackCount++;
-     	emit TrackCreated(_name);
+     	emit TrackCreated(trackCount-1);
 
    }
 }
