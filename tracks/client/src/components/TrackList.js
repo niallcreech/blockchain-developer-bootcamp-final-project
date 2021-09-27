@@ -13,8 +13,9 @@ class TrackList extends Component {
 
 	render() {
 		const listItems = this.props.tracks.map((track) =>
-    	<li key={track.id}>
+    	<li key="{track.id}">
 				<div>{track.id}</div>
+				<div>{track.name}</div>
 				<div>{track.desc}</div>
 				<div>{track.votes}</div>
 			</li>

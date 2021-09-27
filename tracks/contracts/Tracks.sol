@@ -12,6 +12,7 @@ contract Tracks {
     }
 
     struct Track {
+        uint  id;
         string  name;
         string  desc;
         State state;
@@ -79,6 +80,7 @@ contract Tracks {
     
     function addTrack(string memory _name, string memory _desc) public {
 	    tracks[trackCount] = Track({
+	        		id: trackCount,
 	        		name: _name,
 	            desc: _desc,
 	            state: State.TrackNominating

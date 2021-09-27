@@ -17,7 +17,8 @@ class App extends Component {
   constructor(props) {
 		super(props);
 		this.state = {
-			"tracks": [],
+			tracks: [],
+			tracksLength: 0,
 			web3: null, accounts: null, contract: null 
 		}
 
@@ -39,9 +40,8 @@ class App extends Component {
         TracksContract.abi,
         deployedNetwork && deployedNetwork.address,
       );
-			console.info("DOING THINGS");
+			const _tracks = await instance.methods.getTracks().call();
       this.setState({ web3, accounts, contract: instance }, this.updateTrackList);
-			//this.updateTrackList();
    } catch (error) {
       // Catch any errors for any of the above operations.
       alert(
@@ -54,9 +54,8 @@ class App extends Component {
 	async updateTrackList(){
  		console.info("Updating track list");
     const { accounts, contract } = this.state;
-    const _tracks = await contract.methods.getTracks().call();
-    this.setState({ tracks: _tracks });
- 		console.info("Updated track list: " + _tracks);
+    this.setState({ tracks: await contract.methods.getTracks().call() });
+ 		console.info("Updated track list: " + this.state.tracks.length);
   }
 
 	handleTrackListUpdate(){
@@ -72,19 +71,12 @@ class App extends Component {
 		            <Link to="/">Home</Link>
 		          </li>
 		          <li>
-		            <Link to="/tracks">Tracks</Link>
+		            <Link to="/tracks">Tracks ({this.state.tracksLength})</Link>
 		          </li>
 		        </ul>
 		
 		        <hr />
 	
-		        {/*
-		          A <Switch> looks through all its children <Route>
-		          elements and renders the first one whose path
-		          matches the current URL. Use a <Switch> any time
-		          you have multiple routes, but you want only one
-		          of them to render at a time
-		        */}
 		        <Switch>
 		          <Route exact path="/">
 		            <Home />

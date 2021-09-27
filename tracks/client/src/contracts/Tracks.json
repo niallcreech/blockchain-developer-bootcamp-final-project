@@ -117,7 +117,8 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function"
+      "type": "function",
+      "constant": true
     },
     {
       "inputs": [
@@ -146,7 +147,8 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function"
+      "type": "function",
+      "constant": true
     },
     {
       "inputs": [
@@ -165,7 +167,8 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function"
+      "type": "function",
+      "constant": true
     },
     {
       "inputs": [],
@@ -195,7 +198,8 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function"
+      "type": "function",
+      "constant": true
     },
     {
       "inputs": [
@@ -231,7 +235,8 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function"
+      "type": "function",
+      "constant": true
     },
     {
       "inputs": [
@@ -250,7 +255,8 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function"
+      "type": "function",
+      "constant": true
     },
     {
       "inputs": [],
@@ -12638,24 +12644,13 @@
     "5777": {
       "events": {},
       "links": {},
-      "address": "0x384c039ec76b254c784302d88da69b1128721089",
-      "transactionHash": "0x8d3d833734c0f71f1156001e28e8a23b0023409e20c6588b52aa6e847a1a936f"
-    },
-    "1632752524535": {
-      "events": {},
-      "links": {},
-      "address": "0x7de3cAdfE5832900849011fddAb748fE109Ae7BD",
-      "transactionHash": "0xdf888ac675fc3a339443ee34563debbb682bf73b0757e35dc291d67f8363b35b"
-    },
-    "1632766119055": {
-      "events": {},
-      "links": {},
-      "address": "0x21f7d93a00619219a146A13C7740C48947c0d58a",
-      "transactionHash": "0x89dbedaf3f7247e2a7112ea5e4f841171e5d099fb4980d54bb4fdc1525cac056"
+      "address": "0x776Ad278b8D55A6054249195f57b9e1E6fD001a8",
+      "transactionHash": "0xfee7a6e232794a8a1248a5db5b7ecf1ebbdfddde8150cd6888a0f18afd282b1e"
     }
   },
   "schemaVersion": "3.4.3",
-  "updatedAt": "2021-09-27T18:32:17.899Z",
+  "updatedAt": "2021-09-27T18:59:10.166Z",
+  "networkType": "ethereum",
   "devdoc": {
     "kind": "dev",
     "methods": {},

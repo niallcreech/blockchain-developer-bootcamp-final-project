@@ -34,4 +34,12 @@ contract("Tracks", accounts => {
     	return true; //return ev.name === name;
 		});
  	});
+ 	
+ 	it("...should get all the tracks.", async () => {
+    const name = "mytrack"
+    const tx = await contract.addTrack(name, "mydescription", { from: accounts[0] });
+    let _tracks = await contract.getTracks()
+    console.info(_tracks)
+    assert.equal(2, _tracks.length, "");
+  });
 });
