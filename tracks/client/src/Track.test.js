@@ -20,7 +20,7 @@ afterEach(() => {
   container = null;
 });
 
-it("renders with or without a name", () => {
+it("renders with a name and description", () => {
   const _name = "test";
   const _desc = "this is an example of a track";
   act(() => {
