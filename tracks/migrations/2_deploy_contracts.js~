@@ -1,0 +1,5 @@
+const Tracks = artifacts.require("./src/contracts/Tracks");
+
+module.exports = function (deployer) {
+  deployer.deploy(Tracks);
+};

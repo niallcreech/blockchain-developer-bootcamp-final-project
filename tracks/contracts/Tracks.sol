@@ -2,8 +2,9 @@
 pragma solidity ^0.8.0;
 
 contract Tracks {
-    mapping (string  => Track) public tracks;
-    mapping (string  => uint) public votes;
+    mapping (uint  => Track) public tracks;
+    mapping (uint  => uint) public votes;
+    uint public trackCount;
 
     enum State {
         TrackNominating,
@@ -12,8 +13,7 @@ contract Tracks {
 
     struct Track {
         string  name;
-        string  description;
-        string  id;
+        string  desc;
         State state;
     }
 
@@ -30,6 +30,9 @@ contract Tracks {
     event EntryLeader(string trackid, string entryid, string location);
     event TrackSealed();
     event TrackClosed();
+    event TrackOpened(string trackId, string trackDesc);
+    event TrackListed();
+    event TrackCreated(string indexed name);
 
     /**
      * @dev Check if the address is the owner of the entry
@@ -48,10 +51,23 @@ contract Tracks {
         _;
     }
 
-    constructor () {
+		constructor () {
+        addTrack("first_track", "This is the first track");
     }
 
-    function getEntryVotes(string memory  _id) public view returns (uint){
+		function getTracks() public view returns ( Track[] memory) {
+		    Track[] memory _tracks = new Track[](trackCount);
+		    for (uint i=0; i<trackCount; i++) {
+		        _tracks[i] = tracks[i];
+		    }
+		    return _tracks;
+		}
+		
+		function getTrack(uint _id) public view returns (Track memory) {
+		    return tracks[_id];
+		}
+
+    function getEntryVotes(uint  _id) public returns (uint){
         return votes[_id];
     }
 
@@ -60,6 +76,17 @@ contract Tracks {
 
     function vote() public {
     }
+    
+    function addTrack(string memory _name, string memory _desc) public {
+	    tracks[trackCount] = Track({
+	        		name: _name,
+	            desc: _desc,
+	            state: State.TrackNominating
+	       });
+	    trackCount++;
+     	emit TrackCreated(_name);
+
+   }
 }
 
 

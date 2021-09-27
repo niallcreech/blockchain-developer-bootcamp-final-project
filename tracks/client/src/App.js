@@ -1,13 +1,30 @@
-import React, { Component } from "react";
-import Tracks from "./contracts/Tracks.json";
+import React, {Component} from "react";
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route,
+  Link
+} from "react-router-dom";
+import TracksContract from "./contracts/Tracks.json";
 import getWeb3 from "./getWeb3";
-
+import Home from "./components/Home"
+import TrackList from "./components/TrackList"
+import {getAllTracks} from "./helpers/TrackHelpers"
 import "./App.css";
+	
 
 class App extends Component {
-  state = { storageValue: 0, web3: null, accounts: null, contract: null };
+  constructor(props) {
+		super(props);
+		this.state = {
+			"tracks": [],
+			web3: null, accounts: null, contract: null 
+		}
 
-  componentDidMount = async () => {
+		this.handleTrackListUpdate = this.handleTrackListUpdate.bind(this);
+	}
+
+	async componentDidMount() {
     try {
       // Get network provider and web3 instance.
       const web3 = await getWeb3();
@@ -17,57 +34,69 @@ class App extends Component {
 
       // Get the contract instance.
       const networkId = await web3.eth.net.getId();
-      const deployedNetwork = Tracks.networks[networkId];
+      const deployedNetwork = TracksContract.networks[networkId];
       const instance = new web3.eth.Contract(
-        Tracks.abi,
+        TracksContract.abi,
         deployedNetwork && deployedNetwork.address,
       );
-
-      // Set web3, accounts, and contract to the state, and then proceed with an
-      // example of interacting with the contract's methods.
-      this.setState({ web3, accounts, contract: instance }, this.runExample);
-    } catch (error) {
+			console.info("DOING THINGS");
+      this.setState({ web3, accounts, contract: instance }, this.updateTrackList);
+			//this.updateTrackList();
+   } catch (error) {
       // Catch any errors for any of the above operations.
       alert(
         `Failed to load web3, accounts, or contract. Check console for details.`,
       );
       console.error(error);
     }
-  };
+  }
 
-  runExample = async () => {
+	async updateTrackList(){
+ 		console.info("Updating track list");
     const { accounts, contract } = this.state;
+    const _tracks = await contract.methods.getTracks().call();
+    this.setState({ tracks: _tracks });
+ 		console.info("Updated track list: " + _tracks);
+  }
 
-    // Stores a given value, 5 by default.
-    await contract.methods.set(5).send({ from: accounts[0] });
-
-    // Get the value from the contract to prove it worked.
-    const response = await contract.methods.get().call();
-
-    // Update state with the result.
-    this.setState({ storageValue: response });
-  };
+	handleTrackListUpdate(){
+		this.updateTrackList();
+	}
 
   render() {
-    if (!this.state.web3) {
-      return <div>Loading Web3, accounts, and contract...</div>;
-    }
-    return (
-      <div className="App">
-        <h1>Good to Go!</h1>
-        <p>Your Truffle Box is installed and ready.</p>
-        <h2>Smart Contract Example</h2>
-        <p>
-          If your contracts compiled and migrated successfully, below will show
-          a stored value of 5 (by default).
-        </p>
-        <p>
-          Try changing the value stored on <strong>line 42</strong> of App.js.
-        </p>
-        <div>The stored value is: {this.state.storageValue}</div>
-      </div>
-    );
-  }
+		return (
+		    <Router>
+		      <div>
+		        <ul>
+		          <li>
+		            <Link to="/">Home</Link>
+		          </li>
+		          <li>
+		            <Link to="/tracks">Tracks</Link>
+		          </li>
+		        </ul>
+		
+		        <hr />
+	
+		        {/*
+		          A <Switch> looks through all its children <Route>
+		          elements and renders the first one whose path
+		          matches the current URL. Use a <Switch> any time
+		          you have multiple routes, but you want only one
+		          of them to render at a time
+		        */}
+		        <Switch>
+		          <Route exact path="/">
+		            <Home />
+		          </Route>
+		          <Route path="/tracks">
+		            <TrackList tracks={this.state.tracks} handleTrackListUpdate={this.handleTrackListUpdate}/>
+		          </Route>
+		        </Switch>
+		      </div>
+		    </Router>
+		  );
+	}
 }
 
 export default App;
