@@ -3,28 +3,26 @@ pragma solidity ^0.8.0;
 
 contract Tracks {
     mapping (uint  => Track) public tracks;
-    mapping (uint  => uint) public votes;
+    mapping (uint  => uint[]) public trackEntries;
+    mapping (uint  => uint) public entriesTrack;
+
+    uint public nextTrackId;
     uint public trackCount;
+    uint public nextEntryId;
 
     enum State {
         TrackNominating,
         TrackSealed
     }
-
+		struct Entry {
+        uint entryId;
+        bool exists;
+    }
     struct Track {
-        uint  id;
+        uint  trackId;
         string  name;
         string  desc;
         State state;
-    }
-
-    struct Entry {
-        string  location;
-        string  id;
-        string  track_id;
-        string  previous_id;
-        address owner;
-        uint votes;
     }
 
     event EntryNominated(string trackid, string entryid, string location);
@@ -33,7 +31,8 @@ contract Tracks {
     event TrackClosed();
     event TrackOpened(string trackId, string trackDesc);
     event TrackListed();
-    event TrackCreated(uint indexed trackId);
+    event TrackCreated(uint indexed trackId, string name, string desc);
+    event EntryCreated(uint indexed trackId, uint indexed entryId, string name, string desc, string location);
 
     /**
      * @dev Check if the address is the owner of the entry
@@ -53,7 +52,8 @@ contract Tracks {
     }
 
 		constructor () {
-        addTrack("first_track", "This is the first track");
+        uint trackId = addTrack("first_track", "This is the first track");
+        addEntry(trackId, "name", "description", "location");
     }
 
 		function getTracks() public view returns ( Track[] memory) {
@@ -68,8 +68,8 @@ contract Tracks {
 		    return tracks[_id];
 		}
 
-    function getEntryVotes(uint  _id) public view returns (uint){
-        return votes[_id];
+		function getEntriesForTrack(uint trackId) public view returns (uint[] memory){
+        return trackEntries[trackId];
     }
 
     function close() public {
@@ -78,15 +78,28 @@ contract Tracks {
     function vote() public {
     }
     
-    function addTrack(string memory _name, string memory _desc) public {
-	    tracks[trackCount] = Track({
-	        		id: trackCount,
+    function addEntry(uint trackId, string memory _name, string memory _desc, string memory _location) public returns (uint) {
+      uint entryId = nextEntryId;
+      require(entriesTrack[entryId] == 0);
+	    trackEntries[trackId].push(entryId);
+	    entriesTrack[entryId] = trackId;
+	    nextEntryId++;
+     	emit EntryCreated(trackId, entryId, _name, _desc, _location);
+     	return entryId;
+   }
+
+    function addTrack(string memory _name, string memory _desc) public returns (uint) {
+      uint trackId = nextTrackId;
+	    tracks[trackId] = Track({
+	        		trackId: trackId,
 	        		name: _name,
 	            desc: _desc,
 	            state: State.TrackNominating
 	       });
+	    nextTrackId++;
 	    trackCount++;
-     	emit TrackCreated(trackCount-1);
+     	emit TrackCreated(trackId, _name, _desc);
+     	return trackId;
 
    }
 }

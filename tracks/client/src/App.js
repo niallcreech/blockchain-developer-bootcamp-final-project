@@ -3,52 +3,31 @@ import {
   BrowserRouter as Router,
   Switch,
   Route,
-  Link
+  Link,
 } from "react-router-dom";
-import TracksContract from "./contracts/Tracks.json";
-import getWeb3 from "./getWeb3";
 import Home from "./components/Home"
 import TrackList from "./components/TrackList"
+import TrackView from "./components/TrackView"
 import {getAllTracks} from "./helpers/TrackHelpers"
 import "./App.css";
-	
+import {getWeb3State} from "./helpers/Web3Helper";
+
 
 class App extends Component {
   constructor(props) {
 		super(props);
 		this.state = {
 			tracks: [],
+			entries: [],
 			tracksLength: 0,
 			web3: null, accounts: null, contract: null 
 		}
-
+this.setState(getWeb3State(), this.updateTrackList);
 		this.handleTrackListUpdate = this.handleTrackListUpdate.bind(this);
 	}
 
 	async componentDidMount() {
-    try {
-      // Get network provider and web3 instance.
-      const web3 = await getWeb3();
-
-      // Use web3 to get the user's accounts.
-      const accounts = await web3.eth.getAccounts();
-
-      // Get the contract instance.
-      const networkId = await web3.eth.net.getId();
-      const deployedNetwork = TracksContract.networks[networkId];
-      const instance = new web3.eth.Contract(
-        TracksContract.abi,
-        deployedNetwork && deployedNetwork.address,
-      );
-			const _tracks = await instance.methods.getTracks().call();
-      this.setState({ web3, accounts, contract: instance }, this.updateTrackList);
-   } catch (error) {
-      // Catch any errors for any of the above operations.
-      alert(
-        `Failed to load web3, accounts, or contract. Check console for details.`,
-      );
-      console.error(error);
-    }
+    this.setState(await getWeb3State(), this.updateTrackList);
   }
 
 	async updateTrackList(){
@@ -58,6 +37,7 @@ class App extends Component {
  		console.info("Updated track list: " + this.state.tracks.length);
   }
 
+	
 	handleTrackListUpdate(){
 		this.updateTrackList();
 	}
@@ -81,9 +61,10 @@ class App extends Component {
 		          <Route exact path="/">
 		            <Home />
 		          </Route>
-		          <Route path="/tracks">
-		            <TrackList tracks={this.state.tracks} handleTrackListUpdate={this.handleTrackListUpdate}/>
+		          <Route exact path="/tracks">
+		            <TrackList tracks={this.state.tracks}  handleTrackListUpdate={this.handleTrackListUpdate}/>
 		          </Route>
+          		<Route path="/track/:trackId" children={<TrackView />} />
 		        </Switch>
 		      </div>
 		    </Router>

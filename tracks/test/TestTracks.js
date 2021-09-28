@@ -38,8 +38,27 @@ contract("Tracks", accounts => {
  	it("...should get all the tracks.", async () => {
     const name = "mytrack"
     const tx = await contract.addTrack(name, "mydescription", { from: accounts[0] });
-    let _tracks = await contract.getTracks()
-    console.info(_tracks)
+    const _tracks = await contract.getTracks()
     assert.equal(2, _tracks.length, "");
   });
+  
+  it("...should add an entry.", async () => {
+    const trackName = "mytrack"
+    await contract.addTrack(trackName, "mydescription", { from: accounts[0] });
+    const entryName = "myentry"
+    const tx = await contract.addEntryToTrack(entryName, "mydescription", { from: accounts[0] });
+    const _tracks = await contract.getTracks()
+    assert.equal(2, _tracks.length, "");
+  });
+ 
+  it("...should emit an event when adding a track.", async () => {
+    const trackName = "mytrack"
+    await contract.addTrack(name, "mydescription", { from: accounts[0] });
+    const entryName = "myentry"
+    const tx = await contract.addEntryToTrack(entryName, "mydescription", { from: accounts[0] });
+    truffleAssert.eventEmitted(tx, 'EntryCreated', (ev) => {
+    	return true; //return ev.name === name;
+		});
+ 	});
+ 	
 });

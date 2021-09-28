@@ -1,9 +1,15 @@
 import React, {Component} from "react";
+import Track from "./Track";
+import TrackForm from "./TrackForm";
+import { withRouter } from 'react-router-dom';
+
 
 class TrackList extends Component {
+
 	constructor(props) {
 		super(props);
 		this.handleUpdateClick = this.handleUpdateClick.bind(this);
+		this.handleTrackView = this.handleTrackView.bind(this);
 	}
 	
 	handleUpdateClick(event){
@@ -11,22 +17,32 @@ class TrackList extends Component {
 		this.props.handleTrackListUpdate();
 	}
 
+	handleTrackView(value){
+		console.log("handleTrackView: " + value);
+		this.props.history.push("/track/" + value);
+	}
+
 	render() {
-		const listItems = this.props.tracks.map((track) =>
-    	<li key="{track.id}">
-				<div>{track.id}</div>
-				<div>{track.name}</div>
-				<div>{track.desc}</div>
-				<div>{track.votes}</div>
+		const listItems = this.props.tracks.map((track) => (
+			<li key="{track.trackId}">
+    		<Track trackId={track.trackId} name={track.name} desc={track.desc} votes={track.votes} />
+				<button value={track.trackId} onClick={() => this.handleTrackView(track.trackId)}>View</button>
 			</li>
+			)
   	);
 		return (
-			<div>
-			<button onClick={this.handleUpdateClick}>Update</button>
-				{listItems}
+			<div className="TrackList">
+				<ul className="TrackList_list">
+					{listItems}
+				</ul>
+				<div className="TrackList_newtrack">
+					<TrackForm/>
+				</div>
+				<div className="TrackList_buttons">
+					<button onClick={this.handleUpdateClick}>Update</button>
+				</div>
 			</div>
 		);
 	}
 }
-
-export default TrackList;
+export default withRouter(TrackList);
