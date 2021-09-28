@@ -28,7 +28,6 @@ describe("When working with Tracks entries", () => {
       const trackName = "mytrack"
       const tmp = await contract.addTrack(trackName, "mydescription", { from: accounts[0] });
       const trackId = 1; 
-      console.log(tmp);//parseInt(trackIdVal);
       const entryName = "myentry"
       const tx = await contract.addEntry(trackId, entryName, "mydescription", { from: accounts[0] });
       truffleAssert.eventEmitted(tx, 'EntryCreated', (ev) =>{
