@@ -22,7 +22,6 @@ class App extends Component {
 			tracksLength: 0,
 			web3: null, accounts: null, contract: null 
 		}
-this.setState(getWeb3State(), this.updateTrackList);
 		this.handleTrackListUpdate = this.handleTrackListUpdate.bind(this);
 	}
 
@@ -64,7 +63,9 @@ this.setState(getWeb3State(), this.updateTrackList);
 		          <Route exact path="/tracks">
 		            <TrackList tracks={this.state.tracks}  handleTrackListUpdate={this.handleTrackListUpdate}/>
 		          </Route>
-          		<Route path="/track/:trackId" children={<TrackView />} />
+							<Route exact path="/track/:trackId">
+		            <TrackView/>
+		          </Route>
 		        </Switch>
 		      </div>
 		    </Router>

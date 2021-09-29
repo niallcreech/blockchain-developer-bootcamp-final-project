@@ -11,6 +11,7 @@ class EntryForm extends Component {
 		this.handleDescriptionChange = this.handleDescriptionChange.bind(this);
 		this.handleNameChange = this.handleNameChange.bind(this);
 		this.handleLocationChange = this.handleLocationChange.bind(this);
+		this.handleSubmit = this.handleSubmit.bind(this);
 	}
 
 	handleDescriptionChange(event) {
@@ -22,6 +23,11 @@ class EntryForm extends Component {
 handleLocationChange(event) {
     this.setState({location: event.target.value});
   }
+
+	handleSubmit(event){
+		console.debug("EntryForm::handleSubmit")
+		event.preventDefault();
+	}
 
 	render(){
 		return (
@@ -38,7 +44,7 @@ handleLocationChange(event) {
           Location:
           <input type="text" value={this.state.location} onChange={this.handleLocationChange} />
         </label>
-        <input type="submit" value="Submit" />
+        <input type="submit" value="Nominate" />
       </form>
   	);
 	}

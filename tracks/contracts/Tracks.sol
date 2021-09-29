@@ -33,6 +33,7 @@ contract Tracks {
   event TrackListed();
   event TrackCreated(uint indexed trackId, string name, string desc);
   event EntryCreated(uint indexed trackId, uint indexed entryId, string name, string desc, string location);
+  event EntryVotedFor(uint indexed trackId, uint indexed entryId);
 
   /**
    * @dev Check if the address is the owner of the entry
@@ -71,7 +72,7 @@ contract Tracks {
   function getEntriesForTrack(uint trackId) public view returns (uint[] memory){
       return trackEntries[trackId];
   }
-
+	
   function close() public {
   }
 
