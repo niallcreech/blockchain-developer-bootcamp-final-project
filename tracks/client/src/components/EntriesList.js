@@ -1,7 +1,7 @@
 import React, {Component} from "react";
 import { withRouter } from "react-router";
 import Entry from "./Entry";
-import {getWeb3State, getPastEntryCreations, getVotesForTrack} from "../helpers/Web3Helper";
+import {getWeb3State, getEntries, getVotes} from "../helpers/Web3Helper";
 
 
 class EntriesList extends Component {
@@ -26,36 +26,16 @@ class EntriesList extends Component {
 			//const newentries = await contract.methods.getEntriesForTrack(parseInt(this.props.trackId)).call();
  			console.info("EntriesList::updateEntries: Called contract getPastEntryCreations with trackId " + parseInt(this.props.trackId));
 			//console.info(newentries);
-			const newEntries = await getPastEntryCreations(contract, this.props.trackId).then((result) => (result.map(entryEvent => this.getEntryEventDetails(entryEvent))));
-			const voteEntries = await getVotesForTrack(contract, this.props.trackId).then((result) => (result.map(entryEvent => this.getEntryEventDetails(entryEvent))));
-			const votes = this.countVotes(voteEntries);
+			const entries = await getEntries(contract, this.props.trackId);
+			const votes = await getVotes(contract, this.props.trackId);
 			console.info("EntriesList::updateEntries ");
-			this.setState({ entries: newEntries, votes: votes });
+			this.setState({ entries: entries, votes: votes });
  			console.info("EntriesList::updateEntries:Updated entries with " + this.state.entries.length + " entries.");
     } catch (error) {
       // Catch any errors for any of the above operations.
       console.error(error);
      }
   }
-	countVotes(voteEntries){
-		let votes = {};
-		voteEntries.forEach(function(i){
-			if (votes[i.entryId]) {
-				votes[i.entryId]++;
-			} else {
-				votes[i.entryId] = 1;
-			}
-		});
-		return votes;
-	}
-
-	getEntryEventDetails(entryEvent) {
- 			console.info("EntriesList::getEntryEventDetails ");
- 			console.info(entryEvent.returnValues);
-		
-		return entryEvent.returnValues;
-	}
-	
 
 	render(){
 		console.debug("EntriesList::render")

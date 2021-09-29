@@ -49,18 +49,37 @@ async function getPastTrackEvents(contract, trackId, eventName, eventFilter){
 	return events;
 }
 
-export async function getPastEntryCreations(contract, trackId){
+export async function getEntries(contract, trackId){
 	const eventName = "EntryCreated";
 	const eventFilter = {trackId: trackId};
-	const events = getPastTrackEvents(contract, trackId, eventName, eventFilter)
+	const events = await getPastTrackEvents(contract, trackId, eventName, eventFilter)
+		.then((result) => (result.map(entryEvent => getEntryEventDetails(entryEvent))));
 	return events;
 }
 
-export async function getVotesForTrack(contract, trackId){
+export async function getVotes(contract, trackId){
 	const eventName = "EntryVotedFor";
 	const eventFilter = {trackId: trackId};
-	const events = await getPastTrackEvents(contract, trackId, eventName, eventFilter);
-	return events;
+	const events = await getPastTrackEvents(contract, trackId, eventName, eventFilter)
+		.then((result) => (result.map(entryEvent => this.getEntryEventDetails(entryEvent))));
+	let votes = {};
+	events.forEach(function(i){
+		if (votes[i.entryId]) {
+			votes[i.entryId]++;
+		} else {
+			votes[i.entryId] = 1;
+		}
+	});
+	return votes;
+}
+
+function	getEntryEventDetails(entryEvent) {
+	return entryEvent.returnValues;
+}
+	
+	
+export async function sendVote(contract, trackId, entryId){
+	// Send a contract call to vote for the entry
 }
 
 
