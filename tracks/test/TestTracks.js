@@ -1,7 +1,7 @@
 const Tracks = artifacts.require("./Tracks.sol");
 const truffleAssert = require('truffle-assertions');
 
-describe("When working with a Tracks contract", () => {
+describe("When working with a contract", () => {
   contract("Tracks", accounts => {
     
     let contract;

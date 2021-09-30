@@ -61,7 +61,7 @@ export async function getVotes(contract, trackId){
 	const eventName = "EntryVotedFor";
 	const eventFilter = {trackId: trackId};
 	const events = await getPastTrackEvents(contract, trackId, eventName, eventFilter)
-		.then((result) => (result.map(entryEvent => this.getEntryEventDetails(entryEvent))));
+		.then((result) => (result.map(entryEvent => getEntryEventDetails(entryEvent))));
 	let votes = {};
 	events.forEach(function(i){
 		if (votes[i.entryId]) {
@@ -80,6 +80,10 @@ function	getEntryEventDetails(entryEvent) {
 	
 export async function sendVote(contract, trackId, entryId){
 	// Send a contract call to vote for the entry
+	if (contract === null) {
+		getWeb3()
+	}
+	console.info("sendVote"); 
 }
 
 
