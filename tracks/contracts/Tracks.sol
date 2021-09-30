@@ -79,7 +79,7 @@ contract Tracks {
 	  }
 
 	modifier hasNotVotedForTrack(address _addr, uint _entryId){
-	    require(!votesByAddress[msg.sender][entriesTrack[_entryId]]);
+	    //require(!votesByAddress[msg.sender][entriesTrack[_entryId]]);
 	    _;
 	}
 	/**
@@ -113,9 +113,10 @@ contract Tracks {
    * @dev XXX
    * @param _entryId The id of the entry
    */
-  function getVotes(uint _entryId) public view checkTrackUnblocked(entriesTrack[_entryId]) returns (uint) {
+  function getVotesForEntry(uint _entryId) public view checkTrackUnblocked(entriesTrack[_entryId]) returns (uint) {
       return votes[_entryId];
   }
+  
 
   /**
    * @dev XXX
@@ -188,8 +189,8 @@ contract Tracks {
    * @param _entryId The id of the entry
    */
   function vote(uint _entryId) public checkTrackOpen(entriesTrack[_entryId]) hasNotVotedForTrack(msg.sender,entriesTrack[_entryId]){
-    votesByAddress[msg.sender][entriesTrack[_entryId]] = true;
-    votes[_entryId]++;
+    //votesByAddress[msg.sender][entriesTrack[_entryId]] = true;
+    //votes[_entryId]++;
  		emit EntryVotedFor(entriesTrack[_entryId], _entryId);
   }
 

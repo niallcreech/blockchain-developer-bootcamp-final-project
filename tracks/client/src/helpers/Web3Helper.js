@@ -36,41 +36,55 @@ const getWeb3 = () =>
     });
   });
 
-async function getPastTrackEvents(contract, trackId, eventName, eventFilter){
-	if (contract === null) {
-		getWeb3()
-	}
-	const events = await contract.getPastEvents('EntryCreated', {
-    filter: eventFilter,
-    fromBlock: 0,
-    toBlock: 'latest'
-	});
-	console.info("getPastTrackEvents: "+ events.length + " events"); 
-	return events;
+
+export async function getTracks(){
+    const {contract} = await getWeb3State();
+ 		const tracks = await contract.methods.getTracks().call();
+		return tracks;
 }
 
-export async function getEntries(contract, trackId){
-	const eventName = "EntryCreated";
-	const eventFilter = {trackId: trackId};
-	const events = await getPastTrackEvents(contract, trackId, eventName, eventFilter)
-		.then((result) => (result.map(entryEvent => getEntryEventDetails(entryEvent))));
-	return events;
+async function getEvents(eventName, eventFilter){
+	const {contract} = await getWeb3State();
+	let results;
+	try{
+		const resultsRaw = await contract.getPastEvents(eventName, {
+    	filter: eventFilter,
+    	fromBlock: 0,
+    	toBlock: 'latest'
+		});
+		results = resultsRaw.map(event => getVoteEventDetails(event));
+	} catch(e) {
+		console.error(e);
+		results = [];
+	}	
+	return results;	
 }
 
-export async function getVotes(contract, trackId){
+export async function getVotes(trackId){
 	const eventName = "EntryVotedFor";
 	const eventFilter = {trackId: trackId};
-	const events = await getPastTrackEvents(contract, trackId, eventName, eventFilter)
-		.then((result) => (result.map(entryEvent => getEntryEventDetails(entryEvent))));
+	const events = await getEvents(eventName, eventFilter);
 	let votes = {};
-	events.forEach(function(i){
-		if (votes[i.entryId]) {
-			votes[i.entryId]++;
+	events.forEach(function(event) {
+		console.debug(event)
+		const entryId = parseInt(event.entryId);
+		if (votes[entryId]){
+			votes[entryId]++;
 		} else {
-			votes[i.entryId] = 1;
+			votes[entryId] = 1;
 		}
 	});
 	return votes;
+}
+	
+export async function getEntries(trackId){
+	const eventName = "EntryCreated";
+	const eventFilter = {trackId: trackId};
+	return await getEvents(eventName, eventFilter);
+}
+
+function	getVoteEventDetails(entryEvent) {
+	return entryEvent.returnValues;
 }
 
 function	getEntryEventDetails(entryEvent) {
@@ -78,19 +92,22 @@ function	getEntryEventDetails(entryEvent) {
 }
 	
 	
-export async function sendVote(contract, trackId, entryId){
+export async function sendVote(_entryId){
 	// Send a contract call to vote for the entry
-	if (contract === null) {
-		getWeb3()
-	}
-	console.info("sendVote"); 
+	const {contract} = await getWeb3State();
+	console.debug("WEB3:sendVote: " + _entryId);
+	try {
+		await contract.methods.vote(_entryId);
+	} catch(e) {
+		console.error(e);
+	}	
 }
 
 
 export async function getWeb3State() {
   try {
       // Get network provider and web3 instance.
-      const web3 = await getWeb3();
+     	const web3 = new Web3(window.ethereum);
 
       // Use web3 to get the user's accounts.
       const accounts = await web3.eth.getAccounts();

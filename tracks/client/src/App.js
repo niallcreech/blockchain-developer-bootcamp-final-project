@@ -8,9 +8,8 @@ import {
 import Home from "./components/Home"
 import TrackList from "./components/TrackList"
 import TrackView from "./components/TrackView"
-import {getAllTracks} from "./helpers/TrackHelpers"
 import "./App.css";
-import {getWeb3State} from "./helpers/Web3Helper";
+import {getTracks} from "./helpers/Web3Helper";
 
 
 class App extends Component {
@@ -19,26 +18,13 @@ class App extends Component {
 		this.state = {
 			tracks: [],
 			entries: [],
-			tracksLength: 0,
-			web3: null, accounts: null, contract: null 
+			tracksLength: 0
 		}
-		this.handleTrackListUpdate = this.handleTrackListUpdate.bind(this);
 	}
 
 	async componentDidMount() {
-    this.setState(await getWeb3State(), this.updateTrackList);
-  }
-
-	async updateTrackList(){
- 		console.info("Updating track list");
-    const { accounts, contract } = this.state;
-    this.setState({ tracks: await contract.methods.getTracks().call() });
- 		console.info("Updated track list: " + this.state.tracks.length);
-  }
-
-	
-	handleTrackListUpdate(){
-		this.updateTrackList();
+		const tracks = await getTracks() ;
+    this.setState({tracks: tracks});
 	}
 
   render() {
@@ -61,7 +47,7 @@ class App extends Component {
 		            <Home />
 		          </Route>
 		          <Route exact path="/tracks">
-		            <TrackList tracks={this.state.tracks}  handleTrackListUpdate={this.handleTrackListUpdate}/>
+		            <TrackList tracks={this.state.tracks}  />
 		          </Route>
 							<Route exact path="/track/:trackId">
 		            <TrackView/>

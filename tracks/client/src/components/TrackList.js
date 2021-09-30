@@ -8,7 +8,6 @@ class TrackList extends Component {
 
 	constructor(props) {
 		super(props);
-		this.handleUpdateClick = this.handleUpdateClick.bind(this);
 		this.handleTrackView = this.handleTrackView.bind(this);
 	}
 	
@@ -24,7 +23,7 @@ class TrackList extends Component {
 
 	render() {
 		const listItems = this.props.tracks.map((track) => (
-			<li key="{track.trackId}">
+			<li key={track.trackId}>
     		<Track trackId={track.trackId} name={track.name} desc={track.desc} votes={track.votes} />
 				<button value={track.trackId} onClick={() => this.handleTrackView(track.trackId)}>View</button>
 			</li>
@@ -37,9 +36,6 @@ class TrackList extends Component {
 				</ul>
 				<div className="TrackList_newtrack">
 					<TrackForm/>
-				</div>
-				<div className="TrackList_buttons">
-					<button onClick={this.handleUpdateClick}>Update</button>
 				</div>
 			</div>
 		);

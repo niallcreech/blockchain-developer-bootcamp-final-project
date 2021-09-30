@@ -15,8 +15,7 @@ describe("When working with Tracks entries", () => {
     
     it("...should add an entry.", async () => {
       const trackName = "mytrack"
-      const trackIdVal = await contract.addTrack(trackName, "mydescription", { from: accounts[0]
-      });
+      const trackIdVal = await contract.addTrack(trackName, "mydescription", { from: accounts[0]});
       const trackId = 1; //parseInt(trackIdVal);
       const tx = await contract.addEntry(trackId, "myentry", "mydescription", { from: accounts[0] });
       const _entries = await contract.getEntriesForTrack(trackId);
