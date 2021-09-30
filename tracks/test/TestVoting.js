@@ -5,24 +5,35 @@ describe("When voting on an entry", () => {
   contract("Voting", accounts => {
     
     let contract;
-  
+  	let trackId;
+  	let entryId;
+
     beforeEach(function() {
        return Tracks.new()
        .then(function(instance) {
           contract = instance;
-       });
+					trackId = 0
+      		contract.addTrack("mytrack", "mydescription", { from: accounts[0] });
+					entryId = 0
+					contract.addEntry(trackId, "myentry", "mydescription", { from: accounts[0] }); 
+			});
     });
   
     it("...should increase an entries vote by one.", async () => {
-      //let _tracks = await contract.getTracks();
-      //assert.equal(1, _tracks.length, "The initial track count is 1");
-  
+			const preVote = await contract.getVotes(entryId);
+      await contract.vote(entryId, { from: accounts[0] }); 
+ 			assert.equal(preVote.toNumber() + 1, await contract.getVotes(entryId).then(result => result.toNumber()), "");
     });
   
     it("...should not allow voting on an entry in the same track.", async () => {
-      //let _tracks = await contract.getTracks();
-      //assert.equal(1, _tracks.length, "The initial track count is 1");
-  
+      const preVote = await contract.getVotes(entryId);
+      await contract.vote(entryId, { from: accounts[0] }); 
+ 			assert.equal(preVote.toNumber() + 1, await contract.getVotes(entryId).then(result => result.toNumber()), "");
+      try{
+				await contract.vote(entryId, { from: accounts[0] }); 
+				assert(false);
+			}catch{}
+ 			assert.equal(preVote.toNumber() + 1, await contract.getVotes(entryId).then(result => result.toNumber()), "");
     });
 
   });

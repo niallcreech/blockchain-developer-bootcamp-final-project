@@ -37,7 +37,7 @@ contract Tracks {
    * @dev XXX
    * @param _trackId The id of the track
    */
-	modifier isTrackOpen(uint _trackId) {
+	modifier checkTrackOpen(uint _trackId) {
 		require(tracks[_trackId].state == State.TrackOpen);
     _;
   }
@@ -46,7 +46,7 @@ contract Tracks {
    * @dev XXX
    * @param _trackId The id of the track
    */
-	modifier isTrackClosed(uint _trackId) {
+	modifier checkTrackClosed(uint _trackId) {
 		require(tracks[_trackId].state == State.TrackClosed);
     _;
   }
@@ -55,7 +55,7 @@ contract Tracks {
    * @dev XXX
    * @param _trackId The id of the track
    */
-	modifier isTrackBlocked(uint _trackId) {
+	modifier checkTrackBlocked(uint _trackId) {
 		require(tracks[_trackId].state == State.TrackBlocked);
     _;
   }
@@ -64,7 +64,7 @@ contract Tracks {
    * @dev XXX
    * @param _trackId The id of the track
    */
-	modifier isTrackUnblocked(uint _trackId) {
+	modifier checkTrackUnblocked(uint _trackId) {
 		require(tracks[_trackId].state != State.TrackBlocked);
     _;
   }
@@ -73,7 +73,7 @@ contract Tracks {
    * @dev XXX
    * @param _trackId The id of the track
    */
-	modifier trackExists(uint _trackId) {
+	modifier checkTrackExists(uint _trackId) {
 			require(tracks[_trackId].exists == true);
 	    _;
 	  }
@@ -105,8 +105,16 @@ contract Tracks {
    * @dev XXX
    * @param _trackId The id of the track
    */
-  function getTrack(uint _trackId) public view isTrackUnblocked(_trackId) returns (Track memory) {
+  function getTrack(uint _trackId) public view checkTrackUnblocked(_trackId) returns (Track memory) {
       return tracks[_trackId];
+  }
+	
+	/**
+   * @dev XXX
+   * @param _entryId The id of the entry
+   */
+  function getVotes(uint _entryId) public view checkTrackUnblocked(entriesTrack[_entryId]) returns (uint) {
+      return votes[_entryId];
   }
 
   /**
@@ -121,7 +129,7 @@ contract Tracks {
    * @dev XXX
    * @param _trackId The id of the track
    */
-  function openTrack(uint _trackId) public trackExists(_trackId) isTrackClosed(_trackId) {
+  function openTrack(uint _trackId) public checkTrackExists(_trackId) checkTrackClosed(_trackId) {
       tracks[_trackId].state = State.TrackOpen;
       emit TrackOpened(_trackId);
   }
@@ -130,7 +138,7 @@ contract Tracks {
    * @dev XXX
    * @param _trackId The id of the track
    */
-	function closeTrack(uint _trackId) public trackExists(_trackId) isTrackOpen(_trackId) {
+	function closeTrack(uint _trackId) public checkTrackExists(_trackId) checkTrackOpen(_trackId) {
       tracks[_trackId].state = State.TrackClosed;
       emit TrackClosed(_trackId);
   }
@@ -139,7 +147,7 @@ contract Tracks {
    * @dev XXX
    * @param _trackId The id of the track
    */
-	function blockTrack(uint _trackId) public trackExists(_trackId) isTrackUnblocked(_trackId) {
+	function blockTrack(uint _trackId) public checkTrackExists(_trackId) checkTrackUnblocked(_trackId) {
       tracks[_trackId].state = State.TrackBlocked;
       emit TrackBlocked(_trackId);
   }
@@ -148,16 +156,38 @@ contract Tracks {
    * @dev XXX
    * @param _trackId The id of the track
    */
-  function unblockTrack(uint _trackId) public trackExists(_trackId) isTrackBlocked(_trackId) {
+  function unblockTrack(uint _trackId) public checkTrackExists(_trackId) checkTrackBlocked(_trackId) {
       tracks[_trackId].state = State.TrackClosed;
       emit TrackUnblocked(_trackId);
   }
 
 	/**
    * @dev XXX
+   * @param _trackId The id of the track
+   */
+  function isTrackOpen(uint _trackId) public view checkTrackExists(_trackId) returns (bool){
+      return (tracks[_trackId].state == State.TrackOpen);
+  }
+  /**
+   * @dev XXX
+   * @param _trackId The id of the track
+   */
+  function isTrackClosed(uint _trackId) public view checkTrackExists(_trackId) returns (bool){
+      return (tracks[_trackId].state == State.TrackClosed);
+  }
+  /**
+   * @dev XXX
+   * @param _trackId The id of the track
+   */
+  function isTrackBlocked(uint _trackId) public view checkTrackExists(_trackId) returns (bool){
+      return (tracks[_trackId].state == State.TrackBlocked);
+  }
+
+	/**
+   * @dev XXX
    * @param _entryId The id of the entry
    */
-  function vote(uint _entryId) public isTrackOpen(entriesTrack[_entryId]) hasNotVotedForTrack(msg.sender,entriesTrack[_entryId]){
+  function vote(uint _entryId) public checkTrackOpen(entriesTrack[_entryId]) hasNotVotedForTrack(msg.sender,entriesTrack[_entryId]){
     votesByAddress[msg.sender][entriesTrack[_entryId]] = true;
     votes[_entryId]++;
  		emit EntryVotedFor(entriesTrack[_entryId], _entryId);
@@ -167,7 +197,7 @@ contract Tracks {
    * @dev XXX
    * @param _trackId The id of the track
    */
-  function addEntry(uint _trackId, string memory _name, string memory _desc, string memory _location) public isTrackOpen(_trackId) returns (uint) {
+  function addEntry(uint _trackId, string memory _name, string memory _desc, string memory _location) public checkTrackOpen(_trackId) returns (uint) {
     uint entryId = nextEntryId;
     require(entriesTrack[entryId] == 0);
     trackEntries[_trackId].push(entryId);
