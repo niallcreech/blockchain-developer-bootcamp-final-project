@@ -121,7 +121,7 @@ contract Tracks {
    * @dev XXX
    * @param _trackId The id of the track
    */
-  function open(uint _trackId) public trackExists(_trackId) isTrackClosed(_trackId) {
+  function openTrack(uint _trackId) public trackExists(_trackId) isTrackClosed(_trackId) {
       tracks[_trackId].state = State.TrackOpen;
       emit TrackOpened(_trackId);
   }
@@ -130,7 +130,7 @@ contract Tracks {
    * @dev XXX
    * @param _trackId The id of the track
    */
-	function close(uint _trackId) public trackExists(_trackId) isTrackOpen(_trackId) {
+	function closeTrack(uint _trackId) public trackExists(_trackId) isTrackOpen(_trackId) {
       tracks[_trackId].state = State.TrackClosed;
       emit TrackClosed(_trackId);
   }
@@ -139,7 +139,7 @@ contract Tracks {
    * @dev XXX
    * @param _trackId The id of the track
    */
-	function block(uint _trackId) public trackExists(_trackId) isTrackUnblocked(_trackId) {
+	function blockTrack(uint _trackId) public trackExists(_trackId) isTrackUnblocked(_trackId) {
       tracks[_trackId].state = State.TrackBlocked;
       emit TrackBlocked(_trackId);
   }
@@ -148,7 +148,7 @@ contract Tracks {
    * @dev XXX
    * @param _trackId The id of the track
    */
-  function unblock(uint _trackId) public trackExists(_trackId) isTrackBlocked(_trackId) {
+  function unblockTrack(uint _trackId) public trackExists(_trackId) isTrackBlocked(_trackId) {
       tracks[_trackId].state = State.TrackClosed;
       emit TrackUnblocked(_trackId);
   }
