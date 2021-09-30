@@ -19,22 +19,14 @@ describe("When voting on an entry", () => {
 			});
     });
   
-    it("...should increase an entries vote by one.", async () => {
-			const preVote = await contract.getVotes(entryId);
-      await contract.vote(entryId, { from: accounts[0] }); 
- 			assert.equal(preVote.toNumber() + 1, await contract.getVotes(entryId).then(result => result.toNumber()), "");
+    it("...should emit a vote event.", async () => {
+      const tx1 = await contract.vote(entryId, { from: accounts[0] });
+			truffleAssert.eventEmitted(tx1, 'EntryVotedFor', (ev) => {
+    			expect(ev.entryId.toNumber()).to.equal(0);
+        	return true;
+    	});
     });
-  
-    it("...should not allow voting on an entry in the same track.", async () => {
-      const preVote = await contract.getVotes(entryId);
-      await contract.vote(entryId, { from: accounts[0] }); 
- 			assert.equal(preVote.toNumber() + 1, await contract.getVotes(entryId).then(result => result.toNumber()), "");
-      try{
-				await contract.vote(entryId, { from: accounts[0] }); 
-				assert(false);
-			}catch{}
- 			assert.equal(preVote.toNumber() + 1, await contract.getVotes(entryId).then(result => result.toNumber()), "");
-    });
-
+  	
+		
   });
 });

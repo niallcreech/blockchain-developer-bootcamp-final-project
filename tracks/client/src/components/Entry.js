@@ -14,7 +14,7 @@ class Entry extends Component {
 	}
 
 	render(){
-		//console.debug(this.props);
+		console.debug(this.props);
 		return (
     	<li key={this.props.entryId}>
 				{this.props.entryId} {this.props.name} {this.props.desc} {this.props.location}({this.props.votes} votes)

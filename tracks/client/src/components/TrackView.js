@@ -16,15 +16,20 @@ class TrackView extends Component {
 	}
 	
 	async componentDidMount() {
+		await this.update();
+	}
+	
+	async update(){
 		const votes = await getVotes(this.props.match.params.trackId);
 		const entries = await getEntries(this.props.match.params.trackId);
 		this.setState({entries: entries, votes: votes});
+		console.debug("TrackView::update");
 	}
 
 	render(){
 		return (
     	<div>
-				<EntriesList votes={this.state.votes} entries={this.state.entries}/>
+				<EntriesList votes={this.state.votes} entries={this.state.entries} handleUpdate={() => this.update()}/>
 				<EntryForm />
 			</div>
   	);
