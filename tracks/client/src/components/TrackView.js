@@ -29,8 +29,8 @@ class TrackView extends Component {
 	render(){
 		return (
     	<div>
-				<EntriesList votes={this.state.votes} entries={this.state.entries} handleUpdate={() => this.handleUpdate()}/>
 				<EntryForm trackId={this.props.match.params.trackId} handleUpdate={() => this.handleUpdate()}/>
+        <EntriesList votes={this.state.votes} entries={this.state.entries} handleUpdate={() => this.handleUpdate()}/>
 			</div>
   	);
 	}

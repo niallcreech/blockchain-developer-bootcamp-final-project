@@ -7,8 +7,8 @@
 }
 
 .App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+  background-color: #333333;
+  min-height: 20vh;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -17,6 +17,31 @@
   color: white;
 }
 
+.App-header ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+.App-header li {
+  float: left;
+  background-color: #333333;
+}
+
+.App-header li a {
+  display: block;
+  color: white;
+  text-align: center;
+  padding: 16px;
+  text-decoration: none;
+}
+
+.App-header li a:hover {
+  background-color: #111111;
+}
+
 .App-link {
   color: #09d3ac;
 }
+

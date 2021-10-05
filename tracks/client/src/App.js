@@ -33,9 +33,10 @@ class App extends Component {
 
   render() {
 		return (
+      <div className="App">
 		    <Router>
 		      <div>
-		        <ul>
+		        <ul className="App-header">
 		          <li>
 		            <Link to="/">Home</Link>
 		          </li>
@@ -54,11 +55,12 @@ class App extends Component {
 		            <TrackList tracks={this.state.tracks} handleUpdate={() => this.handleTrackListUpdate()} />
 		          </Route>
 							<Route exact path="/track/:trackId">
-		            <TrackView/>
+		            <TrackView className="TrackView"/>
 		          </Route>
 		        </Switch>
 		      </div>
 		    </Router>
+        </div>
 		  );
 	}
 }

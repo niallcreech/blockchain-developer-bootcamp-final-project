@@ -30,13 +30,15 @@ class TrackList extends Component {
 			)
   	);
 		return (
+      
 			<div className="TrackList">
+      <div className="TrackList_newtrack">
+          <TrackForm handleUpdate={() => this.handleUpdate()}/>
+        </div>
 				<ul className="TrackList_list">
 					{listItems}
 				</ul>
-				<div className="TrackList_newtrack">
-					<TrackForm handleUpdate={() => this.handleUpdate()}/>
-				</div>
+        
 			</div>
 		);
 	}
