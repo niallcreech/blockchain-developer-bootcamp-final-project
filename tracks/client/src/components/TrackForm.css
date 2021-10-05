@@ -1,0 +1,25 @@
+.TrackForm {
+    font-weight:bold;
+    background-color: #333333;
+    font-size: calc(10px + 2vmin);
+    color: white;
+}
+
+.TrackForm form label {
+    font-weight:bold;
+    padding: (10px + 2vmin);
+    color: white;
+}
+
+.TrackForm form input {
+    padding: (10px + 2vmin);
+    color: black;
+}
+
+.TrackFormButton {
+    font-weight:bold;
+    padding: (40px + 2vmin);
+    color: black;
+    color: #fff;
+    font-size: 20px;
+}

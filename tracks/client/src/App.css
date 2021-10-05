@@ -1,5 +1,9 @@
-ul {
+.App-header{
   list-style-type: none;
+  font-weight:bold;
+    background-color: #333333;
+    font-size: calc(10px + 2vmin);
+    color: white;
 }
 
 .App {

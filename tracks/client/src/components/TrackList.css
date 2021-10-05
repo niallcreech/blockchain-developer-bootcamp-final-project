@@ -1,0 +1,35 @@
+.TrackListTable {
+	width:90%;
+   padding: 5%;
+    display:table;
+    text-align: center;
+}
+.TrackListTable .header {
+	display:table-header-group;
+    font-weight:bold;
+    background-color: #333333;
+    font-size: calc(10px + 2vmin);
+    color: white;
+}
+.TrackListTable .rowGroup {
+	display:table-row-group;
+}
+.TrackListTable .row {
+	display:table-row;
+}
+.TrackListTable .bigCell {
+	 display:table-cell;
+    width:40%;
+}
+
+.TrackListTable .smallCell {
+display:table-cell;
+    width: 10%;
+}
+.TrackListTable .form {
+	display:form-header-group;
+    font-weight:bold;
+    background-color: #333333;
+    font-size: calc(10px + 2vmin);
+    color: white;
+}

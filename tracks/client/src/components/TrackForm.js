@@ -46,11 +46,11 @@ class TrackForm extends Component {
 		return (
     	<form className="TrackForm" onSubmit={this.handleSubmit}>
         <label>
-          Name:
+          Name
           <input type="text" value={this.state.name} onChange={this.handleNameChange} />
         </label>
 				<label>
-          Description:
+          Description
           <input type="text" value={this.state.desc} onChange={this.handleDescriptionChange} />
         </label>
         <input type="submit" value="Submit" />

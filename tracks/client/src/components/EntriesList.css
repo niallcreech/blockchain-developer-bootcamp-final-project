@@ -1,0 +1,37 @@
+.EntriesListTable {
+	 width:90%;
+	 padding: 5%;
+    display:table;
+    text-align: center;
+}
+.EntriesListTable .header {
+    display:table-header-group;
+    font-weight:bold;
+    background-color: #333333;
+    font-size: calc(10px + 2vmin);
+    color: white;
+    min-height: 20vh;
+}
+.EntriesListTable .rowGroup {
+    display:table-row-group;
+}
+.EntriesListTable .row {
+    display:table-row;
+}
+.EntriesListTable .bigCell {
+    display:table-cell;
+    width:25%;
+}
+
+.EntriesListTable .smallCell {
+    display:table-cell;
+    width:12.5%;
+}
+.EntriesListTable .form {
+    display:form-header-group;
+    font-weight:bold;
+    background-color: #333333;
+    font-size: calc(10px + 2vmin);
+    color: white;
+    min-height: 20vh;
+}

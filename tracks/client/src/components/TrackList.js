@@ -2,6 +2,7 @@ import React, {Component} from "react";
 import Track from "./Track";
 import TrackForm from "./TrackForm";
 import { withRouter } from 'react-router-dom';
+import "./TrackList.css";
 
 
 class TrackList extends Component {
@@ -23,22 +24,28 @@ class TrackList extends Component {
 
 	render() {
 		const listItems = this.props.tracks.map((track) => (
-			<li key={track.trackId}>
-    		<Track trackId={track.trackId} name={track.name} desc={track.desc} votes={track.votes} />
-				<button value={track.trackId} onClick={() => this.handleTrackView(track.trackId)}>View</button>
-			</li>
+      <div className="rowGroup" key={track.trackId}>
+    		  <div className="row">
+          <div className="smallCell">{track.trackId}</div>
+          <div className="bigCell">{track.name}</div>
+          <div className="bigCell">{track.desc}</div>
+          <div className="smallCell">
+            <button value={track.trackId} onClick={() => this.handleTrackView(track.trackId)}>View</button>
+          </div>
+        </div>
+			</div>
 			)
   	);
-    console.debug("TrackList::render: " + listItems.length +  " items.")
-		return (
-			<div className="TrackList">
-				<ul className="TrackList_list">
-					{listItems}
-				</ul>
-				<div className="TrackList_newtrack">
-					<TrackForm handleUpdate={() => this.handleUpdate()}/>
-				</div>
-			</div>
+    return (
+      <div className="TrackListTable">
+        <div className="header">
+          <div className="smallCell">ID</div>
+          <div className="bigCell">Name</div>
+          <div className="bigCell">Description</div>
+          <div className="smallCell"></div>
+        </div>
+        {listItems}
+    </div>
 		);
 	}
 }

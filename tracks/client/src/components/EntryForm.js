@@ -1,6 +1,7 @@
 import React, {Component} from "react";
 import {sendEntry} from "../helpers/ContractHelper";
-
+import "./EntryForm.css";
+ 
 
 class EntryForm extends Component {
 	constructor(props){
@@ -55,21 +56,23 @@ class EntryForm extends Component {
 
 	render(){
 		return (
-    	<form className="EntryForm" onSubmit={this.handleSubmit}>
+     <div className="EntryForm">
+    	<form onSubmit={this.handleSubmit}>
         <label>
-          Name:
+          Name
           <input type="text" value={this.state.name} onChange={this.handleNameChange} />
         </label>
 				<label>
-          Description:
+          Description
           <input type="text" value={this.state.desc} onChange={this.handleDescriptionChange} />
         </label>
 				<label>
-          Location:
+          URL
           <input type="text" value={this.state.location} onChange={this.handleLocationChange} />
         </label>
-        <input type="submit" value="Nominate" />
+        <input className="EntryFormButton" type="submit" value="Nominate" />
       </form>
+      </div>
   	);
 	}
 	

@@ -4,7 +4,11 @@ class Track extends Component {
 
 	render(){
 		return (
-    	<span key="{this.props.trackId}">{this.props.trackId} {this.props.name} {this.props.desc}</span>
+      <div className="row">
+        <div className="smallCell">{this.props.trackId}</div>
+        <div className="bigCell">{this.props.name}</div>
+        <div className="bigCell">{this.props.desc}</div>
+      </div>
   	);
 	}
 	
