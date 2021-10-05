@@ -10,7 +10,10 @@ class Entry extends Component {
   }
 
 	async handleEntryVote(value){
-		await sendVote(value);
+		await sendVote(value).catch((err) => {
+      debugger;
+      console.debug(err.message);
+    });;
 	}
 
 	render(){

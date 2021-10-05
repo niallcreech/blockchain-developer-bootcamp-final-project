@@ -79,7 +79,7 @@ contract Tracks {
 	  }
 
 	modifier hasNotVotedForEntry(address _addr, uint _entryId){
-	    require(!votesByAddress[msg.sender][_entryId]);
+	    require(votesByAddress[msg.sender][_entryId] == false, "Users cannot vote for the same entry multiple times.");
 	    _;
 	}
 	/**

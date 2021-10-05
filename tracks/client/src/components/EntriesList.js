@@ -12,14 +12,15 @@ class EntriesList extends Component {
 	}
 	
   async handleUpdate(){
+    console.debug("EntriesList::handleUpdate: ")
     await this.props.handleUpdate();
   }
 
 	async handleVote(value){
-		await sendVote(value);
-		this.handleUpdate();
+    console.debug("EntriesList::handleUpdate: ")
+		await sendVote(value, this.handleUpdate);
 	}
-
+  
 	render(){
 		const listItems = 
       <SortedList by='title'>
@@ -40,7 +41,6 @@ class EntriesList extends Component {
             <button value={item.entryId} onClick={() => this.handleVote(item.entryId)}>Vote</button>
           </li>
         ));
-    console.debug("EntriesList::render: " + listItems.length +  " items.")
 		return (
     	<div>
 				<ul>{unsortedItems}</ul>
