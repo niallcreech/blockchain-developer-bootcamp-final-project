@@ -8,14 +8,14 @@ export async function getTracks(){
 		return tracks;
 }
 
-async function getEvents(eventName, eventFilter){
+async function getEvents(eventName, eventFilter, fromBlock="earliest", toBlock="latest"){
 	const {contract} = await getWeb3State();
 	let results;
 	try{
 		const resultsRaw = await contract.getPastEvents(eventName, {
     	filter: eventFilter,
-    	fromBlock: 0,
-    	toBlock: 'latest'
+    	fromBlock: fromBlock,
+    	toBlock: toBlock
 		});
 		results = resultsRaw.map(event => event.returnValues);
 	} catch(e) {
@@ -48,13 +48,25 @@ export async function getEntries(trackId){
 	return await getEvents(eventName, eventFilter);
 }
 
+function parseError(err){
+  let parsedError = JSON.parse(err.message.match(/{.*}/)[0]);
+  const err_code = parsedError.value.code || err.code;
+  const err_message = parsedError.value.data.message || err.message; 
+  return {
+    code: err_code,
+    message: err_message
+  };
+}
+
 export async function sendVote(_entryId, _callback){
 	// Send a contract call to vote for the entry
 	const {accounts, contract} = await getWeb3State();
   const options = {from: accounts[0]}
   console.debug("WEB3:sendVote: " + _entryId);
   await contract.methods.vote(_entryId).send(options, _callback)
-    .catch((err) => alert(err.message));
+    .catch((err) => {
+      const parsedError = parseError(err);
+      alert(parsedError.message)});
 }
 
 export async function sendTrack(name, desc, _callback){
