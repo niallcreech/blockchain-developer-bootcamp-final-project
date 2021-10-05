@@ -2,7 +2,7 @@ import React, {Component} from "react";
 import EntriesList from "./EntriesList";
 import EntryForm from "./EntryForm";
 import { withRouter } from 'react-router-dom';
-import {getEntries, getVotes} from "../helpers/Web3Helper";
+import {getEntries, getVotes} from "../helpers/ContractHelper";
 
 
 class TrackView extends Component {
@@ -16,21 +16,21 @@ class TrackView extends Component {
 	}
 	
 	async componentDidMount() {
-		await this.update();
+		await this.handleUpdate();
 	}
 	
-	async update(){
+	async handleUpdate(){
+    console.debug("TrackView::handleUpdate");
 		const votes = await getVotes(this.props.match.params.trackId);
 		const entries = await getEntries(this.props.match.params.trackId);
 		this.setState({entries: entries, votes: votes});
-		console.debug("TrackView::update");
 	}
 
 	render(){
 		return (
     	<div>
-				<EntriesList votes={this.state.votes} entries={this.state.entries} handleUpdate={() => this.update()}/>
-				<EntryForm />
+				<EntriesList votes={this.state.votes} entries={this.state.entries} handleUpdate={() => this.handleUpdate()}/>
+				<EntryForm trackId={this.props.match.params.trackId} handleUpdate={() => this.handleUpdate()}/>
 			</div>
   	);
 	}

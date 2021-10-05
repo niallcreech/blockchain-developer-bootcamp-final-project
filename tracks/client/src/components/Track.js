@@ -4,7 +4,7 @@ class Track extends Component {
 
 	render(){
 		return (
-    	<span key="{this.props.trackId}">{this.props.trackId} {this.props.name} {this.props.desc} ({this.props.votes} votes)</span>
+    	<span key="{this.props.trackId}">{this.props.trackId} {this.props.name} {this.props.desc}</span>
   	);
 	}
 	

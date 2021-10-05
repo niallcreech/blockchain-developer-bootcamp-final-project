@@ -11,9 +11,9 @@ class TrackList extends Component {
 		this.handleTrackView = this.handleTrackView.bind(this);
 	}
 	
-	handleUpdateClick(event){
-		console.log("handleUpdateClick");
-		this.props.handleTrackListUpdate();
+	async handleUpdate(event){
+		console.log("handleUpdate");
+		await this.props.handleUpdate();
 	}
 
 	handleTrackView(value){
@@ -35,7 +35,7 @@ class TrackList extends Component {
 					{listItems}
 				</ul>
 				<div className="TrackList_newtrack">
-					<TrackForm/>
+					<TrackForm handleUpdate={() => this.handleUpdate()}/>
 				</div>
 			</div>
 		);

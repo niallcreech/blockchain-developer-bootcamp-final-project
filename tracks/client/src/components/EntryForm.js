@@ -1,4 +1,6 @@
 import React, {Component} from "react";
+import {sendEntry} from "../helpers/ContractHelper";
+
 
 class EntryForm extends Component {
 	constructor(props){
@@ -11,8 +13,14 @@ class EntryForm extends Component {
 		this.handleDescriptionChange = this.handleDescriptionChange.bind(this);
 		this.handleNameChange = this.handleNameChange.bind(this);
 		this.handleLocationChange = this.handleLocationChange.bind(this);
-		this.handleSubmit = this.handleSubmit.bind(this);
+    this.handleSubmit = this.handleSubmit.bind(this);
+    this.handleUpdate = this.handleUpdate.bind(this);
 	}
+
+  async handleUpdate(){
+    console.debug("EntryForm::handleUpdate");
+    await this.props.handleUpdate();
+  }
 
 	handleDescriptionChange(event) {
     this.setState({desc: event.target.value});
@@ -20,12 +28,28 @@ class EntryForm extends Component {
 	handleNameChange(event) {
     this.setState({name: event.target.value});
   }
-handleLocationChange(event) {
+  handleLocationChange(event) {
     this.setState({location: event.target.value});
   }
 
 	handleSubmit(event){
-		console.debug("EntryForm::handleSubmit")
+    console.debug("EntryForm::handleSubmit: ("
+       + this.props.trackId + ", "
+       + this.state.name + ", "
+       + this.state.desc + ", "
+       + this.state.location + ")"
+    )
+    if (this.state.name.length > 0
+      && this.state.desc.length > 0
+      &&  this.state.location.length > 0){
+        sendEntry(
+          this.props.trackId,
+          this.state.name,
+          this.state.desc,
+          this.state.location,
+          this.handleUpdate
+        );
+    }
 		event.preventDefault();
 	}
 

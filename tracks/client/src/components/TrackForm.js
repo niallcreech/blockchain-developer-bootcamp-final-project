@@ -1,4 +1,6 @@
 import React, {Component} from "react";
+import {sendTrack} from "../helpers/ContractHelper";
+
 
 class TrackForm extends Component {
 	constructor(props){
@@ -8,8 +10,30 @@ class TrackForm extends Component {
 			desc: "",
 		}
 		this.handleDescriptionChange = this.handleDescriptionChange.bind(this);
-		this.handleNameChange = this.handleNameChange.bind(this);
+    this.handleNameChange = this.handleNameChange.bind(this);
+    this.handleUpdate = this.handleUpdate.bind(this);
+    this.handleSubmit = this.handleSubmit.bind(this);
 	}
+
+  handleSubmit(event){
+    console.debug("TrackForm::handleSubmit: ("
+       + this.state.name + ", "
+       + this.state.desc +  ")"
+    )
+    if (this.state.name.length > 0
+      && this.state.desc.length > 0){
+        sendTrack(
+          this.state.name,
+          this.state.desc,
+          this.handleUpdate
+        );
+    }
+    event.preventDefault();
+  }
+
+  async handleUpdate(){
+    await this.props.handleUpdate()
+  }
 
 	handleDescriptionChange(event) {
     this.setState({desc: event.target.value});

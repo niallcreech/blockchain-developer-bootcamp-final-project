@@ -9,7 +9,7 @@ import Home from "./components/Home"
 import TrackList from "./components/TrackList"
 import TrackView from "./components/TrackView"
 import "./App.css";
-import {getTracks} from "./helpers/Web3Helper";
+import {getTracks} from "./helpers/ContractHelper";
 
 
 class App extends Component {
@@ -20,12 +20,16 @@ class App extends Component {
 			entries: [],
 			tracksLength: 0
 		}
+    this.handleTrackListUpdate = this.handleTrackListUpdate.bind(this);
 	}
 
 	async componentDidMount() {
-		const tracks = await getTracks() ;
-    this.setState({tracks: tracks});
+		await this.handleTrackListUpdate() ;
 	}
+  
+  async handleTrackListUpdate(){
+     this.setState({tracks: await getTracks()});
+  }
 
   render() {
 		return (
@@ -36,7 +40,7 @@ class App extends Component {
 		            <Link to="/">Home</Link>
 		          </li>
 		          <li>
-		            <Link to="/tracks">Tracks ({this.state.tracksLength})</Link>
+		            <Link to="/tracks">Tracks ({this.state.tracks.length})</Link>
 		          </li>
 		        </ul>
 		
@@ -47,7 +51,7 @@ class App extends Component {
 		            <Home />
 		          </Route>
 		          <Route exact path="/tracks">
-		            <TrackList tracks={this.state.tracks}  />
+		            <TrackList tracks={this.state.tracks} handleUpdate={() => this.handleTrackListUpdate()} />
 		          </Route>
 							<Route exact path="/track/:trackId">
 		            <TrackView/>

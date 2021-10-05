@@ -40,6 +40,7 @@ const getWeb3 = () =>
 export async function getTracks(){
     const {contract} = await getWeb3State();
  		const tracks = await contract.methods.getTracks().call();
+    console.debug("getTracks: found " + tracks.length + " tracks.");
 		return tracks;
 }
 
@@ -94,13 +95,48 @@ function	getEntryEventDetails(entryEvent) {
 	
 export async function sendVote(_entryId){
 	// Send a contract call to vote for the entry
-	const {contract} = await getWeb3State();
-	console.debug("WEB3:sendVote: " + _entryId);
+	const {accounts, contract} = await getWeb3State();
+  const options = {from: accounts[0]}
+  console.debug("WEB3:sendVote: " + _entryId);
 	try {
-		await contract.methods.vote(_entryId);
+		await contract.methods.vote(_entryId).send(options);
 	} catch(e) {
 		console.error(e);
 	}	
+}
+
+export async function sendTrack(name, desc, _callback=null){
+  // Send a contract call to vote for the entry
+  const {accounts, contract} = await getWeb3State();
+  const options = {from: accounts[0]}
+  console.debug("WEB3:sendTrack: "
+    + name + ", "
+    + desc + ", "
+    + _callback + ")"
+  ); 
+  try {
+    await contract.methods.addTrack(name, desc).send(options, _callback);
+  } catch(e) {
+    console.error(e);
+  } 
+}
+
+export async function sendEntry(trackId, name, desc, location, _callback){
+  // Send a contract call to vote for the entry
+  const {accounts, contract} = await getWeb3State();
+  const options = {from: accounts[0]}
+  console.debug("WEB3:sendEntry: "
+    + trackId + ", "
+    + name + ", "
+    + desc + ", "
+    + location + ","
+    + _callback + ")"
+  ); 
+  try {
+    await contract.methods.addEntry(trackId, name, desc, location).send(options, _callback);
+  } catch(e) {
+    console.error(e);
+  } 
 }
 
 

@@ -1,5 +1,5 @@
 import React, {Component} from "react";
-import {sendVote} from "../helpers/Web3Helper";
+import {sendVote} from "../helpers/ContractHelper";
 
 class Entry extends Component {
 	constructor(props){

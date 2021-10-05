@@ -189,8 +189,8 @@ contract Tracks {
    * @param _entryId The id of the entry
    */
   function vote(uint _entryId) public checkTrackOpen(entriesTrack[_entryId]) hasNotVotedForEntry(msg.sender, _entryId){
-    //votesByAddress[msg.sender][entriesTrack[_entryId]] = true;
-    //votes[_entryId]++;
+    votesByAddress[msg.sender][entriesTrack[_entryId]] = true;
+    votes[_entryId]++;
     uint trackId = entriesTrack[_entryId];
  		emit EntryVotedFor(trackId, _entryId);
   }
