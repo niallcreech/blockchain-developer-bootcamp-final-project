@@ -5,7 +5,7 @@ contract Tracks {
   mapping (uint  => Track) public tracks;
   mapping (uint  => uint[]) public trackEntries; //trackId => entryId[]
   mapping (uint  => uint) public entriesTrack; //entryId => trackId
-  mapping (address  => mapping (uint => bool)) public votesByAddress; //address => (trackId => bool)
+  mapping (address  => mapping (uint => bool)) public votesByAddress; //address => (entryId => bool)
   mapping (uint  => uint) public votes; //entryId => Vote
 
   uint public nextTrackId;
@@ -189,10 +189,8 @@ contract Tracks {
    * @param _entryId The id of the entry
    */
   function vote(uint _entryId) public checkTrackOpen(entriesTrack[_entryId]) hasNotVotedForEntry(msg.sender, _entryId){
-    votesByAddress[msg.sender][entriesTrack[_entryId]] = true;
-    votes[_entryId]++;
-    uint trackId = entriesTrack[_entryId];
- 		emit EntryVotedFor(trackId, _entryId);
+    votesByAddress[msg.sender][_entryId] = true;
+    emit EntryVotedFor(entriesTrack[_entryId], _entryId);
   }
 
   /**

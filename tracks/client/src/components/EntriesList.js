@@ -21,7 +21,8 @@ class EntriesList extends Component {
 	}
 
 	render(){
-		const listItems = <SortedList by='title'>
+		const listItems = 
+      <SortedList by='title'>
       {
         this.props.entries.map((item) => (
           <li key={item.entryId} votes={this.props.votes[item.entryId] || 0}>
@@ -32,9 +33,17 @@ class EntriesList extends Component {
         ))
       }
     </SortedList>;
+    const unsortedItems = this.props.entries.map((item) => (
+          <li key={item.entryId} votes={this.props.votes[item.entryId] || 0}>
+            {item.entryId} {item.name} {item.desc} {item.location}
+            <VoteCounter votes={this.props.votes[item.entryId] || 0}/>    
+            <button value={item.entryId} onClick={() => this.handleVote(item.entryId)}>Vote</button>
+          </li>
+        ));
+    console.debug("EntriesList::render: " + listItems.length +  " items.")
 		return (
     	<div>
-				<ul>{listItems}</ul>
+				<ul>{unsortedItems}</ul>
 			</div>
   	);
 	}

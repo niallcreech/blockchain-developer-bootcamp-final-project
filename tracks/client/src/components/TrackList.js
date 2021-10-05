@@ -29,16 +29,15 @@ class TrackList extends Component {
 			</li>
 			)
   	);
+    console.debug("TrackList::render: " + listItems.length +  " items.")
 		return (
-      
 			<div className="TrackList">
-      <div className="TrackList_newtrack">
-          <TrackForm handleUpdate={() => this.handleUpdate()}/>
-        </div>
 				<ul className="TrackList_list">
 					{listItems}
 				</ul>
-        
+				<div className="TrackList_newtrack">
+					<TrackForm handleUpdate={() => this.handleUpdate()}/>
+				</div>
 			</div>
 		);
 	}

@@ -27,6 +27,21 @@ describe("When voting on an entry", () => {
     	});
     });
   	
+    it("...should stop the address voting again for the same entry.", async () => {
+      let res;
+      await contract.vote(entryId, { from: accounts[0] });
+      res = await contract.votes(entryId).then(res => res.toString());
+      expect(res === '0');
+      await contract.vote(entryId, { from: accounts[1] });
+      res = await contract.votes(entryId).then(res => res.toString());
+      expect(res === '1');
+      try {
+        await contract.vote(entryId, { from: accounts[0] });
+        assert(false);
+      } catch (e){}
+      res = await contract.votes(entryId).then(res => res.toString());
+      expect(res === '1');
+    });
 		
   });
 });
