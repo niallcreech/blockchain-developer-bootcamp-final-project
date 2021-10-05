@@ -49,9 +49,18 @@ export async function getEntries(trackId){
 }
 
 function parseError(err){
-  let parsedError = JSON.parse(err.message.match(/{.*}/)[0]);
-  const err_code = parsedError.value.code || err.code;
-  const err_message = parsedError.value.data.message || err.message; 
+  let parsedError;
+  let err_code;
+  let err_message;
+  try {
+    parsedError = JSON.parse(err.message.match(/{.*}/)[0]);
+    err_code = parsedError.value.code
+    err_message = parsedError.value.data.message
+  } catch (e) {
+    parsedError = err;
+    err_code = err.code
+    err_message = err.message
+  }
   return {
     code: err_code,
     message: err_message
