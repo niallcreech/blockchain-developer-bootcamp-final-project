@@ -42,6 +42,20 @@ describe("When voting on an entry", () => {
       res = await contract.votes(entryId).then(res => res.toString());
       expect(res === '1');
     });
+
+	it("...should stop the address voting again during cooldown.", async () => {
+      let res;
+      await contract.vote(entryId, { from: accounts[0] });
+      res1 = await contract.lastVoteTime(accounts[0]).then(res => res.toString());
+			expect(res1 !== '0');
+			contract.addEntry(trackId, "myentry", "mydescription", { from: accounts[0] }); 
+      try {
+        await contract.vote(1, { from: accounts[0] });
+        assert(false);
+      } catch (e){}
+			res2 = await contract.lastVoteTime(accounts[0]).then(res => res.toString());
+			expect(res1 === res2);
+    });
 		
   });
 });

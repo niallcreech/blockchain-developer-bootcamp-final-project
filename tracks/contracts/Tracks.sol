@@ -7,10 +7,12 @@ contract Tracks {
   mapping (uint  => uint) public entriesTrack; //entryId => trackId
   mapping (address  => mapping (uint => bool)) public votesByAddress; //address => (entryId => bool)
   mapping (uint  => uint) public votes; //entryId => Vote
+  mapping (address  => uint) public lastVoteTime; //address => time(s)
 
   uint public nextTrackId;
   uint public trackCount;
   uint public nextEntryId;
+  uint public cooldownPeriod;
 
   enum State {
       TrackOpen,
@@ -82,12 +84,19 @@ contract Tracks {
 	    require(votesByAddress[msg.sender][_entryId] == false, "Users cannot vote for the same entry multiple times.");
 	    _;
 	}
+	
+	modifier isNotInCooldown(address addr){
+	    require(lastVoteTime[addr] == 0 || lastVoteTime[addr] + cooldownPeriod < block.timestamp, "User is currently in voting cooldown period.");
+	    _;
+	}
+
 	/**
    * @dev XXX
    */
   constructor () {
       uint trackId = addTrack("first_track", "This is the first track");
       addEntry(trackId, "name", "description", "location");
+      cooldownPeriod = 1 days;
   }
 
 	/**
@@ -188,8 +197,9 @@ contract Tracks {
    * @dev XXX
    * @param _entryId The id of the entry
    */
-  function vote(uint _entryId) public checkTrackOpen(entriesTrack[_entryId]) hasNotVotedForEntry(msg.sender, _entryId){
+  function vote(uint _entryId) public checkTrackOpen(entriesTrack[_entryId]) hasNotVotedForEntry(msg.sender, _entryId) isNotInCooldown(msg.sender) {
     votesByAddress[msg.sender][_entryId] = true;
+    lastVoteTime[msg.sender] = block.timestamp;
     emit EntryVotedFor(entriesTrack[_entryId], _entryId);
   }
 
