@@ -138,48 +138,48 @@ export async function sendEntry(trackId, name, desc, location, _callback){
 }
 
 export async function checkConnected(){
-    let isConnected;
-    let message;
-  let statusCode;
-    await getWeb3State()
-      .then(({accounts}) => {
-        isConnected = (accounts.length > 0)
-        message = "Wallet is connected";
-        statusCode = 200;
-      })
-      .catch((err) => {
-        const parsedError = parseError(err);
-        message = parsedError.message;
-        statusCode = parsedError.code;
-      });
-  return {data: [], statusCode: statusCode, message: message};
+  const {accounts, contract, web3, statusCode, message, connected} = await getWeb3State();
+  return {statusCode, message, connected};
 }
 
 export async function getWeb3State() {
-  try {
-      // Get network provider and web3 instance.
-     	const web3 = new Web3(window.ethereum);
-
-      // Use web3 to get the user's accounts.
-      const accounts = await web3.eth.getAccounts();
-
-      // Get the contract instance.
-      const networkId = await web3.eth.net.getId();
+  let accounts;
+  let contract;
+  let statusCode;
+  let message;
+  let connected;
+  const web3 = new Web3(window.ethereum);
+  await web3.eth.getAccounts()
+    .then((acc) => {
+      accounts = acc;
+      statusCode = 200;
+      message = 'Connected to web3 accounts.'
+    })
+    .catch((err) => {
+      accounts = [];
+      statusCode = 500;
+      message = 'Failed to get web3 accounts.'
+    });
+  await web3.eth.net.getId()
+    .then((networkId) => {
       const deployedNetwork = TracksContract.networks[networkId];
-      const instance = new web3.eth.Contract(
+      contract = new web3.eth.Contract(
         TracksContract.abi,
         deployedNetwork && deployedNetwork.address,
       );
-			return { web3, accounts, contract: instance };
-   } catch (error) {
-      // Catch any errors for any of the above operations.
-      alert(
-        `Failed to load web3, accounts, or contract. Check console for details.`,
-      );
-      console.error(error);
-			return {};
-    }
+      statusCode = statusCode || 200;
+      message = message || 'Connected to web3 network.';
+      connected = true;
+    })
+    .catch((err) => {
+      contract = null;
+      statusCode = statusCode || 500;
+      message = message || 'Failed to get web3 network connection.';
+      connected = false;
+    });
+    return {accounts, contract, web3, statusCode, message, connected};
 }
+
 
 function parseError(err){
   let parsedError;

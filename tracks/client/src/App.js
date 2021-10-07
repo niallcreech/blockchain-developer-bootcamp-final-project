@@ -22,8 +22,6 @@ class App extends Component {
 		super(props);
 		this.state = {
 			tracks: [],
-			entries: [],
-			tracksLength: 0,
       notificationMessage: "",
       notificationStatusCode: null,
       notificationCountdown: 0,
@@ -37,18 +35,19 @@ class App extends Component {
 	}
 
 	async componentDidMount() {
-    await this.checkWalletConnection().then(
-      () => {
-        if (this.state.connected){
-          this.handleTrackListUpdate();
-        }
-      }
-    );
+    const response = await checkConnected();
+    const {statusCode, message, connected} = await checkConnected();
+    console.debug(`App::componentDidMount: ${statusCode} ${message} ${connected}`);
+    console.debug(response);
+   this.setState({connected: connected});
+    if (connected){
+      this.handleTrackListUpdate();
+    } else {
+      console.debug(`App::componentDidMount: ${statusCode} ${message} ${connected}`);
+      this.handleNotificationMessage(message, statusCode, null);
+    }
+    this.handleNotificationMessage(message, statusCode, 5);
 	}
-  
-  async checkWalletConnection(){
-     this.setState({connected: checkConnected()});
-  }
   
   async handleTrackListUpdate(){
      const result = await getTracks();
@@ -59,10 +58,12 @@ class App extends Component {
      this.setState({notificationMessages: ""});
   }
   
-  async handleNotificationMessage(message, statusCode){
+  async handleNotificationMessage(message, statusCode, delay=5){
       console.debug(`App::handleNotificationMessage: ${message}, ${statusCode}`);
      this.setState({notificationMessage: message, notificationStatusCode: statusCode, notificationCountdown: 5});
-     this.startNotificationTimer();
+     if (delay) {
+      this.startNotificationTimer(delay);
+     }
   }
 
 
@@ -74,9 +75,9 @@ class App extends Component {
     }
   }
 
-  async startNotificationTimer(){
+  async startNotificationTimer(delay){
     console.debug(`Notification::handleNotificationCountdown`);
-    this.setState({notificationCountdown: 5});
+    this.setState({notificationCountdown: delay});
     this.timer = setInterval(this.handleNotificationCountdown, 1000);
   }
   

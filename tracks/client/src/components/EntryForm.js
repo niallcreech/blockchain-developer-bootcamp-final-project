@@ -52,15 +52,10 @@ class EntryForm extends Component {
           this.handleUpdate
         )
         .then((result) => {
-          alert("EntryForm::handleSubmit: ("
-       + result.code + ", "
-       + result.message + ")");
-      }
-    );
-    }
-    
-		
-	}
+          this.props.handleNotificationMessage(result.message, result.statusCode);
+        });
+     }
+  }
 
 	render(){
 		return (

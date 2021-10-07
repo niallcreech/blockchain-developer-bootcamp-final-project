@@ -27,7 +27,7 @@ class Notification extends Component {
     }
     let message;
     if (this.props.message){
-      message = `${this.props.countdown||""} ${this.props.message}`;
+      message = `${this.props.message}`;
     } else {
      message = <br/>;
     }

@@ -36,6 +36,8 @@ class TrackView extends Component {
   
   async updateVotes(){
     const result = await getVotes(this.props.match.params.trackId);
+    console.debug(`TrackView::updateVotes`);
+    console.debug(result);
     return result.data;
   }
 

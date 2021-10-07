@@ -20,7 +20,6 @@ class EntriesList extends Component {
 	async handleVote(value){
 		const result = await sendVote(value, this.handleUpdate);
     console.debug(`EntriesList::handleVote: ${result.statusCode}`)
-    console.debug(result)
     this.props.handleNotificationMessage(result.message, result.statusCode);
 	}
   
