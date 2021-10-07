@@ -13,6 +13,16 @@ export async function getTracks(){
             message: message};
 }
 
+export async function getTrackDetails(trackId){
+    const {contract} = await getWeb3State();
+    const track = await contract.methods.tracks(trackId).call();
+    const statusCode = 200;
+    const message = "Found track.";
+    return {data: track,
+            statusCode: statusCode,
+            message: message};
+}
+
 async function getEvents(eventName, eventFilter, fromBlock="earliest", toBlock="latest"){
 	const {contract} = await getWeb3State();
 	let results;
@@ -79,7 +89,7 @@ export async function sendVote(_entryId, _callback){
     })
     .catch((err) => {
       const parsedError = parseError(err);
-      message = parsedError.reason || "Voting failed! You can only vote on one entry each track during the 1 minute block-time cooldown period";
+      message = parsedError.reason || "Voting failed! You can only vote once for each entry, each track, during the cooldown period";
       statusCode = parsedError.code;
     });
   console.debug(`sendVote: ${message}, ${statusCode}`);

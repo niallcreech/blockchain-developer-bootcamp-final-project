@@ -1,0 +1,23 @@
+.TrackView {
+   padding-left: 5%;
+   padding-right: 5%;
+   width: 90%;
+}
+
+.TrackViewHeader {
+	background-color: #333333;
+	padding: 1%;
+   text-align: center;
+   font-size: calc(10px + 2vmin);
+   color: white;
+}
+.TrackViewHeaderName {
+	padding: 1%;
+   text-align: center;
+   font-weight:bold;
+   font-size: calc(30px + 2vmin);
+    
+}
+.TrackViewHeaderDesc {
+   font-size: calc(10px + 2vmin);
+}

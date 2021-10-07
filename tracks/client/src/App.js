@@ -10,6 +10,7 @@ import TrackList from "./components/TrackList"
 import TrackView from "./components/TrackView"
 import TrackForm from "./components/TrackForm"
 import WalletConnector from "./components/WalletConnector"
+import HeaderView from "./components/HeaderView"
 
 
 import "./App.css";
@@ -108,6 +109,7 @@ class App extends Component {
       <div className="SingleTrackView">
         <TrackView 
           className="TrackView"
+          tracks={this.state.tracks}
           handleNotificationMessage={(message, status_code)=>this.handleNotificationMessage(message, status_code)}
         />
       </div>
@@ -119,25 +121,38 @@ class App extends Component {
       />
     );
     
-    const headerView = (
+    const LinkheaderView = (
       <ul className="App-header">
               <li>
                 <Link to="/">Tracks ({this.state.tracks.length})</Link>
               </li>
             </ul>
     );
+    const dynamicHeader = (
+      <div>
+        <HeaderView tracks={this.state.tracks}/>
+        <Notification
+          handleClick={() => this.handleNotificationMessageClick()}
+          message={this.state.notificationMessage}
+          countdown={this.state.notificationCountdown}
+          statusCode={this.state.notificationStatusCode}/>
+       </div>
+      );
     if (this.state.connected){
       routes = (
         <Switch>
               <Route exact path="/">
+                {dynamicHeader}
                 {multipleTrackView}
               </Route>
               <Route exact path="/track/:trackId">
+                {dynamicHeader}
                 {singleTrackView}
               </Route>
             </Switch>
       );
     } else {
+      
       routes = <Switch>
           <Route path="/">
                 {walletView}
@@ -146,11 +161,8 @@ class App extends Component {
     }
 		return (
       <div className="App">
-        <Router>
-          {headerView}
+         <Router>
           <div>
-            <Notification handleClick={() => this.handleNotificationMessageClick()} message={this.state.notificationMessage} countdown={this.state.notificationCountdown}statusCode={this.state.notificationStatusCode}/>
-            <hr />
 		    {routes}
         </div>
         </Router>

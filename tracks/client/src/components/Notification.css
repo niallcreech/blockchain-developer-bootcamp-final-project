@@ -1,5 +1,6 @@
 .Notification {
-   padding: 1%;
+   padding-top: 10pt;
+   padding-bottom: 10pt;
    text-align: center;
    font-weight:bold;
    font-size: calc(10px + 2vmin);

@@ -1,6 +1,7 @@
 .TrackListTable {
 	width:90%;
-   padding: 5%;
+   padding-right: 5%;
+   padding-left: 5%;
     display:table;
     text-align: center;
 }

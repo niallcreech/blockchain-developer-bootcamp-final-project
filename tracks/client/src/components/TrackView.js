@@ -3,7 +3,7 @@ import EntriesList from "./EntriesList";
 import EntryForm from "./EntryForm";
 import { withRouter } from 'react-router-dom';
 import {getEntries, getVotes} from "../helpers/ContractHelper";
-
+import "./TrackView.css"
 
 class TrackView extends Component {
 	constructor(props){
@@ -11,6 +11,7 @@ class TrackView extends Component {
 		this.state = {
 			entries: [],
 			votes: {},
+      track: {name: "", desc: ""}
 		}
 
 	}
@@ -21,11 +22,9 @@ class TrackView extends Component {
 	
   
 	async handleUpdate(){
-    const entries = await this.updateEntries();
-    const votes = await this.updateVotes();
     this.setState({
-        entries: entries,
-        votes: votes
+        entries: await this.updateEntries(),
+        votes: await this.updateVotes(),
     });
 	}
 
@@ -43,10 +42,12 @@ class TrackView extends Component {
 
 	render(){
 		return (
-    	<div>
+    	<div className="TrackView">
         <EntriesList
           votes={this.state.votes}
           entries={this.state.entries}
+          name={this.props.name}
+          desc={this.props.desc}
           handleNotificationMessage={(message, statusCode) => this.props.handleNotificationMessage(message, statusCode)}
           handleUpdate={() => this.handleUpdate()}/>
         <EntryForm
