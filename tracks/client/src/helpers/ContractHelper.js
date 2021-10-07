@@ -16,6 +16,7 @@ export async function getTracks(){
 export async function getTrackDetails(trackId){
     const {contract} = await getWeb3State();
     const track = await contract.methods.tracks(trackId).call();
+    console.debug(`getTrackDetails: ${track}`);
     const statusCode = 200;
     const message = "Found track.";
     return {data: track,
