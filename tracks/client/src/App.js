@@ -41,12 +41,11 @@ class App extends Component {
     console.debug(response);
    this.setState({connected: connected});
     if (connected){
-      this.handleTrackListUpdate();
+      await this.handleTrackListUpdate();
+      this.handleNotificationMessage(message, statusCode, 5);
     } else {
-      console.debug(`App::componentDidMount: ${statusCode} ${message} ${connected}`);
       this.handleNotificationMessage(message, statusCode, null);
     }
-    this.handleNotificationMessage(message, statusCode, 5);
 	}
   
   async handleTrackListUpdate(){
@@ -59,7 +58,11 @@ class App extends Component {
   }
   
   async handleNotificationMessage(message, statusCode, delay=5){
-      console.debug(`App::handleNotificationMessage: ${message}, ${statusCode}`);
+    console.debug(`App::handleNotificationMessage: ${message}, ${statusCode}`);
+    if (this.state.notificationTimer) {
+      this.clearNotification();
+    }
+     
      this.setState({notificationMessage: message, notificationStatusCode: statusCode, notificationCountdown: 5});
      if (delay) {
       this.startNotificationTimer(delay);

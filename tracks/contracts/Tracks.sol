@@ -7,7 +7,7 @@ contract Tracks {
   mapping (uint  => uint) public entriesTrack; //entryId => trackId
   mapping (address  => mapping (uint => bool)) public votesByAddress; //address => (entryId => bool)
   mapping (uint  => uint) public votes; //entryId => Vote
-  mapping (address  => uint) public lastVoteTime; //address => time(s)
+  mapping (address  => mapping(uint => uint)) public lastVoteTime; //address => trackId => time(s)
 
   uint public nextTrackId;
   uint public trackCount;
@@ -85,8 +85,8 @@ contract Tracks {
 	    _;
 	}
 	
-	modifier isNotInCooldown(address addr){
-	    require(lastVoteTime[addr] == 0 || lastVoteTime[addr] + cooldownPeriod < block.timestamp, "User is currently in voting cooldown period.");
+	modifier isNotInCooldown(address addr, uint trackId){
+	    require(lastVoteTime[addr][trackId] == 0 || lastVoteTime[addr][trackId] + cooldownPeriod < block.timestamp, "User is currently in voting cooldown period for track.");
 	    _;
 	}
 
@@ -96,7 +96,7 @@ contract Tracks {
   constructor () {
       uint trackId = addTrack("first_track", "This is the first track");
       addEntry(trackId, "name", "description", "location");
-      cooldownPeriod = 1 days;
+      cooldownPeriod = 1 hours;
   }
 
 	/**
@@ -197,10 +197,11 @@ contract Tracks {
    * @dev XXX
    * @param _entryId The id of the entry
    */
-  function vote(uint _entryId) public checkTrackOpen(entriesTrack[_entryId]) hasNotVotedForEntry(msg.sender, _entryId) isNotInCooldown(msg.sender) {
+  function vote(uint _entryId) public checkTrackOpen(entriesTrack[_entryId]) hasNotVotedForEntry(msg.sender, _entryId) isNotInCooldown(msg.sender, entriesTrack[_entryId]) {
+    uint trackId = entriesTrack[_entryId];
     votesByAddress[msg.sender][_entryId] = true;
-    lastVoteTime[msg.sender] = block.timestamp;
-    emit EntryVotedFor(entriesTrack[_entryId], _entryId);
+    lastVoteTime[msg.sender][trackId] = block.timestamp;
+    emit EntryVotedFor(trackId, _entryId);
   }
 
   /**

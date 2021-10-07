@@ -1,6 +1,6 @@
 import React, {Component} from "react";
 import {sendTrack} from "../helpers/ContractHelper";
-
+import "./TrackForm.css";
 
 class TrackForm extends Component {
 	constructor(props){
@@ -15,20 +15,23 @@ class TrackForm extends Component {
     this.handleSubmit = this.handleSubmit.bind(this);
 	}
 
-  handleSubmit(event){
+  async handleSubmit(event){
+    event.preventDefault();
     console.debug("TrackForm::handleSubmit: ("
        + this.state.name + ", "
        + this.state.desc +  ")"
     )
     if (this.state.name.length > 0
       && this.state.desc.length > 0){
-        sendTrack(
+        await sendTrack(
           this.state.name,
           this.state.desc,
           this.handleUpdate
-        );
+        ).then((result) => {
+          this.props.handleNotificationMessage(result.message, result.statusCode);
+        });
+        
     }
-    event.preventDefault();
   }
 
   async handleUpdate(){
@@ -44,7 +47,8 @@ class TrackForm extends Component {
 
 	render(){
 		return (
-    	<form className="TrackForm" onSubmit={this.handleSubmit}>
+    <div className="TrackForm" >
+    	<form onSubmit={this.handleSubmit}>
         <label>
           Name
           <input type="text" value={this.state.name} onChange={this.handleNameChange} />
@@ -55,6 +59,7 @@ class TrackForm extends Component {
         </label>
         <input type="submit" value="Submit" />
       </form>
+      </div>
   	);
 	}
 	
