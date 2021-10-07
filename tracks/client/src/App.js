@@ -5,7 +5,6 @@ import {
   Route,
   Link,
 } from "react-router-dom";
-import Home from "./components/Home"
 import Notification from "./components/Notification"
 import TrackList from "./components/TrackList"
 import TrackView from "./components/TrackView"
