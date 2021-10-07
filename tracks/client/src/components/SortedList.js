@@ -4,6 +4,7 @@ import React from 'react';
 const compare =(a, b) => {
     // you can access the relevant property like this a.props[by]
 // depending whether you are sorting by tilte or year, you can write a compare function here, 
+    console.debug(`SortedList::compare: ${a.props.votes} < ${b.props.votes}`);
     return (a.props.votes < b.props.votes);
   }
 

@@ -19,7 +19,6 @@ class EntriesList extends Component {
 
 	async handleVote(value){
 		const result = await sendVote(value, this.handleUpdate);
-    console.debug(`EntriesList::handleVote: ${result.statusCode}`)
     this.props.handleNotificationMessage(result.message, result.statusCode);
 	}
   
@@ -28,7 +27,7 @@ class EntriesList extends Component {
       <SortedList by='title'>
       {
         this.props.entries.map((item) => (
-          <div className="rowGroup" key={item.entryId}>
+          <div className="rowGroup" key={item.entryId} votes={this.props.votes[item.entryId] || 0}>
             <div className="row">
               <div className="smallCell">{item.entryId}</div>
               <div className="bigCell">{item.name}</div>

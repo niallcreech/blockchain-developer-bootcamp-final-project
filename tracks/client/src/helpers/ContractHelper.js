@@ -72,7 +72,6 @@ export async function sendVote(_entryId, _callback){
   let statusCode;
 	const {accounts, contract} = await getWeb3State();
   const options = {from: accounts[0]}
-  console.debug("WEB3:sendVote: " + _entryId);
   await contract.methods.vote(_entryId).send(options, _callback)
     .then(() => {
       message = "Successfully voted for entry";
@@ -80,7 +79,7 @@ export async function sendVote(_entryId, _callback){
     })
     .catch((err) => {
       const parsedError = parseError(err);
-      message = parsedError.message;
+      message = parsedError.reason || "Voting failed! You can only vote on one entry each track during the 1 minute block-time cooldown period";
       statusCode = parsedError.code;
     });
   console.debug(`sendVote: ${message}, ${statusCode}`);
@@ -185,18 +184,26 @@ function parseError(err){
   let parsedError;
   let err_code;
   let err_message;
+  let err_reason;
   try {
     parsedError = JSON.parse(err.message.match(/{.*}/)[0]);
     err_code = parsedError.value.code
     err_message = parsedError.value.data.message
+    err_reason = null;
   } catch (e) {
     parsedError = err;
     err_code = err.code || 500;
-    err_message = err.message || "An error occurred in the contract transaction";
+    err_reason = err.reason || null;
+    if (!err.message || err.message.match("Transaction has been reverted by the EVM")) {
+      err_message = "An error occurred in the contract transaction";
+    } else {
+      err_message = err.message;
+    }
   }
   return {
     code: err_code,
-    message: err_message
+    message: err_message,
+    reason: err_reason
   };
   
 }
