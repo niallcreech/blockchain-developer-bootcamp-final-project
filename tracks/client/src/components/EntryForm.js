@@ -33,25 +33,33 @@ class EntryForm extends Component {
     this.setState({location: event.target.value});
   }
 
-	handleSubmit(event){
+	async handleSubmit(event){
+    event.preventDefault();
     console.debug("EntryForm::handleSubmit: ("
        + this.props.trackId + ", "
        + this.state.name + ", "
        + this.state.desc + ", "
        + this.state.location + ")"
-    )
+    );
     if (this.state.name.length > 0
       && this.state.desc.length > 0
       &&  this.state.location.length > 0){
-        sendEntry(
+        await sendEntry(
           this.props.trackId,
           this.state.name,
           this.state.desc,
           this.state.location,
           this.handleUpdate
-        );
+        )
+        .then((result) => {
+          alert("EntryForm::handleSubmit: ("
+       + result.code + ", "
+       + result.message + ")");
+      }
+    );
     }
-		event.preventDefault();
+    
+		
 	}
 
 	render(){

@@ -1,0 +1,24 @@
+.Notification {
+   padding: 1%;
+   text-align: center;
+   font-weight:bold;
+   font-size: calc(10px + 2vmin);
+   color: white;
+}
+
+.NotificationWarning {
+	padding: 1%;
+   text-align: center;
+   font-weight:bold;
+   font-size: calc(10px + 2vmin);
+   color: white;
+    background-color: #DD3333;
+}
+.NotificationInfo {
+	padding: 1%;
+   text-align: center;
+   font-weight:bold;
+   font-size: calc(10px + 2vmin);
+   color: white;
+    background-color: #33DD33;
+}

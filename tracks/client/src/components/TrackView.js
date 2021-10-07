@@ -19,18 +19,38 @@ class TrackView extends Component {
 		await this.handleUpdate();
 	}
 	
+  
 	async handleUpdate(){
-    console.debug("TrackView::handleUpdate");
-		const votes = await getVotes(this.props.match.params.trackId);
-		const entries = await getEntries(this.props.match.params.trackId);
-		this.setState({entries: entries, votes: votes});
+    const entries = await this.updateEntries();
+    const votes = await this.updateVotes();
+    this.setState({
+        entries: entries,
+        votes: votes
+    });
 	}
+
+  async updateEntries(){
+    const result = await getEntries(this.props.match.params.trackId);
+    return result.data;
+  }
+  
+  async updateVotes(){
+    const result = await getVotes(this.props.match.params.trackId);
+    return result.data;
+  }
 
 	render(){
 		return (
     	<div>
-        <EntriesList votes={this.state.votes} entries={this.state.entries} handleUpdate={() => this.handleUpdate()}/>
-        <EntryForm trackId={this.props.match.params.trackId} handleUpdate={() => this.handleUpdate()}/>
+        <EntriesList
+          votes={this.state.votes}
+          entries={this.state.entries}
+          handleNotificationMessage={(message, statusCode) => this.props.handleNotificationMessage(message, statusCode)}
+          handleUpdate={() => this.handleUpdate()}/>
+        <EntryForm
+          trackId={this.props.match.params.trackId}
+          handleUpdate={() => this.handleUpdate()}
+          handleNotificationMessage={(message, statusCode) => this.props.handleNotificationMessage(message, statusCode)}/>
 			</div>
   	);
 	}

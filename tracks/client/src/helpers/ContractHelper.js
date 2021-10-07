@@ -1,16 +1,23 @@
 import TracksContract from "../contracts/Tracks.json";
 import Web3 from "web3";
 
+
+
 export async function getTracks(){
     const {contract} = await getWeb3State();
  		const tracks = await contract.methods.getTracks().call();
-    console.debug("getTracks: found " + tracks.length + " tracks.");
-		return tracks;
+    const statusCode = 200;
+    const message = "Found " + tracks.length + " tracks.";
+    return {data: tracks,
+            statusCode: statusCode,
+            message: message};
 }
 
 async function getEvents(eventName, eventFilter, fromBlock="earliest", toBlock="latest"){
 	const {contract} = await getWeb3State();
 	let results;
+  let message;
+  let statusCode;
 	try{
 		const resultsRaw = await contract.getPastEvents(eventName, {
     	filter: eventFilter,
@@ -18,68 +25,72 @@ async function getEvents(eventName, eventFilter, fromBlock="earliest", toBlock="
     	toBlock: toBlock
 		});
 		results = resultsRaw.map(event => event.returnValues);
+    statusCode = 200;
+    message = "Found " + results.length + " events.";
 	} catch(e) {
-		console.error(e);
 		results = [];
+    let parsedError = parseError(e);
+    statusCode = parsedError.code;
+    message = parsedError.message;
 	}	
-	return results;	
+  
+  return {data: results,
+          statusCode: statusCode,
+          message: message};
 }
 
 export async function getVotes(trackId){
+  let votes = {};
 	const eventName = "EntryVotedFor";
 	const eventFilter = {trackId: trackId};
-	const events = await getEvents(eventName, eventFilter);
-	let votes = {};
-	events.forEach(function(event) {
-		console.debug(event)
-		const entryId = parseInt(event.entryId);
-		if (votes[entryId]){
-			votes[entryId]++;
-		} else {
-			votes[entryId] = 1;
-		}
-	});
-	return votes;
+  const res = await getEvents(eventName, eventFilter);
+  if (res.statusCode === 200){
+    	res.data.forEach(function(event) {
+    		console.debug(event)
+    		const entryId = parseInt(event.entryId);
+    		if (votes[entryId]){
+    			votes[entryId]++;
+    		} else {
+    			votes[entryId] = 1;
+    		}
+    	});
+  }
+  return {data: votes, statusCode: res.statusCode, message: res.message};
 }
 	
 export async function getEntries(trackId){
 	const eventName = "EntryCreated";
 	const eventFilter = {trackId: trackId};
-	return await getEvents(eventName, eventFilter);
+	const res = await getEvents(eventName, eventFilter);
+  return {data: res.data, statusCode: res.statusCode, message: res.message};
 }
 
-function parseError(err){
-  let parsedError;
-  let err_code;
-  let err_message;
-  try {
-    parsedError = JSON.parse(err.message.match(/{.*}/)[0]);
-    err_code = parsedError.value.code
-    err_message = parsedError.value.data.message
-  } catch (e) {
-    parsedError = err;
-    err_code = err.code
-    err_message = err.message
-  }
-  return {
-    code: err_code,
-    message: err_message
-  };
-}
 
 export async function sendVote(_entryId, _callback){
 	// Send a contract call to vote for the entry
+  let message;
+  let statusCode;
 	const {accounts, contract} = await getWeb3State();
   const options = {from: accounts[0]}
   console.debug("WEB3:sendVote: " + _entryId);
   await contract.methods.vote(_entryId).send(options, _callback)
+    .then(() => {
+      message = "Successfully voted for entry";
+      statusCode = 200;
+    })
     .catch((err) => {
       const parsedError = parseError(err);
-      alert(parsedError.message)});
+      message = parsedError.message;
+      statusCode = parsedError.code;
+    });
+  console.debug(`sendVote: ${message}, ${statusCode}`);
+  return {data: [], statusCode: statusCode, message: message};
 }
 
 export async function sendTrack(name, desc, _callback){
   // Send a contract call to vote for the entry
+  let message;
+  let statusCode;
   const {accounts, contract} = await getWeb3State();
   const options = {from: accounts[0]}
   console.debug("WEB3:sendTrack: "
@@ -88,10 +99,21 @@ export async function sendTrack(name, desc, _callback){
     + _callback + ")"
   ); 
   await contract.methods.addTrack(name, desc).send(options, _callback)
-    .catch((err) => alert(err.message));
+    .then(() => {
+      message = "Successfully created track";
+      statusCode = 200;
+    })
+    .catch((err) => {
+      const parsedError = parseError(err);
+      message = parsedError.message;
+      statusCode = parsedError.code;
+    });
+  return {data: [], statusCode: statusCode, message: message};
 }
 
 export async function sendEntry(trackId, name, desc, location, _callback){
+  let message;
+  let statusCode;
   // Send a contract call to vote for the entry
   const {accounts, contract} = await getWeb3State();
   const options = {from: accounts[0]}
@@ -103,9 +125,35 @@ export async function sendEntry(trackId, name, desc, location, _callback){
     + _callback + ")"
   ); 
   await contract.methods.addEntry(trackId, name, desc, location).send(options, _callback)
-    .catch((err) => alert(err.message));
+    .then(() => {
+      message = "Successfully created entry";
+      statusCode = 200;
+    })
+    .catch((err) => {
+      const parsedError = parseError(err);
+      message = parsedError.message;
+      statusCode = parsedError.code;
+    });
+  return {data: [], statusCode: statusCode, message: message};
 }
 
+export async function checkConnected(){
+    let isConnected;
+    let message;
+  let statusCode;
+    await getWeb3State()
+      .then(({accounts}) => {
+        isConnected = (accounts.length > 0)
+        message = "Wallet is connected";
+        statusCode = 200;
+      })
+      .catch((err) => {
+        const parsedError = parseError(err);
+        message = parsedError.message;
+        statusCode = parsedError.code;
+      });
+  return {data: [], statusCode: statusCode, message: message};
+}
 
 export async function getWeb3State() {
   try {
@@ -131,5 +179,25 @@ export async function getWeb3State() {
       console.error(error);
 			return {};
     }
+}
+
+function parseError(err){
+  let parsedError;
+  let err_code;
+  let err_message;
+  try {
+    parsedError = JSON.parse(err.message.match(/{.*}/)[0]);
+    err_code = parsedError.value.code
+    err_message = parsedError.value.data.message
+  } catch (e) {
+    parsedError = err;
+    err_code = err.code || 500;
+    err_message = err.message || "An error occurred in the contract transaction";
+  }
+  return {
+    code: err_code,
+    message: err_message
+  };
+  
 }
 
