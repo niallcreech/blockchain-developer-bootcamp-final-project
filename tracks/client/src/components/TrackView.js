@@ -11,7 +11,7 @@ class TrackView extends Component {
 		this.state = {
 			entries: [],
 			votes: {},
-      track: {name: "", desc: ""}
+      trackId: {name: "", desc: ""}
 		}
 
 	}

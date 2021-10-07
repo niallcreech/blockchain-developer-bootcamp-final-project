@@ -1,20 +1,18 @@
 import React, {Component} from "react";
 import "./HeaderView.css";
 import { withRouter } from 'react-router-dom';
-import {getTrackDetails} from "../helpers/ContractHelper";
 
 class HeaderViewName extends Component {
   constructor(props){
     super(props);
     this.state = {
-      trackId: null,
       text: null
     }
   }
   render(){
     return (
       <div className="HeaderViewName">
-        <div trackId={this.props.id}  className="HeaderViewName">{this.props.text || "All Tracks"}</div>
+        <div trackId={this.props.trackId}  className="HeaderViewName">{this.props.text || "All Tracks"}</div>
       </div>
     );
   }
@@ -23,7 +21,6 @@ class HeaderViewDesc extends Component {
   constructor(props){
     super(props);
     this.state = {
-      trackId: null,
       text: null
     }
   }
@@ -43,34 +40,29 @@ class HeaderView extends Component {
     this.state = {
       trackId: null,
       trackName: null,
+      trackDesc: null,
       trackDetails: null,
-      selectedTrack: false,
     }
     this.handleReturnClick = this.handleReturnClick.bind(this);
+    this.updateSelectedTrack = this.updateSelectedTrack.bind(this);
   }
   
   async componentDidMount(){
-    await this.updateTrack().then((trackDetails) => {
-      this.setState({trackId: this.props.match.params.trackId, trackName: trackDetails.name, trackDesc: trackDetails.desc});
-      console.debug(`HeaderView::componentDidMount: (${this.state.trackName}, ${this.state.trackDetails})`);
-      console.debug(this.state.track);
-    });
+    await this.updateSelectedTrack();
   }
-  async updateTrack(){
-    console.debug(`HeaderView::updateTrack: ${this.props.match.params.trackId}`);
+  
+  async updateSelectedTrack(){
+    console.debug(`HeaderView::updateTrack`);
     if (this.props.match.params.trackId) {
-      const trackId = this.props.match.params.trackId;
-      const trackDetails =  await getTrackDetails(trackId);
-      console.debug(`HeaderView::updateTrack`);
-      console.debug(trackDetails);
-      return trackDetails.data;
+      this.props.updateSelectedTrack(this.props.match.params.trackId);
     } else {
-      return {name: null, desc: null};
+      this.props.updateSelectedTrack(null);
     }
   }
   
   handleReturnClick(){
     this.props.history.push("/");
+    this.updateSelectedTrack();
   }
 
 	render(){
@@ -87,11 +79,12 @@ class HeaderView extends Component {
       </div>
       )
     }
+    console.debug("HeaderView::render: " + this.state.trackId);
     const headerView = (
       <div>
       {backView}
-        <HeaderViewName trackId={this.state.trackId} text={this.state.trackName} />
-        <HeaderViewDesc trackId={this.state.trackId} text={this.state.trackDesc}/>
+        <HeaderViewName trackId={this.props.trackId} text={this.state.trackName} />
+        <HeaderViewDesc trackId={this.props.trackId} text={this.state.trackDesc}/>
       </div>
     );
     

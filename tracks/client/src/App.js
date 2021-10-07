@@ -14,7 +14,7 @@ import HeaderView from "./components/HeaderView"
 
 
 import "./App.css";
-import {checkConnected, getTracks} from "./helpers/ContractHelper";
+import {checkConnected, getTracks, getTrackDetails} from "./helpers/ContractHelper";
 
 
 class App extends Component {
@@ -26,6 +26,9 @@ class App extends Component {
       notificationStatusCode: null,
       notificationCountdown: 0,
       notificationTimer: null,
+      selectedTrackId: null,
+      selectedTrackName: null,
+      selectedTrackDesc: null,
       connected: false
 		}
     this.handleTrackListUpdate = this.handleTrackListUpdate.bind(this);
@@ -50,7 +53,7 @@ class App extends Component {
   
   async handleTrackListUpdate(){
      const result = await getTracks();
-     this.setState({tracks: result.data});
+     this.setState({tracks: result.data, selectedTrack: null});
   }
   
   async handleNotificationMessageClick(){
@@ -69,7 +72,27 @@ class App extends Component {
      }
   }
 
-
+  async updateSelectedTrack(trackId){
+    if (trackId) {
+      const trackDetails =  await getTrackDetails(trackId);
+      console.debug(`HeaderView::updateTrack`);
+      console.debug(trackDetails);
+      this.setState({
+        selectedTrackId: trackId || null,
+        selectedTrackName: trackDetails.data.name || null,
+        selectedTrackDesc: trackDetails.data.desc || null,
+        
+      })
+    } else {
+      this.setState({
+        selectedTrackId: null,
+        selectedTrackName:  null,
+        selectedTrackDesc:  null,
+        
+      })
+    }
+  }
+      
   async handleNotificationCountdown(){
     console.debug(`Notification::handleNotificationCountdown: ${this.state.notificationCountdown}`);
     this.setState({notificationCountdown: this.state.notificationCountdown - 1});
@@ -130,7 +153,11 @@ class App extends Component {
     );
     const dynamicHeader = (
       <div>
-        <HeaderView tracks={this.state.tracks}/>
+        <HeaderView
+          updateSelectedTrack={() => this.updateSelectedTrack()}
+          trackId={this.state.selectedTrackId}
+          trackName={this.state.selectedTrackName}
+          trackDesc={this.state.selectedTrackDesc}/>
         <Notification
           handleClick={() => this.handleNotificationMessageClick()}
           message={this.state.notificationMessage}
