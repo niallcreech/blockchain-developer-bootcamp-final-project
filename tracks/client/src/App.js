@@ -11,10 +11,11 @@ import TrackView from "./components/TrackView"
 import TrackForm from "./components/TrackForm"
 import WalletConnector from "./components/WalletConnector"
 import HeaderView from "./components/HeaderView"
+import TrackHeaderView from "./components/TrackHeaderView"
 
 
 import "./App.css";
-import {checkConnected, getTracks, getTrackDetails} from "./helpers/ContractHelper";
+import {checkConnected, getTracks} from "./helpers/ContractHelper";
 
 
 class App extends Component {
@@ -26,9 +27,6 @@ class App extends Component {
       notificationStatusCode: null,
       notificationCountdown: 0,
       notificationTimer: null,
-      selectedTrackId: null,
-      selectedTrackName: null,
-      selectedTrackDesc: null,
       connected: false
 		}
     this.handleTrackListUpdate = this.handleTrackListUpdate.bind(this);
@@ -40,8 +38,6 @@ class App extends Component {
 	async componentDidMount() {
     const response = await checkConnected();
     const {statusCode, message, connected} = await checkConnected();
-    console.debug(`App::componentDidMount: ${statusCode} ${message} ${connected}`);
-    console.debug(response);
    this.setState({connected: connected});
     if (connected){
       await this.handleTrackListUpdate();
@@ -53,7 +49,7 @@ class App extends Component {
   
   async handleTrackListUpdate(){
      const result = await getTracks();
-     this.setState({tracks: result.data, selectedTrack: null});
+     this.setState({tracks: result.data});
   }
   
   async handleNotificationMessageClick(){
@@ -61,7 +57,6 @@ class App extends Component {
   }
   
   async handleNotificationMessage(message, statusCode, delay=5){
-    console.debug(`App::handleNotificationMessage: ${message}, ${statusCode}`);
     if (this.state.notificationTimer) {
       this.clearNotification();
     }
@@ -72,29 +67,7 @@ class App extends Component {
      }
   }
 
-  async updateSelectedTrack(trackId){
-    if (trackId) {
-      const trackDetails =  await getTrackDetails(trackId);
-      console.debug(`HeaderView::updateTrack`);
-      console.debug(trackDetails);
-      this.setState({
-        selectedTrackId: trackId || null,
-        selectedTrackName: trackDetails.data.name || null,
-        selectedTrackDesc: trackDetails.data.desc || null,
-        
-      })
-    } else {
-      this.setState({
-        selectedTrackId: null,
-        selectedTrackName:  null,
-        selectedTrackDesc:  null,
-        
-      })
-    }
-  }
-      
   async handleNotificationCountdown(){
-    console.debug(`Notification::handleNotificationCountdown: ${this.state.notificationCountdown}`);
     this.setState({notificationCountdown: this.state.notificationCountdown - 1});
      if (this.state.notificationCountdown < 0){
       this.clearNotification();
@@ -102,7 +75,6 @@ class App extends Component {
   }
 
   async startNotificationTimer(delay){
-    console.debug(`Notification::handleNotificationCountdown`);
     this.setState({notificationCountdown: delay});
     this.timer = setInterval(this.handleNotificationCountdown, 1000);
   }
@@ -113,7 +85,6 @@ class App extends Component {
   }
 
   render() {
-    console.debug("App::render: " + this.state.connected);
     let routes;
     const multipleTrackView = (
       <div className="MultipleTrackView">
@@ -144,36 +115,29 @@ class App extends Component {
       />
     );
     
-    const LinkheaderView = (
-      <ul className="App-header">
-              <li>
-                <Link to="/">Tracks ({this.state.tracks.length})</Link>
-              </li>
-            </ul>
-    );
-    const dynamicHeader = (
-      <div>
-        <HeaderView
-          updateSelectedTrack={() => this.updateSelectedTrack()}
-          trackId={this.state.selectedTrackId}
-          trackName={this.state.selectedTrackName}
-          trackDesc={this.state.selectedTrackDesc}/>
-        <Notification
-          handleClick={() => this.handleNotificationMessageClick()}
-          message={this.state.notificationMessage}
-          countdown={this.state.notificationCountdown}
-          statusCode={this.state.notificationStatusCode}/>
-       </div>
-      );
     if (this.state.connected){
       routes = (
         <Switch>
               <Route exact path="/">
-                {dynamicHeader}
+                <div>
+                  <HeaderView name="All Tracks" text="Find the track you want to explore."/>
+                  <Notification
+                    handleClick={() => this.handleNotificationMessageClick()}
+                    message={this.state.notificationMessage}
+                    countdown={this.state.notificationCountdown}
+                    statusCode={this.state.notificationStatusCode}/>
+                 </div>
                 {multipleTrackView}
               </Route>
               <Route exact path="/track/:trackId">
-                {dynamicHeader}
+                <div>
+                <TrackHeaderView />
+                <Notification
+                  handleClick={() => this.handleNotificationMessageClick()}
+                  message={this.state.notificationMessage}
+                  countdown={this.state.notificationCountdown}
+                  statusCode={this.state.notificationStatusCode}/>
+               </div>
                 {singleTrackView}
               </Route>
             </Switch>
@@ -189,6 +153,7 @@ class App extends Component {
 		return (
       <div className="App">
          <Router>
+         
           <div>
 		    {routes}
         </div>

@@ -1,12 +1,17 @@
-.HeaderView {
+.HeaderViewTextContainer {
+	text-align: center;
+}
+
+.HeaderView{
 	background-color: #333333;
-	padding: 1%;
+  width: 100%;
    text-align: center;
    font-size: calc(10px + 2vmin);
    color: white;
 }
 .HeaderViewName {
 	padding: 1%;
+	padding-right: 5%;
    text-align: center;
    font-weight:bold;
    font-size: calc(30px + 2vmin);
@@ -14,4 +19,13 @@
 }
 .HeaderViewDesc {
    font-size: calc(10px + 2vmin);
+}
+
+.HeaderViewReturn {
+	width: 10%;
+	padding: 20px 0;
+   font-weight:bold;
+   font-size: calc(30px + 2vmin);
+    
+	float: left;
 }

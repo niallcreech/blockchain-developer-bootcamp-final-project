@@ -11,12 +11,10 @@ class Notification extends Component {
   
 
   handleClick(){
-    console.debug("Notification::handleClick");
     this.props.handleClick();
   }
 
   render(){
-    console.debug(`Notification::render: (${this.props.statusCode})`);
     let className;
     if (!this.props.statusCode) {
       className = "Notification"
