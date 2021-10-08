@@ -15,6 +15,7 @@ class TrackHeaderView extends Component {
     };
     this.handleReturnClick = this.handleReturnClick.bind(this);
     this.getSelectedTrack = this.getSelectedTrack.bind(this);
+		this.handleReturnClick = this.handleReturnClick.bind(this);
   }
   
   async componentDidMount(){
@@ -30,11 +31,11 @@ class TrackHeaderView extends Component {
     });
   }
   
-  handleReturnClick(){
+  async handleReturnClick(){
     console.debug(`HeaderView::handleReturnClick`);
-    this.props.history.push("/");
+    await this.props.handleTrackListUpdate();
+		this.props.history.push("/");
   }
-
 	render(){
 		return (
       <div className="HeaderView">

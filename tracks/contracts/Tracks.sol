@@ -6,7 +6,7 @@ contract Tracks {
   mapping (uint  => uint[]) public trackEntries; //trackId => entryId[]
   mapping (uint  => uint) public entriesTrack; //entryId => trackId
   mapping (address  => mapping (uint => bool)) public votesByAddress; //address => (entryId => bool)
-  mapping (uint  => uint) public votes; //entryId => Vote
+  mapping (uint  => uint) public votesByTrack; //trackId => vote count
   mapping (address  => mapping(uint => uint)) public lastVoteTime; //address => trackId => time(s)
 
   uint public nextTrackId;
@@ -118,14 +118,6 @@ contract Tracks {
       return tracks[_trackId];
   }
 	
-	/**
-   * @dev XXX
-   * @param _entryId The id of the entry
-   */
-  function getVotesForEntry(uint _entryId) public view checkTrackUnblocked(entriesTrack[_entryId]) returns (uint) {
-      return votes[_entryId];
-  }
-  
 
   /**
    * @dev XXX
@@ -198,10 +190,11 @@ contract Tracks {
    * @param _entryId The id of the entry
    */
   function vote(uint _entryId) public checkTrackOpen(entriesTrack[_entryId]) hasNotVotedForEntry(msg.sender, _entryId) isNotInCooldown(msg.sender, entriesTrack[_entryId]) {
-    uint trackId = entriesTrack[_entryId];
+    uint _trackId = entriesTrack[_entryId];
     votesByAddress[msg.sender][_entryId] = true;
-    lastVoteTime[msg.sender][trackId] = block.timestamp;
-    emit EntryVotedFor(trackId, _entryId);
+    lastVoteTime[msg.sender][_trackId] = block.timestamp;
+    votesByTrack[_trackId]++;
+    emit EntryVotedFor(_trackId, _entryId);
   }
 
   /**

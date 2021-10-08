@@ -15,7 +15,7 @@ import TrackHeaderView from "./components/TrackHeaderView"
 
 
 import "./App.css";
-import {checkConnected, getTracks} from "./helpers/ContractHelper";
+import {checkConnected, getTracks, getVotesByTrack} from "./helpers/ContractHelper";
 
 
 class App extends Component {
@@ -23,6 +23,7 @@ class App extends Component {
 		super(props);
 		this.state = {
 			tracks: [],
+			trackVotes: [],
       notificationMessage: "",
       notificationStatusCode: null,
       notificationCountdown: 0,
@@ -48,8 +49,12 @@ class App extends Component {
 	}
   
   async handleTrackListUpdate(){
-     const result = await getTracks();
-     this.setState({tracks: result.data});
+		console.debug("App::handleTrackListUpdate");
+    const _tracks = await getTracks();
+    const _trackIds = _tracks.data.map((track) => (track.trackId));
+		this.setState({
+			tracks: _tracks.data,
+			trackVotes: await getVotesByTrack(_trackIds).then(results => results.data)});
   }
   
   async handleNotificationMessageClick(){
@@ -84,13 +89,14 @@ class App extends Component {
     clearInterval(this.timer);
   }
 
+
   render() {
     let routes;
     const multipleTrackView = (
       <div className="MultipleTrackView">
         <TrackList 
           tracks={this.state.tracks}
-          handleUpdate={() => this.handleTrackListUpdate()}
+          trackVotes={this.state.trackVotes}
           handleNotificationMessage={(message, status_code)=>this.handleNotificationMessage(message, status_code)}
         />
         <TrackForm 
@@ -131,7 +137,9 @@ class App extends Component {
               </Route>
               <Route exact path="/track/:trackId">
                 <div>
-                <TrackHeaderView />
+                <TrackHeaderView 
+									handleTrackListUpdate={() => this.handleTrackListUpdate()}
+								/>
                 <Notification
                   handleClick={() => this.handleNotificationMessageClick()}
                   message={this.state.notificationMessage}

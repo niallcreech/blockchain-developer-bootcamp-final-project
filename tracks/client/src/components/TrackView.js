@@ -22,6 +22,7 @@ class TrackView extends Component {
 	
   
 	async handleUpdate(){
+		console.debug("handleUpdate::handleUpdate");
     this.setState({
         entries: await this.updateEntries(),
         votes: await this.updateVotes(),

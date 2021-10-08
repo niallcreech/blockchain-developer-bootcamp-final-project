@@ -18,8 +18,10 @@ class EntriesList extends Component {
   }
 
 	async handleVote(value){
-		const result = await sendVote(value, this.handleUpdate);
-    this.props.handleNotificationMessage(result.message, result.statusCode);
+		console.debug("EntriesList::handleUpdate:");
+		await sendVote(value)
+			.then(async (result) => this.props.handleNotificationMessage(result.message, result.statusCode))
+			.then(async () => this.handleUpdate());
 	}
   
 	render(){
@@ -32,7 +34,7 @@ class EntriesList extends Component {
               <div className="smallCell">{item.entryId}</div>
               <div className="bigCell">{item.name}</div>
               <div className="bigCell">{item.desc}</div>
-              <div className="bigCell">{item.location}</div>
+              <div className="bigCell"><a href={item.location}>{item.location}</a></div>
               <div className="smallCell"><VoteCounter votes={this.props.votes[item.entryId] || 0}/></div>
               <div className="smallCell">
                 <button value={item.entryId} onClick={() => this.handleVote(item.entryId)}>Vote</button>

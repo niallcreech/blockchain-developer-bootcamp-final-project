@@ -17,7 +17,7 @@ class Notification extends Component {
   render(){
     let className;
     if (!this.props.statusCode) {
-      className = "Notification"
+      className = "NotificationEmpty"
     }else if (this.props.statusCode === 200){
       className = "NotificationInfo";
     } else {
@@ -30,8 +30,10 @@ class Notification extends Component {
      message = <br/>;
     }
     return (
+	<div className="NotificationContainer">
       <div className={className} onClick={this.handleClick}>
       {message}
+      </div>
       </div>
     );
   }

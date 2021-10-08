@@ -17,12 +17,24 @@
  * phrase from a file you've .gitignored so it doesn't accidentally become public.
  *
  */
-
-// const HDWalletProvider = require('@truffle/hdwallet-provider');
+require('dotenv').config()
+const HDWalletProvider = require('@truffle/hdwallet-provider');
 // const infuraKey = "fj4jll3k.....";
 //
 // const fs = require('fs');
 // const mnemonic = fs.readFileSync(".secret").toString().trim();
+const mnemonic = process.env.MNEMONIC;
+const infuraProjectId = process.env.INFURA_PROJECT_ID;
+
+// naive environment assertions, since these aren't present by default
+if (infuraProjectId === undefined || infuraProjectId === '') {
+  throw new Error('truffle-config.js needs the environment variable "INFURA_PROJECT_ID"');
+} else if (mnemonic === undefined) {
+  throw new Error('truffle-config.js needs the environment variable "MNEMONIC"');
+} else if (mnemonic.split(' ').length != 12) {
+  throw new Error('The environment variable "MNEMONIC" must be 12 words (space delineated)');
+}
+
 
 const path = require("path");
 
@@ -63,14 +75,14 @@ module.exports = {
     // },
     // Useful for deploying to a public network.
     // NB: It's important to wrap the provider as a function.
-    // ropsten: {
-    // provider: () => new HDWalletProvider(mnemonic, `https://ropsten.infura.io/v3/YOUR-PROJECT-ID`),
-    // network_id: 3,       // Ropsten's id
+    ropsten: {
+     provider: () => new HDWalletProvider(mnemonic, `https://ropsten.infura.io/v3/${infuraProjectId}`),
+     network_id: 3,       // Ropsten's id
     // gas: 5500000,        // Ropsten has a lower block limit than mainnet
     // confirmations: 2,    // # of confs to wait between deployments. (default: 0)
     // timeoutBlocks: 200,  // # of blocks before a deployment times out  (minimum/default: 50)
     // skipDryRun: true     // Skip dry run before migrations? (default: false for public nets )
-    // },
+     },
     // Useful for private networks
     // private: {
     // provider: () => new HDWalletProvider(mnemonic, `https://network.io`),

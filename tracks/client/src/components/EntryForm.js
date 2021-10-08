@@ -1,5 +1,5 @@
 import React, {Component} from "react";
-import {sendEntry} from "../helpers/ContractHelper";
+import {sendEntry, isValidUrl} from "../helpers/ContractHelper";
 import "./EntryForm.css";
  
 
@@ -33,29 +33,84 @@ class EntryForm extends Component {
     this.setState({location: event.target.value});
   }
 
+	clearFields() {
+		console.debug("EntryForm::clearFields");
+    this.setState({
+			name: "",
+			desc: "",
+			location: "",
+		});
+  }
+
+	areFieldsEmpty(){
+		console.debug("EntryForm::areFieldsEmpty");
+		let valid = true;
+		let message = "";
+		let statusCode = 200;
+		if (this.state.name.length === 0) {
+			message = "Name field is empty";
+			statusCode = 500;
+			valid = false;
+		} else if (this.state.desc.length === 0) {
+			message = "Description field is empty";
+			statusCode = 500;
+			valid = false;
+		} else if (this.state.location.length === 0) {
+			message = "Location field is empty";
+			statusCode = 500;
+			valid = false;
+		}
+    return {
+			valid: valid,
+			message: message,
+			statusCode: statusCode
+		}
+	}
+
+	areFieldsValid(){
+		console.debug("EntryForm::areFieldsValid");
+		const emptyFields = this.areFieldsEmpty();
+		if (!emptyFields.valid) {
+			return emptyFields;
+		}
+		const validLocation = isValidUrl(this.state.location);
+		if (!validLocation.valid) {
+			return validLocation;
+		}
+		return {
+			valid: true,
+			message: "",
+			statusCode: 200
+		}
+	}
+
 	async handleSubmit(event){
-    event.preventDefault();
-    console.debug("EntryForm::handleSubmit: ("
+		console.debug("EntryForm::handleSubmit: ("
        + this.props.trackId + ", "
        + this.state.name + ", "
        + this.state.desc + ", "
        + this.state.location + ")"
     );
-    if (this.state.name.length > 0
-      && this.state.desc.length > 0
-      &&  this.state.location.length > 0){
+    event.preventDefault();
+		const validFields = this.areFieldsValid();
+    if (validFields.valid){
         await sendEntry(
           this.props.trackId,
           this.state.name,
           this.state.desc,
-          this.state.location,
-          this.handleUpdate
+          this.state.location
         )
-        .then((result) => {
-          this.props.handleNotificationMessage(result.message, result.statusCode);
+        .then(async (result) => {
+          await this.props.handleNotificationMessage(result.message, result.statusCode);
+        })
+				.then(async () => {
+          await this.handleUpdate();
+					this.clearFields();
         });
-     }
-  }
+     } else{
+			await this.props.handleNotificationMessage(validFields.message, validFields.statusCode);
+		}
+	}
 
 	render(){
 		return (

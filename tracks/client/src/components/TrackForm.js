@@ -15,26 +15,74 @@ class TrackForm extends Component {
     this.handleSubmit = this.handleSubmit.bind(this);
 	}
 
+	areFieldsEmpty(){
+		console.debug("EntryForm::areFieldsEmpty");
+		let valid = true;
+		let message = "";
+		let statusCode = 200;
+		if (this.state.name.length === 0) {
+			message = "Name field is empty";
+			statusCode = 500;
+			valid = false;
+		} else if (this.state.desc.length === 0) {
+			message = "Description field is empty";
+			statusCode = 500;
+			valid = false;
+		}
+    return {
+			valid: valid,
+			message: message,
+			statusCode: statusCode
+		}
+	}
+
+	clearFields() {
+		console.debug("EntryForm::clearFields");
+    this.setState({
+			name: "",
+			desc: "",
+		});
+  }
+
+	areFieldsValid(){
+		console.debug("EntryForm::areFieldsValid");
+		const emptyFields = this.areFieldsEmpty();
+		if (!emptyFields.valid) {
+			return emptyFields;
+		}
+		return {
+			valid: true,
+			message: "",
+			statusCode: 200
+		}
+	}
+
+
   async handleSubmit(event){
     event.preventDefault();
     console.debug("TrackForm::handleSubmit: ("
        + this.state.name + ", "
        + this.state.desc +  ")"
     )
-    if (this.state.name.length > 0
-      && this.state.desc.length > 0){
+		const validFields = this.areFieldsValid();
+    if (validFields.valid){
         await sendTrack(
           this.state.name,
-          this.state.desc,
-          this.handleUpdate
-        ).then((result) => {
-          this.props.handleNotificationMessage(result.message, result.statusCode);
+          this.state.desc
+        ).then(async (result) => {
+          await this.props.handleNotificationMessage(result.message, result.statusCode);
+        })
+				.then(async () => {
+					await this.handleUpdate()
+					this.clearFields();
         });
-        
-    }
+     } else{
+				await this.props.handleNotificationMessage(validFields.message, validFields.statusCode);
+		}
   }
 
   async handleUpdate(){
+		console.debug("TrackForm::handleUpdate");
     await this.props.handleUpdate()
   }
 
