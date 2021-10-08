@@ -71,11 +71,11 @@ class TrackForm extends Component {
           this.state.desc
         ).then(async (result) => {
           await this.props.handleNotificationMessage(result.message, result.statusCode);
+					await this.handleUpdate();
+					if (result.statusCode === 200) {
+						this.clearFields();
+					}
         })
-				.then(async () => {
-					await this.handleUpdate()
-					this.clearFields();
-        });
      } else{
 				await this.props.handleNotificationMessage(validFields.message, validFields.statusCode);
 		}

@@ -9,7 +9,7 @@ class EntryForm extends Component {
 		this.state = {
 			name: "",
 			desc: "",
-			location: ""
+			location: "http://"
 		}
 		this.handleDescriptionChange = this.handleDescriptionChange.bind(this);
 		this.handleNameChange = this.handleNameChange.bind(this);
@@ -102,11 +102,11 @@ class EntryForm extends Component {
         )
         .then(async (result) => {
           await this.props.handleNotificationMessage(result.message, result.statusCode);
+	        await this.handleUpdate();
+						if (result.statusCode === 200) {
+							this.clearFields();
+						}
         })
-				.then(async () => {
-          await this.handleUpdate();
-					this.clearFields();
-        });
      } else{
 			await this.props.handleNotificationMessage(validFields.message, validFields.statusCode);
 		}
