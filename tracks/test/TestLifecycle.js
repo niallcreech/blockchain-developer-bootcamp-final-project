@@ -46,5 +46,29 @@ describe("When working with a Tracks contract", () => {
       assert.equal(false, await contract.isTrackBlocked(trackId), "");
     });
 
+		it("...should not allow adding tracks when admin has blocked.", async () => {
+      await contract.disableAllTracks(true);
+			try {
+        await contract.addTrack(name, "mydescription", { from: accounts[0] });
+        assert(false);
+      } catch (e){}
+    });
+
+		it("...should not allow adding entries when admin has blocked.", async () => {
+      await contract.disableAllTracks(true);
+			try {
+        await contract.addEntry(trackId, "myentry", "mydescription", { from: accounts[0] });
+        assert(false);
+      } catch (e){}
+    });
+
+		it("...should not allow voting when admin has blocked.", async () => {
+      await contract.disableAllVoting(true);
+			try {
+        await contract.vote(entryId, { from: accounts[0] });
+        assert(false);
+      } catch (e){}
+    });
+
   });
 });
