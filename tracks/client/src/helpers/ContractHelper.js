@@ -201,7 +201,7 @@ export async function checkConnected(){
 async function getWeb3Contract(web3){
 	let contract;
 	let statusCode;
-	let message; 
+	let message;
 	await web3.eth.net.getId()
 	  .then((networkId) => {
 	    const deployedNetwork = TracksContract.networks[networkId];
@@ -217,13 +217,12 @@ async function getWeb3Contract(web3){
 	  })
 	  .catch((err) => {
 	    contract = null;
-	    statusCode = statusCode || 500;
+	    statusCode = 500;
 	    message = 'Failed to get web3 network connection.';
 	  });
-  if (contract.currentProvider.selectedAddress.length === 0){
-    contract = null;
-    statusCode = statusCode || 500;
+  if (!contract._address){
     message =  `Contract not found on network ${contract.currentProvider.chainId}, please select the correct network`;
+    statusCode = 500;
   }
 	return {contract, statusCode, message};
 }
@@ -269,6 +268,7 @@ export async function getWeb3State() {
 		contract = contractObj.contract;
 		connected = true;
 	}
+
   message = contractObj.message;
   statusCode = contractObj.statusCode;
   console.debug(accounts, contract, web3, statusCode, message, connected);

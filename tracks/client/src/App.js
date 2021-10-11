@@ -34,28 +34,36 @@ class App extends Component {
     this.handleNotificationMessage = this.handleNotificationMessage.bind(this);
     this.handleNotificationMessageClick = this.handleNotificationMessageClick.bind(this);
     this.handleNotificationCountdown = this.handleNotificationCountdown.bind(this);
-		window.addEventListener("load", function() {
-		  if (window.ethereum) {
-		    // detect Metamask account change
-		    window.ethereum.on('accountsChanged', function (accounts) {
-		      console.log('accountsChanges',accounts);
-		
-		    });
-		
-		     // detect Network account change
-		    window.ethereum.on('networkChanged', function(networkId){
-		      console.log('networkChanged',networkId);
-		    });
-		  }
-		});
+    this.handleConnectionUpdate = this.handleConnectionUpdate.bind(this);
 	}
+
+  async componentWillUnmount() {
+    window.ethereum.removeListener('accountsChanged', this.handleConnectionUpdate);
+    window.ethereum.removeListener('networkChanged', this.handleConnectionUpdate);
+  }
 
 	async componentDidMount() {
       const {statusCode, message} = await this.handleConnectionUpdate();
       if (this.state.connected){
         await this.handleTrackListUpdate();
+        this.handleNotificationMessage(message, statusCode, 5);
+      } else {
+        this.handleNotificationMessage(message, statusCode, 0);
       }
-      this.handleNotificationMessage(message, statusCode, 5);
+      if (window.ethereum) {
+        window.ethereum.on('accountsChanged', async () => {
+          console.debug(`App::componentDidMount: accountsChanged event`);
+          window.location.reload();
+        });
+        window.ethereum.on('networkChanged', async () => {
+          console.debug(`App::componentDidMount: networkChanged event`);
+          window.location.reload();
+        });
+        window.ethereum.on('chainChanged', async () => {
+          console.debug(`App::componentDidMount: chainChanged event`);
+          window.location.reload();
+        });
+      }
 	}
  
   async handleConnectionUpdate(){
@@ -132,14 +140,6 @@ class App extends Component {
       </div>
     );
     
-    const walletView = (
-      <WalletConnector
-				handleUpdate={() => this.handleConnectionUpdate}
-        handleNotificationMessage={(message, status_code)=>this.handleNotificationMessage(message, status_code)}
-      />
-    );
-    
-    if (this.state.connected){
       routes = (
         <Switch>
               <Route exact path="/">
@@ -168,14 +168,6 @@ class App extends Component {
               </Route>
             </Switch>
       );
-    } else {
-      
-      routes = <Switch>
-          <Route path="/">
-                {walletView}
-              </Route>
-              </Switch>
-    }
 		return (
       <div className="App">
          <Router>
