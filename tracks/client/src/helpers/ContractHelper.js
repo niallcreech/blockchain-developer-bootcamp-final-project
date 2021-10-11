@@ -191,18 +191,40 @@ export async function sendEntry(trackId, name, desc, location){
 }
 
 export async function checkConnected(){
-  const {statusCode, message, connected} = await getWeb3State();
+	const {accounts, contract, web3, statusCode, message, connected} = await getWeb3State();
   return {statusCode, message, connected};
 }
 
-export async function getWeb3State() {
-  let accounts;
-  let contract;
-  let statusCode;
-  let message;
-  let connected;
-  const web3 = new Web3(window.ethereum);
-  await web3.eth.getAccounts()
+async function getWeb3Contract(web3){
+	let contract;
+	let statusCode;
+	let message; 
+	await web3.eth.net.getId()
+	  .then((networkId) => {
+	    const deployedNetwork = TracksContract.networks[networkId];
+			console.debug(`getWeb3Contract: ${deployedNetwork}`);
+			console.debug(`getWeb3Contract: ${TracksContract.networks}`);
+			console.debug(TracksContract.networks);
+	    contract = new web3.eth.Contract(
+	      TracksContract.abi,
+	      deployedNetwork && deployedNetwork.address,
+	    );
+	    statusCode = statusCode || 200;
+	    message = message || 'Connected to web3 network.';
+	  })
+	  .catch((err) => {
+	    contract = null;
+	    statusCode = statusCode || 500;
+	    message = message || 'Failed to get web3 network connection.';
+	  });
+	return {contract, statusCode, message};
+}
+
+async function getWeb3Accounts(web3){
+	let accounts;
+	let statusCode;
+	let message;
+	await web3.eth.getAccounts()
     .then((acc) => {
       accounts = acc;
       statusCode = 200;
@@ -213,24 +235,34 @@ export async function getWeb3State() {
       statusCode = 500;
       message = 'Failed to get web3 accounts.'
     });
-  await web3.eth.net.getId()
-    .then((networkId) => {
-      const deployedNetwork = TracksContract.networks[networkId];
-      contract = new web3.eth.Contract(
-        TracksContract.abi,
-        deployedNetwork && deployedNetwork.address,
-      );
-      statusCode = statusCode || 200;
-      message = message || 'Connected to web3 network.';
-      connected = true;
-    })
-    .catch((err) => {
-      contract = null;
-      statusCode = statusCode || 500;
-      message = message || 'Failed to get web3 network connection.';
-      connected = false;
-    });
-    return {accounts, contract, web3, statusCode, message, connected};
+	return {accounts, statusCode, message};
+}
+export async function getWeb3State() {
+  let accounts = null;
+  let contract = null;
+  let connected = false;
+  let message;
+  let statusCode;
+  const web3 = new Web3(window.ethereum);
+	const accountObj = await getWeb3Accounts(web3);
+	if (accountObj.statusCode !== 200) {
+		connected = false;
+		message = accountObj.message;
+		statusCode = accountObj.statusCode;
+	} else {
+		accounts = accountObj.accounts;
+	}
+	const contractObj = await getWeb3Contract(web3);
+	if (contractObj.statusCode !== 200) {
+		connected = false;
+		message = contractObj.message;
+		statusCode = contractObj.statusCode;
+	} else {
+		contract = contractObj.contract;
+		connected = true;
+	}
+	return {accounts, contract, web3, statusCode, message, connected};
+    
 }
 
 

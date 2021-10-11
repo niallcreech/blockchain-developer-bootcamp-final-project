@@ -15,7 +15,7 @@ import TrackHeaderView from "./components/TrackHeaderView"
 
 
 import "./App.css";
-import {checkConnected, getTracks, getVotesByTrack} from "./helpers/ContractHelper";
+import {checkConnected, getTracks, getVotesByTrack, getWeb3State} from "./helpers/ContractHelper";
 
 
 class App extends Component {
@@ -34,20 +34,40 @@ class App extends Component {
     this.handleNotificationMessage = this.handleNotificationMessage.bind(this);
     this.handleNotificationMessageClick = this.handleNotificationMessageClick.bind(this);
     this.handleNotificationCountdown = this.handleNotificationCountdown.bind(this);
+		window.addEventListener("load", function() {
+		  if (window.ethereum) {
+		    // detect Metamask account change
+		    window.ethereum.on('accountsChanged', function (accounts) {
+		      console.log('accountsChanges',accounts);
+		
+		    });
+		
+		     // detect Network account change
+		    window.ethereum.on('networkChanged', function(networkId){
+		      console.log('networkChanged',networkId);
+		    });
+		  }
+		});
 	}
 
 	async componentDidMount() {
-    const response = await checkConnected();
-    const {statusCode, message, connected} = await checkConnected();
-   this.setState({connected: connected});
+    //const {statusCode, message, connected} = await checkConnected();
+		const {accounts, contract, web3, statusCode, message, connected} = await getWeb3State();
+   	this.setState({connected: connected});
     if (connected){
+			console.debug(`App::componentDidMount: CONNECTED`);
+			console.debug(contract);
       await this.handleTrackListUpdate();
       this.handleNotificationMessage(message, statusCode, 5);
     } else {
       this.handleNotificationMessage(message, statusCode, null);
     }
 	}
-  
+  async handleConnectionUpdate(){
+		console.debug("App::handleConnectionUpdate");
+		const {accounts, contract, web3, statusCode, message, connected} = await getWeb3State();
+	  this.setState({connected: connected});
+}
   async handleTrackListUpdate(){
 		console.debug("App::handleTrackListUpdate");
     const _tracks = await getTracks();
@@ -116,7 +136,8 @@ class App extends Component {
     );
     
     const walletView = (
-      <WalletConnector 
+      <WalletConnector
+				handleUpdate={() => this.handleConnectionUpdate}
         handleNotificationMessage={(message, status_code)=>this.handleNotificationMessage(message, status_code)}
       />
     );
