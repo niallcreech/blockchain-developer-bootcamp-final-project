@@ -5,11 +5,6 @@ import { withRouter } from 'react-router-dom';
 
 class HeaderView extends Component {
 
-  constructor(props){
-    super(props);
-  }
-  
-  
 	render(){
     const backView = (
         <div>

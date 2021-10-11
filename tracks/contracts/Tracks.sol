@@ -3,16 +3,16 @@ pragma solidity ^0.8.0;
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 
-contract Tracks  is Ownable {
-  mapping (uint  => Track) public tracks;
-  mapping (uint  => uint[]) public trackEntries; //trackId => entryId[]
-  mapping (uint  => uint) public entriesTrack; //entryId => trackId
-  mapping (uint  => address) public trackOwners; //trackId => address
-  mapping (address  => mapping (uint => bool)) public votesByAddress; //address => (entryId => bool)
-  mapping (address  => TrackEvent) public trackEventsByUser; //address => TrackEvent
-  mapping (address  => EntryEvent) public entryEventsByUser; //address => EntryEvent
-  mapping (uint  => uint) public votesByTrack; //trackId => vote count
-  mapping (address  => mapping(uint => uint)) public lastVoteTime; //address => trackId => time(s)
+contract Tracks is Ownable {
+  mapping (uint => Track) public tracks;
+  mapping (uint => uint[]) public trackEntries; //trackId => entryId[]
+  mapping (uint => uint) public entriesTrack; //entryId => trackId
+  mapping (uint => address) public trackOwners; //trackId => address
+  mapping (address => mapping (uint => bool)) public votesByAddress; //address => (entryId => bool)
+  mapping (address => TrackEvent) public trackEventsByUser; //address => TrackEvent
+  mapping (address => EntryEvent) public entryEventsByUser; //address => EntryEvent
+  mapping (uint => uint) public votesByTrack; //trackId => vote count
+  mapping (address => mapping(uint => uint)) public lastVoteTime; //address => trackId => time(s)
   mapping(address => bool) public bannedUsers;
 
   uint public nextTrackId;
@@ -23,6 +23,9 @@ contract Tracks  is Ownable {
   uint public trackEventCooldownPeriod;
   State public allTracksState;
   State public allVotesState;
+  bool trackCreationCooldownEnabled;
+  bool votingCooldownEnabled;
+  bool entryCreationCooldownEnabled;
   
   
 	struct EntryEvent {
@@ -121,28 +124,54 @@ contract Tracks  is Ownable {
 	    _;
 	  }
 
-	modifier isUserBanned(address _addr){
-			require(bannedUsers[msg.sender] != true, "User has been banned by admin");
+	modifier isUserBanned(address addr){
+			require(
+			    addr != owner()
+			    || bannedUsers[addr] != true,
+			    "User has been banned by admin"
+			);
 	    _;
 	}
 
-	modifier hasNotVotedForEntry(address _addr, uint _entryId){
-	    require(votesByAddress[msg.sender][_entryId] == false, "Users cannot vote for the same entry multiple times.");
+	modifier hasNotVotedForEntry(address addr, uint _entryId){
+	    require(
+	        addr == owner()
+	        || votesByAddress[addr][_entryId] == false,
+	        "Users cannot vote for the same entry multiple times."
+	    );
 	    _;
 	}
 	
 	modifier isNotInVotingCooldown(address addr, uint trackId){
-	    require(lastVoteTime[addr][trackId] == 0 || lastVoteTime[addr][trackId] + voteCooldownPeriod > block.timestamp, "User is currently in voting cooldown period for track.");
+	    require(
+	        !votingCooldownEnabled
+          || addr == owner()
+	        || lastVoteTime[addr][trackId] == 0 
+	        || lastVoteTime[addr][trackId] + voteCooldownPeriod > block.timestamp,
+	        "User is currently in voting cooldown period for track."
+	    );
 	    _;
 	}
 
 	modifier isNotInTrackCreationCooldown(address addr){
-	    require(trackEventsByUser[addr].time == 0 || (trackEventsByUser[addr].time + trackEventCooldownPeriod) > block.timestamp, "User is currently in track cooldown.");
+	    require(
+	        !trackCreationCooldownEnabled
+          || addr == owner()
+	        || trackEventsByUser[addr].time == 0
+          || (trackEventsByUser[addr].time + trackEventCooldownPeriod) > block.timestamp,
+	       "User is currently in track cooldown."
+	     );
 	    _;
 	}
 	
 	modifier isNotInEntryCreationCooldown(address addr){
-	    require(entryEventsByUser[addr].time == 0 || (entryEventsByUser[addr].time + entryEventCooldownPeriod) > block.timestamp, "User is currently in entry cooldown.");
+	    require(
+	        !entryCreationCooldownEnabled
+	        || addr == owner()
+	        || entryEventsByUser[addr].time == 0
+	        || (entryEventsByUser[addr].time + entryEventCooldownPeriod) > block.timestamp,
+	        "User is currently in entry cooldown."
+	    );
 	    _;
 	}
 	
@@ -157,6 +186,7 @@ contract Tracks  is Ownable {
       allVotesState = State.Open;
       uint trackId = addTrack("first_track", "This is the first track");
       addEntry(trackId, "name", "description", "location");
+      enableCooldowns(true);
   }
 
 	/**
@@ -314,6 +344,11 @@ contract Tracks  is Ownable {
 	 		bannedUsers[addr] = banned;   
 		}
    
+   function enableCooldowns(bool enable) public onlyOwner {
+    trackCreationCooldownEnabled = enable;
+    votingCooldownEnabled = enable;
+    entryCreationCooldownEnabled = enable;
+  }
 }
 
 

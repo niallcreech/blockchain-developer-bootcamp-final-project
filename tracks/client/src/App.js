@@ -3,7 +3,6 @@ import {
   BrowserRouter as Router,
   Switch,
   Route,
-  Link,
 } from "react-router-dom";
 import Notification from "./components/Notification"
 import TrackList from "./components/TrackList"

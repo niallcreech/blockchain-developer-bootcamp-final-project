@@ -194,7 +194,7 @@ export async function sendEntry(trackId, name, desc, location){
 }
 
 export async function checkConnected(){
-	const {accounts, contract, web3, statusCode, message, connected} = await getWeb3State();
+	const {statusCode, message, connected} = await getWeb3State();
   return {statusCode, message, connected};
 }
 
