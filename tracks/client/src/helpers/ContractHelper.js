@@ -296,6 +296,7 @@ function parseError(err){
     } else {
       err_message = err.message;
     }
+    console.debug(err);
   }
   return {
     code: err_code,

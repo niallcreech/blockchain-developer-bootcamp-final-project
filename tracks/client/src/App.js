@@ -9,13 +9,12 @@ import Notification from "./components/Notification"
 import TrackList from "./components/TrackList"
 import TrackView from "./components/TrackView"
 import TrackForm from "./components/TrackForm"
-import WalletConnector from "./components/WalletConnector"
 import HeaderView from "./components/HeaderView"
 import TrackHeaderView from "./components/TrackHeaderView"
 
 
 import "./App.css";
-import {checkConnected, getTracks, getVotesByTrack, getWeb3State} from "./helpers/ContractHelper";
+import {getTracks, getVotesByTrack, getWeb3State} from "./helpers/ContractHelper";
 
 
 class App extends Component {

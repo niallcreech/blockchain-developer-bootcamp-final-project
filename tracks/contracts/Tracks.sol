@@ -72,7 +72,7 @@ contract Tracks  is Ownable {
    * @param _trackId The id of the track
    */
 	modifier checkTrackClosed(uint _trackId) {
-		require(tracks[_trackId].state == State.Closed);
+		require(tracks[_trackId].state == State.Closed, "Track is not closed");
     _;
   }
   
@@ -81,7 +81,7 @@ contract Tracks  is Ownable {
    * @param _trackId The id of the track
    */
 	modifier checkTrackBlocked(uint _trackId) {
-		require(tracks[_trackId].state == State.Blocked);
+		require(tracks[_trackId].state == State.Blocked, "Track is not blocked");
     _;
   }
   
@@ -108,7 +108,7 @@ contract Tracks  is Ownable {
    * @param _trackId The id of the track
    */
 	modifier checkTrackUnblocked(uint _trackId) {
-		require(tracks[_trackId].state != State.Blocked);
+		require(tracks[_trackId].state != State.Blocked, "Track is blocked.");
     _;
   }
   
@@ -117,7 +117,7 @@ contract Tracks  is Ownable {
    * @param _trackId The id of the track
    */
 	modifier checkTrackExists(uint _trackId) {
-			require(tracks[_trackId].exists == true);
+			require(tracks[_trackId].exists == true, "Track does not exist");
 	    _;
 	  }
 
