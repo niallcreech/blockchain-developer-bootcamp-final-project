@@ -4,10 +4,13 @@ import Web3 from "web3";
 
 
 export async function getTracks(){
-    const {contract} = await getWeb3State();
- 		const tracks = await contract.methods.getTracks().call();
-    const statusCode = 200;
-    const message = "Found " + tracks.length + " tracks.";
+    let tracks;
+    const {contract, statusCode, message} = await getWeb3State();
+    if (statusCode !== 200){
+      tracks = [];
+    } else {
+      tracks = await contract.methods.getTracks().call();
+    }
     return {data: tracks,
             statusCode: statusCode,
             message: message};
@@ -210,13 +213,18 @@ async function getWeb3Contract(web3){
 	      deployedNetwork && deployedNetwork.address,
 	    );
 	    statusCode = statusCode || 200;
-	    message = message || 'Connected to web3 network.';
+	    message = 'Connected to web3 network.';
 	  })
 	  .catch((err) => {
 	    contract = null;
 	    statusCode = statusCode || 500;
-	    message = message || 'Failed to get web3 network connection.';
+	    message = 'Failed to get web3 network connection.';
 	  });
+  if (contract.currentProvider.selectedAddress.length === 0){
+    contract = null;
+    statusCode = statusCode || 500;
+    message =  `Contract not found on network ${contract.currentProvider.chainId}, please select the correct network`;
+  }
 	return {contract, statusCode, message};
 }
 
@@ -261,6 +269,9 @@ export async function getWeb3State() {
 		contract = contractObj.contract;
 		connected = true;
 	}
+  message = contractObj.message;
+  statusCode = contractObj.statusCode;
+  console.debug(accounts, contract, web3, statusCode, message, connected);
 	return {accounts, contract, web3, statusCode, message, connected};
     
 }

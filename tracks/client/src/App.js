@@ -51,30 +51,27 @@ class App extends Component {
 	}
 
 	async componentDidMount() {
-    //const {statusCode, message, connected} = await checkConnected();
-		const {accounts, contract, web3, statusCode, message, connected} = await getWeb3State();
-   	this.setState({connected: connected});
-    if (connected){
-			console.debug(`App::componentDidMount: CONNECTED`);
-			console.debug(contract);
-      await this.handleTrackListUpdate();
+      const {statusCode, message} = await this.handleConnectionUpdate();
+      if (this.state.connected){
+        await this.handleTrackListUpdate();
+      }
       this.handleNotificationMessage(message, statusCode, 5);
-    } else {
-      this.handleNotificationMessage(message, statusCode, null);
-    }
 	}
+ 
   async handleConnectionUpdate(){
 		console.debug("App::handleConnectionUpdate");
-		const {accounts, contract, web3, statusCode, message, connected} = await getWeb3State();
+		const {statusCode, message, connected} = await getWeb3State();
 	  this.setState({connected: connected});
+    return {connected, statusCode, message};
 }
   async handleTrackListUpdate(){
 		console.debug("App::handleTrackListUpdate");
-    const _tracks = await getTracks();
-    const _trackIds = _tracks.data.map((track) => (track.trackId));
+    const {data, statusCode, message} = await getTracks();
+    const _trackIds = data.map((track) => (track.trackId));
 		this.setState({
-			tracks: _tracks.data,
+			tracks: data,
 			trackVotes: await getVotesByTrack(_trackIds).then(results => results.data)});
+    return {statusCode, message};
   }
   
   async handleNotificationMessageClick(){

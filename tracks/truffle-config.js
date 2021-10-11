@@ -27,13 +27,13 @@ const mnemonic = process.env.MNEMONIC;
 const infuraProjectId = process.env.INFURA_PROJECT_ID;
 
 // naive environment assertions, since these aren't present by default
-if (infuraProjectId === undefined || infuraProjectId === '') {
-  throw new Error('truffle-config.js needs the environment variable "INFURA_PROJECT_ID"');
-} else if (mnemonic === undefined) {
-  throw new Error('truffle-config.js needs the environment variable "MNEMONIC"');
-} else if (mnemonic.split(' ').length != 12) {
-  throw new Error('The environment variable "MNEMONIC" must be 12 words (space delineated)');
-}
+//if (infuraProjectId === undefined || infuraProjectId === '') {
+//  throw new Error('truffle-config.js needs the environment variable "INFURA_PROJECT_ID"');
+//} else if (mnemonic === undefined) {
+ // throw new Error('truffle-config.js needs the environment variable "MNEMONIC"');
+//} else if (mnemonic.split(' ').length != 12) {
+//  throw new Error('The environment variable "MNEMONIC" must be 12 words (space delineated)');
+//}
 
 
 const path = require("path");
