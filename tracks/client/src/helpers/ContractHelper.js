@@ -220,10 +220,14 @@ async function getWeb3Contract(web3){
 	    statusCode = 500;
 	    message = 'Failed to get web3 network connection.';
 	  });
-  if (!contract._address){
-    message =  `Contract not found on network ${contract.currentProvider.chainId}, please select the correct network`;
+	if (!contract){
+    message =  `Contract not found on network, please select the correct network`;
     statusCode = 500;
-  }
+		if (!contract._address){
+		    message =  `Contract not found on network ${contract.currentProvider.chainId}, please select the correct network`;
+		    statusCode = 500;
+		  }
+  } 
 	return {contract, statusCode, message};
 }
 
@@ -271,7 +275,6 @@ export async function getWeb3State() {
 
   message = contractObj.message;
   statusCode = contractObj.statusCode;
-  console.debug(accounts, contract, web3, statusCode, message, connected);
 	return {accounts, contract, web3, statusCode, message, connected};
     
 }

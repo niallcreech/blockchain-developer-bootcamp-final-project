@@ -61,10 +61,7 @@ describe("When working with Tracks", () => {
 			expect(!contract.isSenderInTrackCreationCooldown(), { from: clientAddress });
       await contract.addTrack("mytrack", "mydescription", { from: clientAddress });
 			expect(!contract.isSenderInTrackCreationCooldown(), { from: clientAddress });
-      try {
-      	await contract.addTrack("mytrack", "mydescription", { from: clientAddress });
-        assert(true);
-      } catch (e){assert(false);}
+    	await contract.addTrack("mytrack", "mydescription", { from: clientAddress });
   });
 
 	it("...should stop the address creating another entry during cooldown period.", async () => {
@@ -88,7 +85,6 @@ describe("When working with Tracks", () => {
 			expect(!contract.isSenderInEntryCreationCooldown(), { from: clientAddress });
       try {
       	await contract.addEntry(trackId, "myentry", "mydescription", { from: clientAddress }); 
-        assert(true);
       } catch (e){assert(false);}
   });
 

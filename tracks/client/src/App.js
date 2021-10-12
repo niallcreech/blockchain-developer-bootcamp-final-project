@@ -41,6 +41,7 @@ class App extends Component {
   }
 
 	async componentDidMount() {
+			document.title = "Tracks smudger";
       const {statusCode, message} = await this.handleConnectionUpdate();
       if (this.state.connected){
         await this.handleTrackListUpdate();
