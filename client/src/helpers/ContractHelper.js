@@ -223,11 +223,11 @@ async function getWeb3Contract(web3){
 	if (!contract){
     message =  `Contract not found on network, please select the correct network`;
     statusCode = 500;
-		if (!contract._address){
+    debugger;
+	} else if (!contract._address){
 		    message =  `Contract not found on network ${contract.currentProvider.chainId}, please select the correct network`;
 		    statusCode = 500;
-		  }
-  } 
+  }
 	return {contract, statusCode, message};
 }
 

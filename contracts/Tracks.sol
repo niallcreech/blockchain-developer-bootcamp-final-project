@@ -2,7 +2,11 @@
 pragma solidity ^0.8.0;
 import "@openzeppelin/contracts/access/Ownable.sol";
 
-
+/**
+   * @title The Tracks contract enables the storage of collections of 
+   * text information with voting enabled on each memeber of the collection
+   * through emitting events.
+   */
 contract Tracks is Ownable {
   mapping (uint => Track) public tracks;
   mapping (uint => uint[]) public trackEntries; //trackId => entryId[]
@@ -61,7 +65,7 @@ contract Tracks is Ownable {
 
 
   /**
-   * @dev XXX
+   * @notice Check if the track is in the 'open' state.
    * @param _trackId The id of the track
    */
 	modifier checkTrackOpen(uint _trackId) {
@@ -71,7 +75,7 @@ contract Tracks is Ownable {
   }
   
 	/**
-   * @dev XXX
+   * @notice Check if the track is in the 'closed' state.
    * @param _trackId The id of the track
    */
 	modifier checkTrackClosed(uint _trackId) {
@@ -80,7 +84,7 @@ contract Tracks is Ownable {
   }
   
   /**
-   * @dev XXX
+   * @notice Check if the track is in the 'blocked' state.
    * @param _trackId The id of the track
    */
 	modifier checkTrackBlocked(uint _trackId) {
@@ -89,7 +93,7 @@ contract Tracks is Ownable {
   }
   
   /**
-   * @dev XXX
+   * @notice Check if the track has been 'blocked' by the admin.
    */
 	modifier checkTracksNotBlockedByAdmin() {
 		require(allTracksState != State.Blocked, "All tracks have been blocked by admin");
@@ -98,7 +102,7 @@ contract Tracks is Ownable {
   
   
   /**
-   * @dev XXX
+   * @notice Check if voting has been 'blocked' by the admin.
    */
 	modifier checkVotingNotBlockedByAdmin() {
 		require(allVotesState != State.Blocked, "All voting has been blocked by admin");
@@ -107,7 +111,7 @@ contract Tracks is Ownable {
   
   
   /**
-   * @dev XXX
+   * @notice Check if the track is not 'blocked'.
    * @param _trackId The id of the track
    */
 	modifier checkTrackUnblocked(uint _trackId) {
@@ -116,7 +120,7 @@ contract Tracks is Ownable {
   }
   
   /**
-   * @dev XXX
+   * @notice Check if the track exists.
    * @param _trackId The id of the track
    */
 	modifier checkTrackExists(uint _trackId) {
@@ -124,6 +128,10 @@ contract Tracks is Ownable {
 	    _;
 	  }
 
+  /**
+   * @notice Check if the supplied user address has been banned.
+   * @param addr The address of the user to check.
+   */
 	modifier isUserBanned(address addr){
 			require(
 			    addr != owner()
@@ -133,6 +141,11 @@ contract Tracks is Ownable {
 	    _;
 	}
 
+  /**
+   * @notice Check if the supplied user address has voted for the given entry.
+   * @param addr The address of the user to check.
+   * @param _entryId The id of the entry to check.
+   */
 	modifier hasNotVotedForEntry(address addr, uint _entryId){
 	    require(
 	        addr == owner()
@@ -142,6 +155,12 @@ contract Tracks is Ownable {
 	    _;
 	}
 	
+	/**
+   * @notice Check if the supplied user is in the voting cooldown period for the
+   *  given track.
+   * @param addr The address of the user to check.
+   * @param trackId The id of the track.
+   */
 	modifier isNotInVotingCooldown(address addr, uint trackId){
 	    require(
 	        !votingCooldownEnabled
@@ -153,6 +172,10 @@ contract Tracks is Ownable {
 	    _;
 	}
 
+  /**
+   * @notice Check if the supplied user is in the track creation cooldown period.
+   * @param addr The address of the user to check.
+   */
 	modifier isNotInTrackCreationCooldown(address addr){
 	    require(
 	        !trackCreationCooldownEnabled
@@ -164,6 +187,10 @@ contract Tracks is Ownable {
 	    _;
 	}
 	
+	/**
+   * @notice Check if the supplied user is in the entry creation cooldown period.
+   * @param addr The address of the user to check.
+   */
 	modifier isNotInEntryCreationCooldown(address addr){
 	    require(
 	        !entryCreationCooldownEnabled
@@ -176,7 +203,8 @@ contract Tracks is Ownable {
 	}
 	
 	/**
-   * @dev XXX
+   * @notice Create the new contract
+   * @dev THe default is to have tracks open with cooldowns enabled.
    */
   constructor () {
       voteCooldownPeriod = 1 minutes;
