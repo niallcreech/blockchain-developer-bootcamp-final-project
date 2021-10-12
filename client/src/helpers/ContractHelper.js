@@ -4,13 +4,11 @@ import Web3 from "web3";
 
 
 export async function getTracks(){
-    let tracks;
-    const {contract, statusCode, message} = await getWeb3State();
-    if (statusCode !== 200){
-      tracks = [];
-    } else {
-      tracks = await contract.methods.getTracks().call();
-    }
+    let tracks = [];
+    let {contract, statusCode, message} = await getWeb3State();
+  if (statusCode === 200){
+			tracks = await contract.methods.getTracks().call();
+    } 
     return {data: tracks,
             statusCode: statusCode,
             message: message};
@@ -39,22 +37,24 @@ export function isValidUrl(string){
 }
 
 export async function getVotesByTrack(_trackIds){
-  const {contract} = await getWeb3State();
+
 	let tracks = {};
-	let statusCode;
-	let message;
-	_trackIds.map(async (trackId) => {
-		await contract.methods.votesByTrack(trackId).call()
-		.then((result)=> {
-				tracks[trackId] = result;
-		})
-		.catch((err) => {
-			console.error(`getVotesByTrack: ${err}`);
-	    let parsedError = parseError(err);
-	    statusCode = parsedError.code;
-	    message = parsedError.message;
+	let {contract, statusCode, message} = await getWeb3State();
+  if (statusCode === 200){
+	    _trackIds.map(async (trackId) => {
+			await contract.methods.votesByTrack(trackId).call()
+			.then((result)=> {
+					tracks[trackId] = result;
+			})
+			.catch((err) => {
+				console.error(`getVotesByTrack: ${err}`);
+		    let parsedError = parseError(err);
+		    statusCode = parsedError.code;
+		    message = parsedError.message;
+			});
 		});
-	});
+  }
+	
   return {data: tracks,
           statusCode: statusCode,
           message: message};
@@ -62,36 +62,40 @@ export async function getVotesByTrack(_trackIds){
 
 
 export async function getTrackDetails(trackId){
-    const {contract} = await getWeb3State();
-    const track = await contract.methods.tracks(trackId).call();
-    console.debug(`getTrackDetails: ${track}`);
-    const statusCode = 200;
-    const message = "Found track.";
+		let track = null
+		let {contract, statusCode, message} = await getWeb3State();
+    if (statusCode === 200){
+       track = await contract.methods.tracks(trackId).call();
+    	console.debug(`getTrackDetails: ${track}`);
+     	statusCode = 200;
+     	message = "Found track.";
+    } 
     return {data: track,
             statusCode: statusCode,
             message: message};
 }
 
 async function getEvents(eventName, eventFilter, fromBlock="earliest", toBlock="latest"){
-	const {contract} = await getWeb3State();
-	let results;
-  let message;
-  let statusCode;
-	try{
-		const resultsRaw = await contract.getPastEvents(eventName, {
-    	filter: eventFilter,
-    	fromBlock: fromBlock,
-    	toBlock: toBlock
-		});
-		results = resultsRaw.map(event => event.returnValues);
-    statusCode = 200;
-    message = "Found " + results.length + " events.";
-	} catch(e) {
-		results = [];
-    let parsedError = parseError(e);
-    statusCode = parsedError.code;
-    message = parsedError.message;
-	}	
+	
+	let results = [];
+	let {contract, statusCode, message} = await getWeb3State();
+  if (statusCode === 200){
+		try{
+			const resultsRaw = await contract.getPastEvents(eventName, {
+	    	filter: eventFilter,
+	    	fromBlock: fromBlock,
+	    	toBlock: toBlock
+			});
+			results = resultsRaw.map(event => event.returnValues);
+	    statusCode = 200;
+	    message = "Found " + results.length + " events.";
+		} catch(e) {
+			results = [];
+	    let parsedError = parseError(e);
+	    statusCode = parsedError.code;
+	    message = parsedError.message;
+		}
+	}
   
   return {data: results,
           statusCode: statusCode,
@@ -127,69 +131,69 @@ export async function getEntries(trackId){
 
 export async function sendVote(_entryId){
 	// Send a contract call to vote for the entry
-  let message;
-  let statusCode;
-	const {accounts, contract} = await getWeb3State();
-  const options = {from: accounts[0]}
-  await contract.methods.vote(_entryId).send(options)
-    .then(() => {
-      message = "Successfully voted for entry";
-      statusCode = 200;
-    })
-    .catch((err) => {
-      const parsedError = parseError(err);
-      message = parsedError.reason || "Voting failed! You can only vote once for each entry, each track, during the cooldown period";
-      statusCode = parsedError.code;
-    });
-  console.debug(`sendVote: ${message}, ${statusCode}`);
+	let {accounts, contract, statusCode, message} = await getWeb3State();
+	if (statusCode === 200){
+	  const options = {from: accounts[0]}
+	  await contract.methods.vote(_entryId).send(options)
+	    .then(() => {
+	      message = "Successfully voted for entry";
+	      statusCode = 200;
+	    })
+	    .catch((err) => {
+	      const parsedError = parseError(err);
+	      message = parsedError.reason || "Voting failed! You can only vote once for each entry, each track, during the cooldown period";
+	      statusCode = parsedError.code;
+	    });
+	  console.debug(`sendVote: ${message}, ${statusCode}`);
+	}
   return {data: [], statusCode: statusCode, message: message};
 }
 
 export async function sendTrack(name, desc){
   // Send a contract call to vote for the entry
-  let message;
-  let statusCode;
-  const {accounts, contract} = await getWeb3State();
-  const options = {from: accounts[0]}
-  console.debug("WEB3:sendTrack: "
-    + name + ", "
-    + desc  + ")"
-  ); 
-  await contract.methods.addTrack(name, desc).send(options)
-    .then(() => {
-      message = "Successfully created track";
-      statusCode = 200;
-    })
-    .catch((err) => {
-      const parsedError = parseError(err);
-      message = parsedError.message;
-      statusCode = parsedError.code;
-    });
+  let {accounts, contract, statusCode, message} = await getWeb3State();
+	if (statusCode === 200){
+	  const options = {from: accounts[0]}
+	  console.debug("WEB3:sendTrack: "
+	    + name + ", "
+	    + desc  + ")"
+	  ); 
+	  await contract.methods.addTrack(name, desc).send(options)
+	    .then(() => {
+	      message = "Successfully created track";
+	      statusCode = 200;
+	    })
+	    .catch((err) => {
+	      const parsedError = parseError(err);
+	      message = parsedError.message;
+	      statusCode = parsedError.code;
+	    });
+	}
   return {data: [], statusCode: statusCode, message: message};
 }
 
 export async function sendEntry(trackId, name, desc, location){
-  let message;
-  let statusCode;
   // Send a contract call to vote for the entry
-  const {accounts, contract} = await getWeb3State();
-  const options = {from: accounts[0]}
-  console.debug("WEB3:sendEntry: "
-    + trackId + ", "
-    + name + ", "
-    + desc + ", "
-    + location + ")"
-  ); 
-  await contract.methods.addEntry(trackId, name, desc, location).send(options)
-    .then(() => {
-      message = "Successfully created entry";
-      statusCode = 200;
-    })
-    .catch((err) => {
-      const parsedError = parseError(err);
-      message = parsedError.message;
-      statusCode = parsedError.code;
-    });
+  let {accounts, contract, statusCode, message} = await getWeb3State();
+	if (statusCode === 200){
+	  const options = {from: accounts[0]}
+	  console.debug("WEB3:sendEntry: "
+	    + trackId + ", "
+	    + name + ", "
+	    + desc + ", "
+	    + location + ")"
+	  ); 
+	  await contract.methods.addEntry(trackId, name, desc, location).send(options)
+	    .then(() => {
+	      message = "Successfully created entry";
+	      statusCode = 200;
+	    })
+	    .catch((err) => {
+	      const parsedError = parseError(err);
+	      message = parsedError.message;
+	      statusCode = parsedError.code;
+	    });	
+	}
   return {data: [], statusCode: statusCode, message: message};
 }
 

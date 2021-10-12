@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 usage() {
     echo "Usage: $0 -p <port> -n <network> -t" 1>&2; exit 1;
@@ -26,15 +26,15 @@ while getopts "p:n:t" o; do
     esac
 done
 
-if [ "${NETWORK}" == "development" ]; then
-    echo "Starting up ganache local environment..."
-    (ganache-cli --quiet --port 7545 -h 0.0.0.0) &
-fi
 if [ "${TEST}" == "true" ]; then
   echo "Running test suite..."
-  truffle test --network ${NETWORK}
+  (truffle test --network ${NETWORK}) &
 else
   echo "Deploying contracts to network ${NETWORK}..."
-  truffle migrate --network ${NETWORK}
+  (truffle migrate --network ${NETWORK}) &
 fi
 
+if [ "${NETWORK}" == "development" ]; then
+    echo "Starting up ganache local environment..."
+    ganache-cli --quiet -h 0.0.0.0 --port 7545
+fi

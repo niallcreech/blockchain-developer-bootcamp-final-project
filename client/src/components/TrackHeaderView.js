@@ -23,12 +23,14 @@ class TrackHeaderView extends Component {
   }
   
   async getSelectedTrack(){
-    const trackDetails =  await getTrackDetails(this.props.match.params.trackId);
-    this.setState({
-      trackId: this.props.match.params.trackId,
-      trackName: trackDetails.data.name,
-      trackDesc: trackDetails.data.desc,
-    });
+    const {data, statusCode, message} =  await getTrackDetails(this.props.match.params.trackId);
+		if (statusCode === 200) {
+	    this.setState({
+	      trackId: this.props.match.params.trackId,
+	      trackName: data.name || "",
+	      trackDesc: data.desc || "",
+	    });
+	}
   }
   
   async handleReturnClick(){
