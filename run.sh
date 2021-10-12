@@ -27,12 +27,14 @@ while getopts "p:n:t" o; do
 done
 
 if [ "${NETWORK}" == "development" ]; then
+    echo "Starting up ganache local environment..."
     (ganache-cli --quiet --port 7545 -h 0.0.0.0) &
-    sleep 3
 fi
 if [ "${TEST}" == "true" ]; then
+  echo "Running test suite..."
   truffle test --network ${NETWORK}
 else
+  echo "Deploying contracts to network ${NETWORK}..."
   truffle migrate --network ${NETWORK}
 fi
 
