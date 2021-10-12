@@ -1,4 +1,1 @@
-[core]
-autocrlf = true
-
 *.sol linguist-language=Solidity
