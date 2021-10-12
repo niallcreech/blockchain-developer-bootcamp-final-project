@@ -1,1 +1,5 @@
 # Spins up a local testnet and server to serve your decentralized application locally
+ganache-cli --port 7545 &
+truffle migrate
+cd client
+npm start 

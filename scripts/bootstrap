@@ -1,1 +1,4 @@
 # When run locally, it builds or checks for the dependencies of your project
+
+truffle build
+npm install client

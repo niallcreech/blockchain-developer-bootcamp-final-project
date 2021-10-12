@@ -1,0 +1,12 @@
+services:
+  web:
+    build: ./client/
+    ports:
+      - "3000:3000"
+    links:
+      - ganache
+  ganache:
+    build: .
+    ports:
+      - "7545:7545"
+
