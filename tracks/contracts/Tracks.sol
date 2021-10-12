@@ -23,9 +23,9 @@ contract Tracks is Ownable {
   uint public trackEventCooldownPeriod;
   State public allTracksState;
   State public allVotesState;
-  bool trackCreationCooldownEnabled;
-  bool votingCooldownEnabled;
-  bool entryCreationCooldownEnabled;
+  bool public trackCreationCooldownEnabled;
+  bool public votingCooldownEnabled;
+  bool public entryCreationCooldownEnabled;
   
   
 	struct EntryEvent {
@@ -340,10 +340,34 @@ contract Tracks is Ownable {
        }
 	}
    
-   function banUser(address addr, bool banned) public onlyOwner {
-	 		bannedUsers[addr] = banned;   
-		}
+ function banUser(address addr, bool banned) public onlyOwner {
+ 		bannedUsers[addr] = banned;   
+	}
    
+  function isSenderInTrackCreationCooldown() public view returns (bool) {
+      if (votingCooldownEnabled
+	        && ((trackEventsByUser[msg.sender].time + trackEventCooldownPeriod) < block.timestamp)){
+	            return true;
+	   	}
+	   	return false;
+	}
+	
+	function isSenderInEntryCreationCooldown() public view returns (bool) {
+      if (entryCreationCooldownEnabled
+	        && ((entryEventsByUser[msg.sender].time + entryEventCooldownPeriod) < block.timestamp)){
+	            return true;
+	   	}
+	   	return false;
+	}
+	
+	function isSenderInVotingCooldown(uint trackId) public view returns (bool) {
+      if (votingCooldownEnabled
+	        && ((lastVoteTime[msg.sender][trackId] + voteCooldownPeriod) > block.timestamp)){
+	            return true;
+	   	}
+	   	return false;
+	}
+	
    function enableCooldowns(bool enable) public onlyOwner {
     trackCreationCooldownEnabled = enable;
     votingCooldownEnabled = enable;

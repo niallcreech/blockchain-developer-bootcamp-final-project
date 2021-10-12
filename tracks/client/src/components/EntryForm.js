@@ -38,7 +38,7 @@ class EntryForm extends Component {
     this.setState({
 			name: "",
 			desc: "",
-			location: "",
+			location: "http://",
 		});
   }
 
