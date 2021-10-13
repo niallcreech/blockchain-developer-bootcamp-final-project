@@ -206,24 +206,25 @@ async function getWeb3Contract(web3){
 	let contract;
 	let statusCode;
 	let message;
-	await web3.eth.net.getId()
-	  .then((networkId) => {
-	    const deployedNetwork = TracksContract.networks[networkId];
-			console.debug(`getWeb3Contract: ${deployedNetwork}`);
-			console.debug(`getWeb3Contract: ${TracksContract.networks}`);
-			console.debug(TracksContract.networks);
-	    contract = new web3.eth.Contract(
-	      TracksContract.abi,
-	      deployedNetwork && deployedNetwork.address,
-	    );
-	    statusCode = statusCode || 200;
-	    message = 'Connected to web3 network.';
-	  })
-	  .catch((err) => {
+  let networkId=null;
+  
+  try {
+    networkId = await web3.eth.net.getId();
+    const deployedNetwork = TracksContract.networks[networkId];
+		console.debug(`getWeb3Contract: ${deployedNetwork}`);
+		console.debug(`getWeb3Contract: ${TracksContract.networks}`);
+		console.debug(TracksContract.networks);
+    contract = new web3.eth.Contract(
+      TracksContract.abi,
+      deployedNetwork && deployedNetwork.address,
+    );
+    statusCode = statusCode || 200;
+    message = 'Connected to web3 network.';
+	} catch(err) {
 	    contract = null;
 	    statusCode = 500;
 	    message = 'Failed to get web3 network connection.';
-	  });
+	}
 	if (!contract){
     message =  `Contract not found on network, please select the correct network`;
     statusCode = 500;
@@ -231,6 +232,9 @@ async function getWeb3Contract(web3){
 	} else if (!contract._address){
 		    message =  `Contract not found on network ${contract.currentProvider.chainId}, please select the correct network`;
 		    statusCode = 500;
+  } else {
+    statusCode = 200;
+    message = `Found contract ${contract._address} on network ${networkId}.`;
   }
 	return {contract, statusCode, message};
 }
