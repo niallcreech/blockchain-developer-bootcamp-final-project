@@ -158,16 +158,16 @@ export async function sendTrack(name, desc){
 	    + name + ", "
 	    + desc  + ")"
 	  ); 
-	  await contract.methods.addTrack(name, desc).send(options)
-	    .then(() => {
-	      message = "Successfully created track";
-	      statusCode = 200;
-	    })
-	    .catch((err) => {
+    try {
+      await contract.methods.addTrack(name, desc).send(options);
+      debugger;
+      message = "Successfully created track";
+      statusCode = 200;
+	  } catch(err) {
 	      const parsedError = parseError(err);
 	      message = parsedError.message;
 	      statusCode = parsedError.code;
-	    });
+	  }
 	}
   return {data: [], statusCode: statusCode, message: message};
 }
@@ -250,35 +250,63 @@ async function getWeb3Accounts(web3){
       statusCode = 500;
       message = 'Failed to get web3 accounts.'
     });
+  if (accounts.length === 0) {
+    statusCode = 500;
+    message = 'Could not find any accounts.'
+  }
 	return {accounts, statusCode, message};
+}
+
+function getWeb3Object(){
+  let web3 = null;
+  let statusCode;
+  let message;
+  if(typeof window !== 'undefined' && typeof window.ethereum !== 'undefined'){
+    window.ethereum.enable();
+    web3 = new Web3(window.ethereum);
+    statusCode = 200;
+    message = "Enabled wallet connection.";
+  } else if (typeof window !== 'undefined' && typeof window.web3 !== 'undefined') {
+    web3 = new Web3(window.web3.currentProvider);
+    statusCode = 200;
+    message = "Enabled wallet connection.";
+  } else {
+    statusCode = 500;
+    message = "No MetaMask detected, please install MetaMask first.";
+  }
+  return {web3, statusCode, message};
 }
 export async function getWeb3State() {
   let accounts = null;
   let contract = null;
   let connected = false;
+  let web3 = false;
   let message;
   let statusCode;
-  const web3 = new Web3(window.ethereum);
-	const accountObj = await getWeb3Accounts(web3);
-	if (accountObj.statusCode !== 200) {
-		connected = false;
-		message = accountObj.message;
-		statusCode = accountObj.statusCode;
-	} else {
-		accounts = accountObj.accounts;
-	}
-	const contractObj = await getWeb3Contract(web3);
-	if (contractObj.statusCode !== 200) {
-		connected = false;
-		message = contractObj.message;
-		statusCode = contractObj.statusCode;
-	} else {
-		contract = contractObj.contract;
-		connected = true;
-	}
-
-  message = contractObj.message;
-  statusCode = contractObj.statusCode;
+  const web3Obj = getWeb3Object();
+	if (web3Obj.statusCode !== 200) {
+    message = web3Obj.message;
+    statusCode = web3Obj.statusCode;
+  } else {
+    web3 = web3Obj.web3;
+    const accountObj = await getWeb3Accounts(web3);
+    	if (accountObj.statusCode !== 200) {
+    		message = accountObj.message;
+    		statusCode = accountObj.statusCode;
+    	} else {
+    		accounts = accountObj.accounts;
+      	const contractObj = await getWeb3Contract(web3);
+      	if (contractObj.statusCode !== 200) {
+      		message = contractObj.message;
+      		statusCode = contractObj.statusCode;
+      	} else {
+      		contract = contractObj.contract;
+      		connected = true;
+      	}
+      message = contractObj.message;
+      statusCode = contractObj.statusCode;
+    }
+  }
 	return {accounts, contract, web3, statusCode, message, connected};
     
 }
