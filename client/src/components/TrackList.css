@@ -34,3 +34,11 @@ display:table-cell;
     font-size: calc(10px + 2vmin);
     color: white;
 }
+
+.TrackListViewButton {
+    font-weight:bold;
+    padding: (40px + 2vmin);
+    color: black;
+    font-size: 20px;
+    background: green;
+}

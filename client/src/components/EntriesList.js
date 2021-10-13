@@ -8,6 +8,9 @@ import "./EntriesList.css";
 class EntriesList extends Component {
 	constructor(props){
 		super(props);
+    this.state = {
+      inProgress: false
+    }
 		this.handleVote = this.handleVote.bind(this);
     this.handleUpdate = this.handleUpdate.bind(this);
 	}
@@ -19,9 +22,17 @@ class EntriesList extends Component {
 
 	async handleVote(value){
 		console.debug("EntriesList::handleUpdate:");
+    this.setState({inProgress: true});
 		await sendVote(value)
-			.then(async (result) => this.props.handleNotificationMessage(result.message, result.statusCode))
-			.then(async () => this.handleUpdate());
+			.then(async (result) => {
+        this.props.handleNotificationMessage(result.message, result.statusCode);
+        this.handleUpdate();
+        this.setState({inProgress: false});
+      })
+      .catch((err) => {
+        console.debug(err);
+        this.setState({inProgress: false});
+      });
 	}
   
 	render(){
@@ -37,7 +48,12 @@ class EntriesList extends Component {
               <div className="bigCell"><a href={item.location}>{item.location}</a></div>
               <div className="smallCell"><VoteCounter votes={this.props.votes[item.entryId] || 0}/></div>
               <div className="smallCell">
-                <button value={item.entryId} onClick={() => this.handleVote(item.entryId)}>Vote</button>
+                <button className={this.state.inProgress ? "voteButtonDisabled" : "voteButton"}
+                  disabled={this.state.inProgress}
+                  value={item.entryId}
+                  onClick={() => this.handleVote(item.entryId)}>
+                  {this.state.inProgress ? "Wait" : "Vote"}
+                  </button>
               </div>
             </div>
           </div>
@@ -50,7 +66,7 @@ class EntriesList extends Component {
           <div className="smallCell">ID</div>
           <div className="bigCell">Name</div>
           <div className="bigCell">Description</div>
-          <div className="bigCell">URL</div>
+          <div className="bigCell">Location</div>
           <div className="smallCell">Votes</div>
           <div className="smallCell"></div>
         </div>

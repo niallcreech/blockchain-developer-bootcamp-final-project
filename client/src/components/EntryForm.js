@@ -9,7 +9,8 @@ class EntryForm extends Component {
 		this.state = {
 			name: "",
 			desc: "",
-			location: "http://"
+      location: "http://",
+      inProgress: false
 		}
 		this.handleDescriptionChange = this.handleDescriptionChange.bind(this);
 		this.handleNameChange = this.handleNameChange.bind(this);
@@ -20,6 +21,7 @@ class EntryForm extends Component {
 
   async handleUpdate(){
     console.debug("EntryForm::handleUpdate");
+    this.setState({inProgress: false})
     await this.props.handleUpdate();
   }
 
@@ -94,6 +96,7 @@ class EntryForm extends Component {
     event.preventDefault();
 		const validFields = this.areFieldsValid();
     if (validFields.valid){
+        this.setState({inProgress: true});
         await sendEntry(
           this.props.trackId,
           this.state.name,
@@ -108,27 +111,85 @@ class EntryForm extends Component {
 						}
         })
      } else{
-			await this.props.handleNotificationMessage(validFields.message, validFields.statusCode);
+			await this.props.handleNotificationMessage(
+        validFields.message, validFields.statusCode);
 		}
 	}
 
 	render(){
+    let formInput;
+    let nameField;
+    let descField;
+    let locationField;
+    if (this.state.inProgress){
+      nameField = <label>
+          Name
+          <input type="text"
+            disabled={true}
+            value={this.state.name}
+          />
+        </label>;
+      descField = <label>
+          Description
+          <input type="text"
+            disabled={true}
+            value={this.state.desc}
+          />
+        </label>;
+      locationField = 
+        <label> URL
+          <input
+            disabled={true}
+            type="text"
+            value={this.state.location}
+           />
+        </label>;
+        
+      formInput =
+        <input
+          disabled={true}
+          className="EntryFormButtonDisabled"
+          type="submit"
+          value="In Progress"
+        />
+    } else {
+      nameField = <label>
+          Name
+          <input
+            disabled={false}
+            type="text"
+            value={this.state.name} onChange={this.handleNameChange}
+          />
+        </label>;
+      descField = <label>
+          Description
+          <input
+            disabled={false}
+            type="text"
+            value={this.state.desc} onChange={this.handleDescriptionChange}
+          />
+        </label>;
+      locationField = 
+        <label> URL
+          <input
+            disabled={false}
+            type="text"
+            value={this.state.location} onChange={this.handleLocationChange} 
+           />
+        </label>;
+      formInput =
+        <input
+          disabled={false}
+          className="EntryFormButton" type="submit" value="Nominate" 
+        />
+    }
 		return (
      <div className="EntryForm">
     	<form onSubmit={this.handleSubmit}>
-        <label>
-          Name
-          <input type="text" value={this.state.name} onChange={this.handleNameChange} />
-        </label>
-				<label>
-          Description
-          <input type="text" value={this.state.desc} onChange={this.handleDescriptionChange} />
-        </label>
-				<label>
-          URL
-          <input type="text" value={this.state.location} onChange={this.handleLocationChange} />
-        </label>
-        <input className="EntryFormButton" type="submit" value="Nominate" />
+        {nameField}
+        {descField}
+        {locationField}
+        {formInput}
       </form>
       </div>
   	);

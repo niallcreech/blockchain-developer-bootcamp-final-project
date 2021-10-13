@@ -23,7 +23,7 @@ class TrackHeaderView extends Component {
   }
   
   async getSelectedTrack(){
-    const {data, statusCode, message} =  await getTrackDetails(this.props.match.params.trackId);
+    const {data, statusCode} =  await getTrackDetails(this.props.match.params.trackId);
 		if (statusCode === 200) {
 	    this.setState({
 	      trackId: this.props.match.params.trackId,
