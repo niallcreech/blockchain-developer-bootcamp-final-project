@@ -8,6 +8,7 @@ class TrackForm extends Component {
 		this.state = {
 			name: "",
 			desc: "",
+      inProgress: false
 		}
 		this.handleDescriptionChange = this.handleDescriptionChange.bind(this);
     this.handleNameChange = this.handleNameChange.bind(this);
@@ -66,6 +67,7 @@ class TrackForm extends Component {
     )
 		const validFields = this.areFieldsValid();
     if (validFields.valid){
+        this.setState({inProgress: true});
         await sendTrack(
           this.state.name,
           this.state.desc
@@ -75,6 +77,11 @@ class TrackForm extends Component {
 					if (result.statusCode === 200) {
 						this.clearFields();
 					}
+          this.setState({inProgress: false});
+        })
+        .catch((err) => {
+          console.debug(err);
+          this.setState({inProgress: false});
         })
      } else{
 				await this.props.handleNotificationMessage(validFields.message, validFields.statusCode);
@@ -99,13 +106,17 @@ class TrackForm extends Component {
     	<form onSubmit={this.handleSubmit}>
         <label>
           Name
-          <input type="text" value={this.state.name} onChange={this.handleNameChange} />
+          <input disabled={this.state.inProgress} type="text" value={this.state.name} onChange={this.handleNameChange} />
         </label>
 				<label>
           Description
-          <input type="text" value={this.state.desc} onChange={this.handleDescriptionChange} />
+          <input disabled={this.state.inProgress} type="text" value={this.state.desc} onChange={this.handleDescriptionChange} />
         </label>
-        <input type="submit" value="Submit" />
+        <input 
+          className={this.state.inProgress ? "TrackFormButtonDisabled":"TrackFormButton"}
+          disabled={this.state.inProgress}
+          type="submit"
+          value={this.state.inProgress ? "In Progress":"Submit"} />
       </form>
       </div>
   	);

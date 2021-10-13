@@ -24,4 +24,13 @@
     padding: (40px + 2vmin);
     color: black;
     font-size: 20px;
+    background: green;
+}
+
+.TrackFormButtonDisabled {
+    font-weight:bold;
+    padding: (40px + 2vmin);
+    color: black;
+    font-size: 20px;
+    background: grey;
 }

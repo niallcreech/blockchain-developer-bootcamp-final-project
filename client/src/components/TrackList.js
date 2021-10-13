@@ -29,7 +29,7 @@ class TrackList extends Component {
               <div className="bigCell">{item.desc}</div>
               <div className="smallCell"><VoteCounter votes={this.props.trackVotes[item.trackId] || 0}/></div>
               <div className="smallCell">
-                <button value={item.trackId} onClick={() => this.handleTrackView(item.trackId)}>View</button>
+                <button className="TrackListViewButton" value={item.trackId} onClick={() => this.handleTrackView(item.trackId)}>View</button>
               </div>
             </div>
           </div>
