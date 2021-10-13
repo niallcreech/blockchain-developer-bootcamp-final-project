@@ -212,11 +212,15 @@ contract Tracks is Ownable {
       trackEventCooldownPeriod = 1 minutes;
       allTracksState = State.Open;
       allVotesState = State.Open;
-      uint trackId = addTrack("first_track", "This is the first track");
-      addEntry(trackId, "name", "description", "location");
       enableCooldowns(true);
+      createHelpTrack();
   }
 
+  function createHelpTrack() internal {
+    uint trackId = addTrack("Help", "This is a good place to start to get help");
+    addEntry(trackId, "Homepage", "", "https://sevenmachines.org");
+    addEntry(trackId, "Code", "Where to get the code.", "https://github.com/niallcreech/blockchain-developer-bootcamp-final-project");
+  }
 	/**
    * @notice Get all tracks
    * @return array of all tracks by object
