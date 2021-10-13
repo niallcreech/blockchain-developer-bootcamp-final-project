@@ -5,8 +5,15 @@ services:
       - "3000:3000"
     links:
       - ganache
+    volumes:
+      - contracts:/app/client/src/contracts
   ganache:
     build: .
     ports:
       - "7545:7545"
-
+    volumes:
+      - contracts:/app/client/src/contracts
+  
+volumes:
+  contracts:
+    external: true

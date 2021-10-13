@@ -10,5 +10,6 @@ COPY contracts ./contracts
 COPY migrations ./migrations
 COPY test ./test
 COPY truffle-config.js .
+COPY client/src/contracts ./client/src/contracts
 ENTRYPOINT ["./run.sh"]
 
