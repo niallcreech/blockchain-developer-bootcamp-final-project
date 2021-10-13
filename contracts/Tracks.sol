@@ -65,7 +65,7 @@ contract Tracks is Ownable {
 
 
   /**
-   * @notice Check if the track is in the 'open' state.
+   * @dev Check if the track is in the 'open' state.
    * @param _trackId The id of the track
    */
 	modifier checkTrackOpen(uint _trackId) {
@@ -75,7 +75,7 @@ contract Tracks is Ownable {
   }
   
 	/**
-   * @notice Check if the track is in the 'closed' state.
+   * @dev Check if the track is in the 'closed' state.
    * @param _trackId The id of the track
    */
 	modifier checkTrackClosed(uint _trackId) {
@@ -84,7 +84,7 @@ contract Tracks is Ownable {
   }
   
   /**
-   * @notice Check if the track is in the 'blocked' state.
+   * @dev Check if the track is in the 'blocked' state.
    * @param _trackId The id of the track
    */
 	modifier checkTrackBlocked(uint _trackId) {
@@ -93,7 +93,7 @@ contract Tracks is Ownable {
   }
   
   /**
-   * @notice Check if the track has been 'blocked' by the admin.
+   * @dev Check if the track has been 'blocked' by the admin.
    */
 	modifier checkTracksNotBlockedByAdmin() {
 		require(allTracksState != State.Blocked, "All tracks have been blocked by admin");
@@ -102,7 +102,7 @@ contract Tracks is Ownable {
   
   
   /**
-   * @notice Check if voting has been 'blocked' by the admin.
+   * @dev Check if voting has been 'blocked' by the admin.
    */
 	modifier checkVotingNotBlockedByAdmin() {
 		require(allVotesState != State.Blocked, "All voting has been blocked by admin");
@@ -111,7 +111,7 @@ contract Tracks is Ownable {
   
   
   /**
-   * @notice Check if the track is not 'blocked'.
+   * @dev Check if the track is not 'blocked'.
    * @param _trackId The id of the track
    */
 	modifier checkTrackUnblocked(uint _trackId) {
@@ -120,7 +120,7 @@ contract Tracks is Ownable {
   }
   
   /**
-   * @notice Check if the track exists.
+   * @dev Check if the track exists.
    * @param _trackId The id of the track
    */
 	modifier checkTrackExists(uint _trackId) {
@@ -129,7 +129,7 @@ contract Tracks is Ownable {
 	  }
 
   /**
-   * @notice Check if the supplied user address has been banned.
+   * @dev Check if the supplied user address has been banned.
    * @param addr The address of the user to check.
    */
 	modifier isUserBanned(address addr){
@@ -142,7 +142,7 @@ contract Tracks is Ownable {
 	}
 
   /**
-   * @notice Check if the supplied user address has voted for the given entry.
+   * @dev Check if the supplied user address has voted for the given entry.
    * @param addr The address of the user to check.
    * @param _entryId The id of the entry to check.
    */
@@ -156,7 +156,7 @@ contract Tracks is Ownable {
 	}
 	
 	/**
-   * @notice Check if the supplied user is in the voting cooldown period for the
+   * @dev Check if the supplied user is in the voting cooldown period for the
    *  given track.
    * @param addr The address of the user to check.
    * @param trackId The id of the track.
@@ -173,7 +173,7 @@ contract Tracks is Ownable {
 	}
 
   /**
-   * @notice Check if the supplied user is in the track creation cooldown period.
+   * @dev Check if the supplied user is in the track creation cooldown period.
    * @param addr The address of the user to check.
    */
 	modifier isNotInTrackCreationCooldown(address addr){
@@ -188,7 +188,7 @@ contract Tracks is Ownable {
 	}
 	
 	/**
-   * @notice Check if the supplied user is in the entry creation cooldown period.
+   * @dev Check if the supplied user is in the entry creation cooldown period.
    * @param addr The address of the user to check.
    */
 	modifier isNotInEntryCreationCooldown(address addr){
@@ -203,8 +203,8 @@ contract Tracks is Ownable {
 	}
 	
 	/**
-   * @notice Create the new contract
-   * @dev THe default is to have tracks open with cooldowns enabled.
+   * @dev Create the new contract.
+   *  The default is to have tracks open with cooldowns enabled.
    */
   constructor () {
       voteCooldownPeriod = 1 minutes;
@@ -216,13 +216,16 @@ contract Tracks is Ownable {
       createHelpTrack();
   }
 
+  /**
+   * @dev Create the default help documentation links.
+   */
   function createHelpTrack() internal {
     uint trackId = addTrack("Help", "This is a good place to start to get help");
     addEntry(trackId, "Homepage", "", "https://sevenmachines.org");
     addEntry(trackId, "Code", "Where to get the code.", "https://github.com/niallcreech/blockchain-developer-bootcamp-final-project");
   }
 	/**
-   * @notice Get all tracks
+   * @dev Get all tracks
    * @return array of all tracks by object
    */
   function getTracks() public view returns ( Track[] memory) {
@@ -234,7 +237,7 @@ contract Tracks is Ownable {
   }
 
   /**
-   * @notice Get a specific tracks object
+   * @dev Get a specific tracks object
    * @param _trackId The id of the track
    * @return the relevant Track object
    */
@@ -244,7 +247,7 @@ contract Tracks is Ownable {
 	
 
   /**
-   * @notice Get all the entries attached to a specific track
+   * @dev Get all the entries attached to a specific track
    * @param _trackId The id of the track
    * @return all the Entry ids attached to the track 
    */
@@ -253,7 +256,7 @@ contract Tracks is Ownable {
   }
 
 	/**
-   * @notice Set a specific track to the 'Open' state.
+   * @dev Set a specific track to the 'Open' state.
    * @param _trackId The id of the track
    */
   function openTrack(uint _trackId) public checkTrackExists(_trackId) checkTrackClosed(_trackId) isUserBanned(msg.sender){
@@ -262,7 +265,7 @@ contract Tracks is Ownable {
   }
 
 	/**
-   * @notice Set a specific track to the 'Closed' state.
+   * @dev Set a specific track to the 'Closed' state.
    * @param _trackId The id of the track
    */
 	function closeTrack(uint _trackId) public checkTrackExists(_trackId) checkTrackOpen(_trackId) isUserBanned(msg.sender){
@@ -271,7 +274,7 @@ contract Tracks is Ownable {
   }
 
 	/**
-   * @notice Set a specific track to the 'Blocked' state.
+   * @dev Set a specific track to the 'Blocked' state.
    * @param _trackId The id of the track
    */
 	function blockTrack(uint _trackId) public checkTrackExists(_trackId) checkTrackUnblocked(_trackId) isUserBanned(msg.sender){
@@ -280,7 +283,7 @@ contract Tracks is Ownable {
   }
 
   /**
-   * @notice Unblock a specific track by settings to the 'Closed' state.
+   * @dev Unblock a specific track by settings to the 'Closed' state.
    * @param _trackId The id of the track
    */
   function unblockTrack(uint _trackId) public checkTrackExists(_trackId) checkTrackBlocked(_trackId) isUserBanned(msg.sender) {
@@ -289,7 +292,7 @@ contract Tracks is Ownable {
   }
 
 	/**
-   * @notice Check a specific track is in the 'Open' state.
+   * @dev Check a specific track is in the 'Open' state.
    * @param _trackId The id of the track
    */
   function isTrackOpen(uint _trackId) public view checkTrackExists(_trackId) returns (bool){
@@ -297,7 +300,7 @@ contract Tracks is Ownable {
   }
 
   /**
-   * @notice Check a specific track is in the 'Open' state.
+   * @dev Check a specific track is in the 'Open' state.
    * @param _trackId The id of the track
    */
   function isTrackClosed(uint _trackId) public view checkTrackExists(_trackId) returns (bool){
@@ -305,7 +308,7 @@ contract Tracks is Ownable {
   }
   
   /**
-   * @notice Check a specific track is in the 'Blocked' state.
+   * @dev Check a specific track is in the 'Blocked' state.
    * @param _trackId The id of the track
    */
   function isTrackBlocked(uint _trackId) public view checkTrackExists(_trackId) returns (bool){
@@ -313,8 +316,8 @@ contract Tracks is Ownable {
   }
 
 	/**
-   * @notice Vote for an entry
-   * @dev Voting emits an event. It also sets a number of variables to follow
+   * @dev Vote for an entry. 
+   *  Voting emits an event. It also sets a number of variables to follow
    *  users voting patterns so that multiple voting and cooldowns can be 
    *  monitored.
    * @param _entryId The id of the entry
@@ -328,8 +331,8 @@ contract Tracks is Ownable {
   }
 
   /**
-   * @notice Add an entry to a specific track
-   * @dev An entry is attached to a track as stored data on-chain. However, the
+   * @dev Add an entry to a specific track.
+   *  The entry is attached to a track as stored data on-chain. However, the
    *  actual data belonging to the entry is emitted as an event.
    * @param _trackId The id of the track
    * @return the id of the new entry.
@@ -346,8 +349,7 @@ contract Tracks is Ownable {
   }
 
 	/**
-   * @notice Add a track
-   * @dev A track is stored as data on-chain.
+   * @dev Add a track. The track is stored as data on-chain.
    * @param _name the name of the track.
    * @param _desc a brief description of what the track is about.
    * @return the trackId of the new track.
@@ -372,22 +374,22 @@ contract Tracks is Ownable {
     trackCount++;
     emit TrackCreated(trackId, _name, _desc);
     return trackId;
-   }
+  }
    
-   /**
-   * @notice Set all existing tracks to the 'Blocked' state.
-   * @param enable true to block, false to unblock.
-   */
-   function disableAllTracks(bool enable) public onlyOwner {
-       if (enable) {
-           allTracksState = State.Blocked;   
-       } else {
-           allTracksState = State.Open;   
-       }
-	}
+  /**
+  * @dev Set all existing tracks to the 'Blocked' state.
+  * @param enable true to block, false to unblock.
+  */
+  function disableAllTracks(bool enable) public onlyOwner {
+    if (enable) {
+      allTracksState = State.Blocked;   
+    } else {
+      allTracksState = State.Open;   
+    }
+  }
   
   /**
-   * @notice Set all voting to the 'Blocked' state.
+   * @dev Set all voting to the 'Blocked' state.
    * @param enable, true to block, false to unblock.
    */ 
   function disableAllVoting(bool enable) public onlyOwner {
@@ -399,8 +401,8 @@ contract Tracks is Ownable {
 	}
 
   /**
-   * @notice Ban a user from participation
-   * @dev This function is only availble to the contract owner.
+   * @dev Ban a user from participation. 
+   *  This function is only availble to the contract owner.
    * @param addr, address of the user to block
    * @param banned, true to ban, false to unban.
    */ 
@@ -409,8 +411,8 @@ contract Tracks is Ownable {
 	}
 
   /**
-   * @notice Check if a user is in a cooldown period for track creation.
-   * @dev Cooldown allows automation blocking to balance throughput.
+   * @dev Check if a user is in a cooldown period for track creation.
+   *  Cooldown allows automation blocking to balance throughput.
    * @return true if user is in cooldown, false otherwise.
    */ 
   function isSenderInTrackCreationCooldown() public view returns (bool) {
@@ -422,8 +424,8 @@ contract Tracks is Ownable {
 	}
 	
 	/**
-   * @notice Check if a user is in a cooldown period for entry creation.
-   * @dev Cooldown allows automation blocking to balance throughput.
+   * @dev Check if a user is in a cooldown period for entry creation.
+   *  Cooldown allows automation blocking to balance throughput.
    * @return true if user is in cooldown, false otherwise.
    */ 
 	function isSenderInEntryCreationCooldown() public view returns (bool) {
@@ -435,8 +437,8 @@ contract Tracks is Ownable {
 	}
 	
 	/**
-   * @notice Check if a user is in a cooldown period for voting.
-   * @dev Cooldown allows automation blocking to balance throughput.
+   * @dev Check if a user is in a cooldown period for voting.
+   *  Cooldown allows automation blocking to balance throughput.
    * @return true if user is in cooldown, false otherwise.
    */ 
 	function isSenderInVotingCooldown(uint trackId) public view returns (bool) {
@@ -448,8 +450,8 @@ contract Tracks is Ownable {
 	}
 	
 	/**
-   * @notice Enable or disable the use of cooldowns.
-   * @dev Cooldown allows automation blocking to balance throughput.
+   * @dev Enable or disable the use of cooldowns.
+   *  Cooldown allows automation blocking to balance throughput.
    * @param enable A bool set to true to enable cooldowns, false to disable.
    */ 
   function enableCooldowns(bool enable) public onlyOwner {

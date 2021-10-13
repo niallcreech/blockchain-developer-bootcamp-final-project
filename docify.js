@@ -1,11 +1,12 @@
 
 const NODE_DIR     = "node_modules";
-const INPUT_DIR    = "./contracts";
-const CONFIG_DIR   = "./docgen";
-const OUTPUT_DIR   = "./docgen/docs";
-const README_FILE  = "./docgen/README.md";
-const SUMMARY_FILE = "./docgen/SUMMARY.md";
-const EXCLUDE_FILE = "./docgen/exclude.txt";
+const INPUT_DIR    = "contracts";
+const CONFIG_DIR   = "docgen";
+const OUTPUT_DIR   = "docgen/docs";
+const README_FILE  = "docgen/README.md";
+const SUMMARY_FILE = "docgen/SUMMARY.md";
+const EXCLUDE_FILE = "docgen/exclude.txt";
+const SOLC_VERSION = "0.8";
 
 const fs        = require("fs");
 const path      = require("path");
@@ -56,11 +57,11 @@ const args = [
     "--input="         + INPUT_DIR,
     "--output="        + OUTPUT_DIR,
     "--templates="     + CONFIG_DIR,
-    "--solc-module="   + NODE_DIR + "/truffle/node_modules/solc",
     "--solc-settings=" + JSON.stringify({optimizer: {enabled: true, runs: 200}}),
-    "--contract-pages"
+    "--solc-module="  +  `solc-${SOLC_VERSION}`,
 ];
 
+console.debug(`node ${args}`);
 const result = spawnSync("node", args, {stdio: ["inherit", "inherit", "pipe"]});
 if (result.stderr.length > 0)
     throw new Error(result.stderr);
