@@ -6,7 +6,7 @@ services:
     links:
       - ganache
     volumes:
-      - contracts:/app/client/src/contracts
+      - contracts:/app/src/contracts
   ganache:
     build: .
     ports:
