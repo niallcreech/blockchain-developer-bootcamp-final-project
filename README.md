@@ -1,5 +1,11 @@
 # blockchain-developer-bootcamp-final-project
 
+## Contents
+
+* [Design Pattern Decisions](./design_pattern_decisions.md)
+* [Avoiding Common Attacks](./avoiding_common_attacks.md)
+* [Deployed Addresses](./deployed_addresses.txt)
+
 ## Threads
 
 Threads allows groups of people to write a story together, and have it preserved as an NFT. 
