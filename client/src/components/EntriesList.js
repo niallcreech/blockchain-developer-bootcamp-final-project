@@ -66,7 +66,7 @@ class EntriesList extends Component {
           <div className="smallCell">ID</div>
           <div className="bigCell">Name</div>
           <div className="bigCell">Description</div>
-          <div className="bigCell">URL</div>
+          <div className="bigCell">Location</div>
           <div className="smallCell">Votes</div>
           <div className="smallCell"></div>
         </div>
