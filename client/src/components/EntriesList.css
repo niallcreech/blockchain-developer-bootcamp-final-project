@@ -14,7 +14,7 @@
 }
 .EntriesListTable .rowGroup {
     display:table-row-group;
- 	font-size: calc(10px + 2vmin);
+  font-size: calc(10px + 2vmin);
 }
 .EntriesListTable .rowGroup:hover {
 	background: #3333AA;
@@ -22,14 +22,19 @@
 .EntriesListTable .row {
     display:table-row;
 }
-.EntriesListTable .bigCell {
+.EntriesListTable .bigCellName {
     display:table-cell;
-    width:25%;
+    width:30%;
+}
+.EntriesListTable .bigCellDesc {
+    display:table-cell;
+    width:50%;
+    text-align: left;
 }
 
 .EntriesListTable .smallCell {
     display:table-cell;
-    width:12.5%;
+    width:10%;
 }
 .EntriesListTable .form {
     display:form-header-group;

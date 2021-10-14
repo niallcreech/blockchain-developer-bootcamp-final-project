@@ -53,12 +53,12 @@ class EntriesList extends Component {
                 key={item.entryId}
                 votes={this.props.votes[item.entryId] || 0}>
             <div className="row">
-              <div className="bigCell"
+              <div className="bigCellName"
                 onClick={() => this.handleEntryClick(item.location)} >
                   {item.name}
               </div>
               <div 
-                className="bigCell"
+                className="bigCellDesc"
                 onClick={() => this.handleEntryClick(item.location)}>
                   {item.desc}
               </div>
@@ -85,9 +85,9 @@ class EntriesList extends Component {
               onClick={() => this.handleEntryClick(item.location)}
               votes={this.props.votes[item.entryId] || 0}>
             <div className="row">
-              <div className="bigCell"
+              <div className="bigCellName"
                 onClick={() => this.handleEntryClick(item.location)}>{item.name}</div>
-              <div className="bigCell"
+              <div className="bigCellDesc"
                 onClick={() => this.handleEntryClick(item.location)}>{item.desc}</div>
               <div className="smallCell"><VoteCounter votes={this.props.votes[item.entryId] || 0}/></div>
               <div className="smallCell"></div>
@@ -102,8 +102,8 @@ class EntriesList extends Component {
 		return (
       <div className="EntriesListTable">
         <div className="header">
-          <div className="bigCell">Name</div>
-          <div className="bigCell">Description</div>
+          <div className="bigCellName">Name</div>
+          <div className="bigCellDesc">Description</div>
           <div className="smallCell">Votes</div>
           <div className="smallCell"></div>
         </div>

@@ -38,6 +38,16 @@
     width:40%;
 }
 
+.TrackListTable .bigCellName {
+    display:table-cell;
+    width:30%;
+}
+.TrackListTable .bigCellDesc {
+    display:table-cell;
+    width:50%;
+    text-align: left;
+}
+
 .TrackListTable .smallCell {
 display:table-cell;
     width: 10%;
