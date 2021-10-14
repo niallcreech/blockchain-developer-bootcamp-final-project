@@ -37,6 +37,7 @@ class TrackList extends Component {
 	          </div>
 					return row;
 				}
+				return "";
         })
       }
     </SortedList>;
@@ -60,7 +61,7 @@ class TrackList extends Component {
 	          </div>
 					return row;
 				}
-				
+				return "";
         })
       }
     </SortedList>;
