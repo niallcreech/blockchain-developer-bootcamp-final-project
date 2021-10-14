@@ -30,7 +30,6 @@ class TrackList extends Component {
 							votes={this.props.trackVotes[item.trackId] || 0}
 							onClick={() => this.handleTrackView(item.trackId)}>
 	            <div className="row">
-	              <div className="smallCell">{item.trackId}</div>
 	              <div className="bigCell">{item.name}</div>
 	              <div className="bigCell">{item.desc}</div>
 	              <div className="smallCell"><VoteCounter votes={this.props.trackVotes[item.trackId] || 0}/></div>
@@ -45,7 +44,6 @@ class TrackList extends Component {
 							votes={this.props.trackVotes[item.trackId] || 0}
 							onClick={() => this.handleTrackView(item.trackId)}>
 	            <div className="row">
-	              <div className="smallCell">{item.trackId}</div>
 	              <div className="bigCell">{item.name}</div>
 	              <div className="bigCell">{item.desc}</div>
 	              <div className="smallCell"><VoteCounter votes={this.props.trackVotes[item.trackId] || 0}/></div>
@@ -61,7 +59,6 @@ class TrackList extends Component {
     return (
       <div className="TrackListTable">
         <div className="header">
-          <div className="smallCell">ID</div>
           <div className="bigCell">Name</div>
           <div className="bigCell">Description</div>
           <div className="smallCell">Votes</div>

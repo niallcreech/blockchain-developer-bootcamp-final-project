@@ -51,19 +51,24 @@ class EntriesList extends Component {
 						entry = (
 							<div className="rowGroup"
                 key={item.entryId}
-                votes={this.props.votes[item.entryId] || 0}
-                onClick={() => this.handleEntryClick(item.location)}
-               >
+                votes={this.props.votes[item.entryId] || 0}>
             <div className="row">
-						 	<div className="smallCell">{item.entryId}</div>
-              <div className="bigCell">{item.name}</div>
-              <div className="bigCell">{item.desc}</div>
-              <div className="bigCell"><a href={item.location}>{item.location}</a></div>
-              <div className="smallCell"><VoteCounter votes={this.props.votes[item.entryId] || 0}/></div>
+              <div className="bigCell"
+                onClick={() => this.handleEntryClick(item.location)} >
+                  {item.name}
+              </div>
+              <div 
+                className="bigCell"
+                onClick={() => this.handleEntryClick(item.location)}>
+                  {item.desc}
+              </div>
+              <div className="smallCell"
+                onClick={() => this.handleEntryClick(item.location)}>
+                <VoteCounter votes={this.props.votes[item.entryId] || 0}/></div>
               <div className="smallCell">
                 <button 
-									enabled={(this.state.inProgress && this.props.open).toString()}
-									className={this.state.inProgress ? "voteButtonDisabled" : "voteButton"}
+                  enabled={(this.state.inProgress && this.props.open).toString()}
+                  className={this.state.inProgress ? "voteButtonDisabled" : "voteButton"}
                   disabled={this.state.inProgress}
                   value={item.entryId}
                   onClick={() => this.handleVote(item.entryId)}>
@@ -80,10 +85,10 @@ class EntriesList extends Component {
               onClick={() => this.handleEntryClick(item.location)}
               votes={this.props.votes[item.entryId] || 0}>
             <div className="row">
-						 	<div className="smallCell">{item.entryId}</div>
-              <div className="bigCell">{item.name}</div>
-              <div className="bigCell">{item.desc}</div>
-              <div className="bigCell"><a href={item.location}>{item.location}</a></div>
+              <div className="bigCell"
+                onClick={() => this.handleEntryClick(item.location)}>{item.name}</div>
+              <div className="bigCell"
+                onClick={() => this.handleEntryClick(item.location)}>{item.desc}</div>
               <div className="smallCell"><VoteCounter votes={this.props.votes[item.entryId] || 0}/></div>
               <div className="smallCell"></div>
             </div>
@@ -97,10 +102,8 @@ class EntriesList extends Component {
 		return (
       <div className="EntriesListTable">
         <div className="header">
-          <div className="smallCell">ID</div>
           <div className="bigCell">Name</div>
           <div className="bigCell">Description</div>
-          <div className="bigCell">Location</div>
           <div className="smallCell">Votes</div>
           <div className="smallCell"></div>
         </div>
