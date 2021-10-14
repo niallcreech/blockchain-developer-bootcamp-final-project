@@ -18,12 +18,13 @@ class TrackList extends Component {
 	}
 
 	render() {
-		const pinnedItems = 
-			<SortedList by='title'>
-      {
-        this.props.tracks.map((item) => {
-					if (item.visible && item.pinned) {
-	          const row = <div
+		let pinnedRows = [];
+		let unpinnedRows = [];
+		this.props.tracks.forEach((item) => {
+			if (item.visible) {
+				if (item.pinned) {
+					let row =
+						<div
 							className="rowGroupPinned"
 							key={item.trackId}
 							votes={this.props.trackVotes[item.trackId] || 0}
@@ -35,19 +36,10 @@ class TrackList extends Component {
 	              <div className="smallCell"><VoteCounter votes={this.props.trackVotes[item.trackId] || 0}/></div>
 	            </div>
 	          </div>
-					return row;
-				}
-				return "";
-        })
-      }
-    </SortedList>;
-
-		const sortedItems = 
-      <SortedList by='title'>
-      {
-        this.props.tracks.map((item) => {
-					if (item.visible && !item.pinned) {
-	         const row = <div
+	        pinnedRows.push(row);
+				} else {
+					let row =
+						<div
 							className="rowGroup"
 							key={item.trackId}
 							votes={this.props.trackVotes[item.trackId] || 0}
@@ -59,12 +51,13 @@ class TrackList extends Component {
 	              <div className="smallCell"><VoteCounter votes={this.props.trackVotes[item.trackId] || 0}/></div>
 	            </div>
 	          </div>
-					return row;
+					unpinnedRows.push(row);
 				}
-				return "";
-        })
-      }
-    </SortedList>;
+			}
+		});
+						
+		const pinnedItems = <SortedList by='title'>{pinnedRows}</SortedList>;
+		const unpinnedItems = <SortedList by='title'>{unpinnedRows}</SortedList>;
     return (
       <div className="TrackListTable">
         <div className="header">
@@ -74,7 +67,7 @@ class TrackList extends Component {
           <div className="smallCell">Votes</div>
         </div>
 				{pinnedItems}
-        {sortedItems}
+        {unpinnedItems}
     </div>
 		);
 	}

@@ -21,8 +21,8 @@ require('dotenv').config()
 const HDWalletProvider = require('@truffle/hdwallet-provider');
 const mnemonic = process.env.MNEMONIC;
 const infuraProjectId = process.env.INFURA_PROJECT_ID;
-const networkName = process.env.NETWORK_NAME || "ropsten";
-const networkId = process.env.NETWORK_ID || 3;
+const networkName = process.env.NETWORK_NAME || "rinkeby";
+const networkId = process.env.NETWORK_ID || 4;
 const networkEndpoint = `https://${networkName}.infura.io/v3/${infuraProjectId}`;
 const wsNetworkEndpoint = `wss://${networkName}.infura.io/ws/v3/${infuraProjectId}`;
 
