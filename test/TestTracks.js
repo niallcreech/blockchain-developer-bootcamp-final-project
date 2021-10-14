@@ -46,6 +46,17 @@ describe("When working with a contract", () => {
       const _tracks = await contract.getTracks()
       assert.equal(2, _tracks.length, "");
     });
+
+		it("...should get track status.", async () => {
+      const name = "mytrack"
+			expect(await contract.getTrackStatus("666") === "null");
+      const trackId = await contract.addTrack(name, "mydescription", { from: accounts[0] });
+			expect(await contract.getTrackStatus(trackId) === "open");
+			await contract.closeTrack(trackId).then(()=>expect(await contract.getTrackStatus(trackId) === "closed"));
+			await contract.blockTrack(trackId).then(()=>expect(await contract.getTrackStatus(trackId) === "blocked"));
+			await contract.unBlockTrack(trackId).then(()=>expect(await contract.getTrackStatus(trackId) === "closed"));
+			await contract.unOpenTrack(trackId).then(()=>expect(await contract.getTrackStatus(trackId) === "open"));
+    });
   });
 });
 

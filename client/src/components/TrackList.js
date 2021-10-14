@@ -18,22 +18,50 @@ class TrackList extends Component {
 	}
 
 	render() {
+		const pinnedItems = 
+			<SortedList by='title'>
+      {
+        this.props.tracks.map((item) => {
+					if (item.visible && item.pinned) {
+	          const row = <div
+							className="rowGroupPinned"
+							key={item.trackId}
+							votes={this.props.trackVotes[item.trackId] || 0}
+							onClick={() => this.handleTrackView(item.trackId)}>
+	            <div className="row">
+	              <div className="smallCell">{item.trackId}</div>
+	              <div className="bigCell">{item.name}</div>
+	              <div className="bigCell">{item.desc}</div>
+	              <div className="smallCell"><VoteCounter votes={this.props.trackVotes[item.trackId] || 0}/></div>
+	            </div>
+	          </div>
+					return row;
+				}
+        })
+      }
+    </SortedList>;
+
 		const sortedItems = 
       <SortedList by='title'>
       {
-        this.props.tracks.map((item) => (
-          <div className="rowGroup" key={item.trackId} votes={this.props.trackVotes[item.trackId] || 0}>
-            <div className="row">
-              <div className="smallCell">{item.trackId}</div>
-              <div className="bigCell">{item.name}</div>
-              <div className="bigCell">{item.desc}</div>
-              <div className="smallCell"><VoteCounter votes={this.props.trackVotes[item.trackId] || 0}/></div>
-              <div className="smallCell">
-                <button className="TrackListViewButton" value={item.trackId} onClick={() => this.handleTrackView(item.trackId)}>View</button>
-              </div>
-            </div>
-          </div>
-        ))
+        this.props.tracks.map((item) => {
+					if (item.visible && !item.pinned) {
+	         const row = <div
+							className="rowGroup"
+							key={item.trackId}
+							votes={this.props.trackVotes[item.trackId] || 0}
+							onClick={() => this.handleTrackView(item.trackId)}>
+	            <div className="row">
+	              <div className="smallCell">{item.trackId}</div>
+	              <div className="bigCell">{item.name}</div>
+	              <div className="bigCell">{item.desc}</div>
+	              <div className="smallCell"><VoteCounter votes={this.props.trackVotes[item.trackId] || 0}/></div>
+	            </div>
+	          </div>
+					return row;
+				}
+				
+        })
       }
     </SortedList>;
     return (
@@ -43,8 +71,8 @@ class TrackList extends Component {
           <div className="bigCell">Name</div>
           <div className="bigCell">Description</div>
           <div className="smallCell">Votes</div>
-          <div className="smallCell"></div>
         </div>
+				{pinnedItems}
         {sortedItems}
     </div>
 		);

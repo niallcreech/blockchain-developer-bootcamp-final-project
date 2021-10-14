@@ -14,6 +14,19 @@ export async function getTracks(){
             message: message};
 }
 
+export async function getUserState(addr){
+  const status = {
+		banned: false
+	};
+	let {contract, statusCode, message} = await getWeb3State();
+  if (statusCode === 200){
+		status["banned"] = await contract.methods.isUserBanned(addr).call();
+  } 
+  return {status: status,
+          statusCode: statusCode,
+          message: message};
+}
+
 export function isValidUrl(string){
   let url;
   let valid;
@@ -60,6 +73,36 @@ export async function getVotesByTrack(_trackIds){
           message: message};
 }
 
+
+export async function getTrackState(trackId){
+		let exists = true;
+		let open = false;
+		let closed = false;
+		let blocked = false;
+		let {contract, statusCode, message} = await getWeb3State();
+    if (statusCode === 200){
+      const state = await contract.methods.getTrackState(trackId).call();
+			if (state === 'open'){
+				open = true;
+			} else if (state === 'closed'){
+				closed = true;
+			} else if (state === 'blocked'){
+				blocked = true;
+			} else {
+				exists = false;
+			}
+    	console.debug(`getTrackState: ${state}`);
+     	statusCode = 200;
+     	message = `Track ${trackId} is in state ${state}`;
+    }
+    return {
+			exists: exists,
+			open: open,
+			closed: closed,
+			blocked: blocked,
+      statusCode: statusCode,
+      message: message};
+}
 
 export async function getTrackDetails(trackId){
 		let track = null

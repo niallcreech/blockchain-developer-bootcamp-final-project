@@ -53,6 +53,8 @@ contract Tracks is Ownable {
       string  desc;
       State state;
       bool exists;
+      bool visible;
+      bool pinned;
   }
 
   event TrackOpened(uint trackId);
@@ -132,7 +134,7 @@ contract Tracks is Ownable {
    * @dev Check if the supplied user address has been banned.
    * @param addr The address of the user to check.
    */
-	modifier isUserBanned(address addr){
+	modifier checkIfUserIsBanned(address addr){
 			require(
 			    addr != owner()
 			    || bannedUsers[addr] != true,
@@ -221,8 +223,9 @@ contract Tracks is Ownable {
    */
   function createHelpTrack() internal {
     uint trackId = addTrack("Help", "This is a good place to start to get help");
-    addEntry(trackId, "Homepage", "", "https://sevenmachines.org");
-    addEntry(trackId, "Code", "Where to get the code.", "https://github.com/niallcreech/blockchain-developer-bootcamp-final-project");
+    addEntry(trackId, "Homepage", "Where to read more and get the code.", "https://github.com/niallcreech/blockchain-developer-bootcamp-final-project");
+  	tracks[trackId].pinned = true;
+  	blockTrack(trackId);
   }
 	/**
    * @dev Get all tracks
@@ -259,8 +262,9 @@ contract Tracks is Ownable {
    * @dev Set a specific track to the 'Open' state.
    * @param _trackId The id of the track
    */
-  function openTrack(uint _trackId) public checkTrackExists(_trackId) checkTrackClosed(_trackId) isUserBanned(msg.sender){
+  function openTrack(uint _trackId) public checkTrackExists(_trackId) checkTrackClosed(_trackId) checkIfUserIsBanned(msg.sender){
       tracks[_trackId].state = State.Open;
+      tracks[_trackId].visible = true;
       emit TrackOpened(_trackId);
   }
 
@@ -268,8 +272,9 @@ contract Tracks is Ownable {
    * @dev Set a specific track to the 'Closed' state.
    * @param _trackId The id of the track
    */
-	function closeTrack(uint _trackId) public checkTrackExists(_trackId) checkTrackOpen(_trackId) isUserBanned(msg.sender){
+	function closeTrack(uint _trackId) public checkTrackExists(_trackId) checkTrackOpen(_trackId) checkIfUserIsBanned(msg.sender){
       tracks[_trackId].state = State.Closed;
+      tracks[_trackId].visible = false;
       emit TrackClosed(_trackId);
   }
 
@@ -277,7 +282,7 @@ contract Tracks is Ownable {
    * @dev Set a specific track to the 'Blocked' state.
    * @param _trackId The id of the track
    */
-	function blockTrack(uint _trackId) public checkTrackExists(_trackId) checkTrackUnblocked(_trackId) isUserBanned(msg.sender){
+	function blockTrack(uint _trackId) public checkTrackExists(_trackId) checkTrackUnblocked(_trackId) checkIfUserIsBanned(msg.sender){
       tracks[_trackId].state = State.Blocked;
       emit TrackBlocked(_trackId);
   }
@@ -286,9 +291,29 @@ contract Tracks is Ownable {
    * @dev Unblock a specific track by settings to the 'Closed' state.
    * @param _trackId The id of the track
    */
-  function unblockTrack(uint _trackId) public checkTrackExists(_trackId) checkTrackBlocked(_trackId) isUserBanned(msg.sender) {
+  function unblockTrack(uint _trackId) public checkTrackExists(_trackId) checkTrackBlocked(_trackId) checkIfUserIsBanned(msg.sender) {
       tracks[_trackId].state = State.Closed;
       emit TrackUnblocked(_trackId);
+  }
+
+	/**
+   * @dev Get the state of a track as a string key.
+   * @param _trackId The id of the track
+   */
+  function getTrackState(uint _trackId) public view returns (string memory){
+      string memory status;
+      if (tracks[_trackId].exists == false){
+          status = "null";
+      } else if (tracks[_trackId].state == State.Open){
+          status = "open";
+      } else if (tracks[_trackId].state == State.Closed){
+          status = "closed";
+      } else if (tracks[_trackId].state == State.Blocked){
+          status = "blocked";
+      } else {
+          status = "null";
+      }
+      return status;
   }
 
 	/**
@@ -322,7 +347,7 @@ contract Tracks is Ownable {
    *  monitored.
    * @param _entryId The id of the entry
    */
-  function vote(uint _entryId) public checkTrackOpen(entriesTrack[_entryId]) hasNotVotedForEntry(msg.sender, _entryId) checkVotingNotBlockedByAdmin isUserBanned(msg.sender) isNotInVotingCooldown(msg.sender, entriesTrack[_entryId]) {
+  function vote(uint _entryId) public checkTrackOpen(entriesTrack[_entryId]) hasNotVotedForEntry(msg.sender, _entryId) checkVotingNotBlockedByAdmin checkIfUserIsBanned(msg.sender) isNotInVotingCooldown(msg.sender, entriesTrack[_entryId]) {
     uint _trackId = entriesTrack[_entryId];
     votesByAddress[msg.sender][_entryId] = true;
     lastVoteTime[msg.sender][_trackId] = block.timestamp;
@@ -337,7 +362,7 @@ contract Tracks is Ownable {
    * @param _trackId The id of the track
    * @return the id of the new entry.
    */
-  function addEntry(uint _trackId, string memory _name, string memory _desc, string memory _location) public checkTracksNotBlockedByAdmin isUserBanned(msg.sender) isNotInEntryCreationCooldown(msg.sender)  checkTrackOpen(_trackId) returns (uint) {
+  function addEntry(uint _trackId, string memory _name, string memory _desc, string memory _location) public checkTracksNotBlockedByAdmin checkIfUserIsBanned(msg.sender) isNotInEntryCreationCooldown(msg.sender)  checkTrackOpen(_trackId) returns (uint) {
     uint entryId = nextEntryId;
     require(entriesTrack[entryId] == 0);
     trackEntries[_trackId].push(entryId);
@@ -358,7 +383,7 @@ contract Tracks is Ownable {
     public
       checkTracksNotBlockedByAdmin
       isNotInTrackCreationCooldown(msg.sender)
-      isUserBanned(msg.sender)
+      checkIfUserIsBanned(msg.sender)
     returns (uint) {
     uint trackId = nextTrackId;
     tracks[trackId] = Track({
@@ -366,7 +391,9 @@ contract Tracks is Ownable {
       name: _name,
       desc: _desc,
       state: State.Open,
-      exists: true
+      exists: true,
+      visible: true,
+      pinned: false
     });
     trackEventsByUser[msg.sender] = TrackEvent(block.timestamp, trackId);
     trackOwners[trackId] = msg.sender;
@@ -408,6 +435,15 @@ contract Tracks is Ownable {
    */ 
   function banUser(address addr, bool banned) public onlyOwner {
  		bannedUsers[addr] = banned;   
+	}
+	
+	/**
+   * @dev CHeck if a user is bannedfrom participation. 
+   * @param addr, address of the user to block
+   * @return true if banned, false otherwise.
+   */ 
+  function isUserBanned(address addr) public view returns (bool) {
+ 		return bannedUsers[addr];   
 	}
 
   /**

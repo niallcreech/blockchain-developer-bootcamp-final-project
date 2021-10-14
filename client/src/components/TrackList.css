@@ -14,7 +14,22 @@
 }
 .TrackListTable .rowGroup {
 	display:table-row-group;
+ 	font-size: calc(10px + 2vmin);
 }
+.TrackListTable .rowGroup:hover {
+	background: #3333AA;
+}
+
+.TrackListTable .rowGroupPinned {
+	display:table-row-group;
+	background: #666666;
+ 	font-size: calc(10px + 2vmin);
+}
+
+.TrackListTable .rowGroupPinned:hover {
+	background: #3333AA;
+}
+
 .TrackListTable .row {
 	display:table-row;
 }

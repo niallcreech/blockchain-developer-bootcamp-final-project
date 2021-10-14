@@ -13,7 +13,7 @@ import TrackHeaderView from "./components/TrackHeaderView"
 
 
 import "./App.css";
-import {getTracks, getVotesByTrack, getWeb3State} from "./helpers/ContractHelper";
+import {getTracks, getUserState, getVotesByTrack, getWeb3State} from "./helpers/ContractHelper";
 
 
 class App extends Component {
@@ -26,7 +26,9 @@ class App extends Component {
       notificationStatusCode: null,
       notificationCountdown: 0,
       notificationTimer: null,
-      connected: false
+      connected: false,
+      address: null,
+      banned: false
 		}
     this.handleTrackListUpdate = this.handleTrackListUpdate.bind(this);
     this.handleNotificationMessage = this.handleNotificationMessage.bind(this);
@@ -41,7 +43,6 @@ class App extends Component {
   }
 
 	async componentDidMount() {
-			document.title = "Tracks smudger";
       const {statusCode, message} = await this.handleConnectionUpdate();
       if (this.state.connected){
         await this.handleTrackListUpdate();
@@ -64,11 +65,18 @@ class App extends Component {
         });
       }
 	}
+	
  
   async handleConnectionUpdate(){
 		console.debug("App::handleConnectionUpdate");
-		const {statusCode, message, connected} = await getWeb3State();
-	  this.setState({connected: connected});
+		const {accounts, statusCode, message, connected} = await getWeb3State();
+		const account = (accounts.length > 0)? accounts[0] : null;
+		const {banned}= await getUserState(account);
+	  this.setState({
+			account: account,
+			banned: banned,
+			connected: connected
+		});
     return {connected, statusCode, message};
 }
   async handleTrackListUpdate(){

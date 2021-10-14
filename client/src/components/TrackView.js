@@ -2,7 +2,7 @@ import React, {Component} from "react";
 import EntriesList from "./EntriesList";
 import EntryForm from "./EntryForm";
 import { withRouter } from 'react-router-dom';
-import {getEntries, getVotes} from "../helpers/ContractHelper";
+import {getEntries, getVotes, getTrackState} from "../helpers/ContractHelper";
 import "./TrackView.css"
 
 class TrackView extends Component {
@@ -11,7 +11,10 @@ class TrackView extends Component {
 		this.state = {
 			entries: [],
 			votes: {},
-      trackId: {name: "", desc: ""}
+ 			exists: false,
+ 			open: false,
+ 			closed: false,
+      blocked: false
 		}
 
 	}
@@ -22,10 +25,21 @@ class TrackView extends Component {
 	
   
 	async handleUpdate(){
-		console.debug("handleUpdate::handleUpdate");
+		console.debug("TrackView::handleUpdate");
     this.setState({
         entries: await this.updateEntries(),
         votes: await this.updateVotes(),
+    }, await this.updateTrackAccessState());
+	}
+
+	async updateTrackAccessState(){
+		console.debug("TrackView::updateTrackAccessState");
+		const {exists, open, closed, blocked} = await getTrackState(this.props.match.params.trackId);
+    this.setState({
+			exists: exists,
+			open: open,
+			closed: closed,
+			blocked: blocked
     });
 	}
 
@@ -42,21 +56,40 @@ class TrackView extends Component {
   }
 
 	render(){
-		return (
-    	<div className="TrackView">
-        <EntriesList
-          votes={this.state.votes}
-          entries={this.state.entries}
-          name={this.props.name}
-          desc={this.props.desc}
-          handleNotificationMessage={(message, statusCode) => this.props.handleNotificationMessage(message, statusCode)}
-          handleUpdate={() => this.handleUpdate()}/>
-        <EntryForm
-          trackId={this.props.match.params.trackId}
-          handleUpdate={() => this.handleUpdate()}
-          handleNotificationMessage={(message, statusCode) => this.props.handleNotificationMessage(message, statusCode)}/>
-			</div>
-  	);
+		let view;
+		if (this.state.open){
+			view = (
+	    	<div className="TrackView">
+	        <EntriesList
+						open={(!this.state.exists || this.state.blocked || this.state.closed)? false : true}
+	          votes={this.state.votes}
+	          entries={this.state.entries}
+	          name={this.props.name}
+	          desc={this.props.desc}
+	          handleNotificationMessage={(message, statusCode) => this.props.handleNotificationMessage(message, statusCode)}
+	          handleUpdate={() => this.handleUpdate()}/>
+
+	        <EntryForm
+	          trackId={this.props.match.params.trackId}
+	          handleUpdate={() => this.handleUpdate()}
+	          handleNotificationMessage={(message, statusCode) => this.props.handleNotificationMessage(message, statusCode)}/>
+				</div>
+  		);
+		} else {
+			view = (
+				<div className="TrackView">
+	        <EntriesList
+						open={(!this.state.exists || this.state.blocked || this.state.closed)? false : true}
+	          votes={this.state.votes}
+	          entries={this.state.entries}
+	          name={this.props.name}
+	          desc={this.props.desc}
+	          handleNotificationMessage={(message, statusCode) => this.props.handleNotificationMessage(message, statusCode)}
+	          handleUpdate={() => this.handleUpdate()}/>
+				</div>
+			);
+		}
+		return view;
 	}
 }
 
