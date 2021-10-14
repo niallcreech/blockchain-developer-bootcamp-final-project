@@ -54,7 +54,7 @@ class EntriesList extends Component {
               <div className="smallCell"><VoteCounter votes={this.props.votes[item.entryId] || 0}/></div>
               <div className="smallCell">
                 <button 
-									enabled= {this.state.inProgress && this.props.open}
+									enabled={(this.state.inProgress && this.props.open).toString()}
 									className={this.state.inProgress ? "voteButtonDisabled" : "voteButton"}
                   disabled={this.state.inProgress}
                   value={item.entryId}
