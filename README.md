@@ -13,5 +13,5 @@ Tracks is....
 
 ## Where to find it
 
-* [Tracks Website](https://lucky-lake-7320.on.fleek.co/)
-* [Rinkeby Address](https://rinkeby.etherscan.io/address/0x8D4002A154D06e45c41382Be70978E954491F64c)
+* [Tracks Website](https://r7ph4-kaaaa-aaaad-qaw6a-cai.ic.fleek.co)
+* [Rinkeby Address](https://rinkeby.etherscan.io/address/0x7C0743Bd57B107443c2DF8420E0265E6D0eEf607)
