@@ -34,9 +34,13 @@ class EntriesList extends Component {
 	        console.debug(err);
 	        this.setState({inProgress: false});
 	      });
-	}
+	 }
 	}
   
+  async handleEntryClick(location){
+    window.open(location);
+  }
+                 
 	render(){
 		const sortedItems = 
       <SortedList by='title'>
@@ -45,7 +49,11 @@ class EntriesList extends Component {
 					let entry;
 					if (this.props.open){
 						entry = (
-							<div className="rowGroup" key={item.entryId} votes={this.props.votes[item.entryId] || 0}>
+							<div className="rowGroup"
+                key={item.entryId}
+                votes={this.props.votes[item.entryId] || 0}
+                onClick={() => this.handleEntryClick(item.location)}
+               >
             <div className="row">
 						 	<div className="smallCell">{item.entryId}</div>
               <div className="bigCell">{item.name}</div>
@@ -65,7 +73,12 @@ class EntriesList extends Component {
             </div>
           </div>);
 				} else {
-					entry = (<div className="rowGroup" key={item.entryId} votes={this.props.votes[item.entryId] || 0}>
+					entry = (
+            <div
+              className="rowGroup"
+              key={item.entryId}
+              onClick={() => this.handleEntryClick(item.location)}
+              votes={this.props.votes[item.entryId] || 0}>
             <div className="row">
 						 	<div className="smallCell">{item.entryId}</div>
               <div className="bigCell">{item.name}</div>
