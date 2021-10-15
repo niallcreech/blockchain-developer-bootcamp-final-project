@@ -20,6 +20,7 @@
 require('dotenv').config()
 const HDWalletProvider = require('@truffle/hdwallet-provider');
 const mnemonic = process.env.MNEMONIC;
+const ownerAddress = process.env.OWNER_ADDRESS;
 const infuraProjectId = process.env.INFURA_PROJECT_ID;
 const networkName = process.env.NETWORK_NAME || "rinkeby";
 const networkId = process.env.NETWORK_ID || 4;
@@ -77,10 +78,11 @@ module.exports = {
     // Useful for deploying to a public network.
     // NB: It's important to wrap the provider as a function.
     rinkeby: {
-     provider: () => new HDWalletProvider(mnemonic, wsNetworkEndpoint),
-     network_id: networkId,       // Ropsten's id
-     networkCheckTimeout: 1000000,
-      timeoutBlocks: 200
+      provider: () => new HDWalletProvider(mnemonic, wsNetworkEndpoint),
+      network_id: networkId,       // Ropsten's id
+      networkCheckTimeout: 1000000,
+      timeoutBlocks: 200,
+      from: ownerAddress,
     // gas: 5500000,        // Ropsten has a lower block limit than mainnet
     // confirmations: 2,    // # of confs to wait between deployments. (default: 0)
     // timeoutBlocks: 200,  // # of blocks before a deployment times out  (minimum/default: 50)
