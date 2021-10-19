@@ -36,5 +36,6 @@ it("renders with a name and description", () => {
     render(<EntriesList entries={items} votes={itemVotes}/>, container);
   });
   const _component = container.querySelector('.EntriesListTable');
+	expect(_component.children);
   expect(_component.children.length === items.length);
 });

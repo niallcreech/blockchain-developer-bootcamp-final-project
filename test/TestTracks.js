@@ -52,10 +52,26 @@ describe("When working with a contract", () => {
 			expect(await contract.getTrackStatus("666") === "null");
       const trackId = await contract.addTrack(name, "mydescription", { from: accounts[0] });
 			expect(await contract.getTrackStatus(trackId) === "open");
-			await contract.closeTrack(trackId).then(()=>expect(await contract.getTrackStatus(trackId) === "closed"));
-			await contract.blockTrack(trackId).then(()=>expect(await contract.getTrackStatus(trackId) === "blocked"));
-			await contract.unBlockTrack(trackId).then(()=>expect(await contract.getTrackStatus(trackId) === "closed"));
-			await contract.unOpenTrack(trackId).then(()=>expect(await contract.getTrackStatus(trackId) === "open"));
+			await contract.closeTrack(trackId)
+        .then(async () => {
+          const status = await contract.getTrackStatus(trackId);
+          expect(status === "closed")
+        });
+        await contract.blockTrack(trackId)
+        .then(async () => {
+          const status = await contract.getTrackStatus(trackId);
+          expect(status === "blocked")
+        });
+        await contract.unBlockTrack(trackId)
+        .then(async () => {
+          const status = await contract.getTrackStatus(trackId);
+          expect(status === "closed")
+        });
+        await contract.OpenTrack(trackId)
+        .then(async () => {
+          const status = await contract.getTrackStatus(trackId);
+          expect(status === "open")
+        });
     });
   });
 });
