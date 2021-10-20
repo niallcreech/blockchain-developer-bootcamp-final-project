@@ -4,17 +4,26 @@ const truffleAssert = require('truffle-assertions');
 describe("When working with a Tracks contract", () => {
   contract("Lifecycle", accounts => {
     
-    let contract;
+  let contract;
   	let trackId;
 
-    beforeEach(function() {
+   beforeEach(function() {
        return Tracks.new()
-       .then(function(instance) {
+       .then(async function(instance) {
           contract = instance;
-					trackId = 0
-      		contract.addTrack("mytrack", "mydescription", { from: accounts[0] });
+					trackId = await createTestTrack();
        });
     });
+    
+    async function createTestTrack() {
+      const _tx = await contract.addTrack("track_name", "track_description", { from: accounts[0] });
+      let _trackId;
+      truffleAssert.eventEmitted(_tx, 'TrackCreated', (ev) => {
+        _trackId = ev.trackId;
+        return true;
+      });
+      return _trackId;
+    }
   
     it("...should close an open track.", async () => {
       await contract.closeTrack(trackId, { from: accounts[0] });
