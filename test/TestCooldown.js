@@ -1,5 +1,7 @@
 const Tracks = artifacts.require("./Tracks.sol");
 const truffleAssert = require('truffle-assertions');
+const common = require("./common.js");
+
 
 describe("When working with Tracks", () => {
   contract("Cooldown", accounts => {
@@ -16,19 +18,14 @@ describe("When working with Tracks", () => {
 					ownerAddress = accounts[0];
 					clientAddress = accounts[9];
           contract = instance;
-					trackId = 1
-      		contract.addTrack("mytrack", "mydescription", { from: clientAddress });
-					entryId = 1
-					contract.addEntry(trackId, "myentry", "mydescription", { from: clientAddress }); 
 			});
     });
   
 	it("...should stop the address voting again during cooldown period.", async () => {
+      const {trackId, entryId}  = await common.getTestPair(contract, accounts[0]);
+      const secondEntryId  = await common.getTestEntry(contract, accounts[0], trackId);
 			expect(contract.votingCooldownEnabled);
 			expect(!contract.isSenderInVotingCooldown(trackId), { from: clientAddress });
-      let secondEntryId = entryId + 1;
-      await contract.addEntry(trackId, "myentry", "mydescription", { from: clientAddress }); 
-
       await contract.vote(entryId, { from: clientAddress });
       res1 = await contract.lastVoteTime(clientAddress, trackId).then(res => res.toString());
 			expect(res1 !== '0');
@@ -45,8 +42,8 @@ describe("When working with Tracks", () => {
 	it("...should stop the address creating another track during cooldown period.", async () => {
 			expect(contract.trackCreationCooldownEnabled);
 			expect(!contract.isSenderInTrackCreationCooldown(), { from: clientAddress });
-      await contract.addTrack("mytrack", "mydescription", { from: clientAddress });
-			expect(contract.isSenderInTrackCreationCooldown(), { from: clientAddress });
+      const trackId  = await common.getTestTrack(contract, accounts[0]);
+      expect(contract.isSenderInTrackCreationCooldown(), { from: clientAddress });
 
       try {
       await contract.addTrack("mytrack", "mydescription", { from: clientAddress });
@@ -67,9 +64,8 @@ describe("When working with Tracks", () => {
 	it("...should stop the address creating another entry during cooldown period.", async () => {
 			expect(contract.entryCreationCooldownEnabled);
 			expect(!contract.isSenderInEntryCreationCooldown(), { from: clientAddress });
-      await contract.addEntry(trackId, "myentry", "mydescription", { from: clientAddress }); 
+      const {trackId, entryId}  = await common.getTestPair(contract, accounts[0]);
 			expect(contract.isSenderInEntryCreationCooldown(), { from: clientAddress });
-
       try {
       	await contract.addEntry(trackId, "myentry", "mydescription", { from: clientAddress }); 
         assert(false);
@@ -81,10 +77,10 @@ describe("When working with Tracks", () => {
 			await contract.enableCooldowns(false, {from: ownerAddress})
 			expect(!contract.entryCreationCooldownEnabled);
 			expect(!contract.isSenderInEntryCreationCooldown(), { from: clientAddress });
-      await contract.addEntry(trackId, "myentry", "mydescription", { from: clientAddress }); 
+      const {trackId, entryId}  = await common.getTestPair(contract, accounts[0]);
 			expect(!contract.isSenderInEntryCreationCooldown(), { from: clientAddress });
       try {
-      	await contract.addEntry(trackId, "myentry", "mydescription", { from: clientAddress }); 
+        	const secondEntryId  = await common.getTestEntry(contract, accounts[0], trackId);
       } catch (e){assert(false);}
   });
 

@@ -1,5 +1,7 @@
 const Tracks = artifacts.require("./Tracks.sol");
 const truffleAssert = require('truffle-assertions');
+const common = require("./common.js");
+
 
 describe("When working with a contract", () => {
   contract("Tracks", accounts => {
@@ -13,6 +15,7 @@ describe("When working with a contract", () => {
        });
     });
   
+
     it("...should have a default track.", async () => {
       // Set value of 89
       let _tracks = await contract.getTracks();
@@ -49,27 +52,30 @@ describe("When working with a contract", () => {
 
 		it("...should get track status.", async () => {
       const name = "mytrack"
-			expect(await contract.getTrackStatus("666") === "null");
-      const trackId = await contract.addTrack(name, "mydescription", { from: accounts[0] });
-			expect(await contract.getTrackStatus(trackId) === "open");
-			await contract.closeTrack(trackId)
+			expect(await contract.getTrackState("666") === "null");
+      const _trackId = await common.getTestTrack(contract, accounts[0]);
+			await contract.getTrackState(_trackId).then((_state) => {
+        console.debug(_state);
+        expect(_state === "open");
+      });
+			await contract.closeTrack(_trackId)
         .then(async () => {
-          const status = await contract.getTrackStatus(trackId);
+          const status = await contract.getTrackState(_trackId);
           expect(status === "closed")
         });
-        await contract.blockTrack(trackId)
+        await contract.blockTrack(_trackId)
         .then(async () => {
-          const status = await contract.getTrackStatus(trackId);
+          const status = await contract.getTrackState(_trackId);
           expect(status === "blocked")
         });
-        await contract.unBlockTrack(trackId)
+        await contract.unblockTrack(_trackId)
         .then(async () => {
-          const status = await contract.getTrackStatus(trackId);
+          const status = await contract.getTrackState(_trackId);
           expect(status === "closed")
         });
-        await contract.OpenTrack(trackId)
+        await contract.openTrack(_trackId)
         .then(async () => {
-          const status = await contract.getTrackStatus(trackId);
+          const status = await contract.getTrackState(_trackId);
           expect(status === "open")
         });
     });
