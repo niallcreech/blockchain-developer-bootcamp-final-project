@@ -5,7 +5,6 @@ import {getTrackDetails} from "../helpers/ContractHelper";
 
 
 class TrackHeaderView extends Component {
-
   constructor(props){
     super(props);
     this.state = {
@@ -23,16 +22,19 @@ class TrackHeaderView extends Component {
   }
   
   async getSelectedTrack(){
-    const {data, statusCode} =  await getTrackDetails(this.props.match.params.trackId);
-		if (statusCode === 200) {
+      const {data, statusCode} =  await getTrackDetails(this.props.match.params.trackId);
+		  if (statusCode === 200) {
 	    this.setState({
 	      trackId: this.props.match.params.trackId,
 	      trackName: data.name || "",
 	      trackDesc: data.desc || "",
 	    });
-	}
+  }
   }
   
+  async componentWillUnmount(){
+  }
+
   async handleReturnClick(){
     console.debug(`HeaderView::handleReturnClick`);
     await this.props.handleTrackListUpdate();

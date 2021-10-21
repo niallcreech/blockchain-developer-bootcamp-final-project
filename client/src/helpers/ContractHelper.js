@@ -18,7 +18,19 @@ export async function getUserState(addr){
   const status = {
 		banned: false
 	};
-	let {contract, statusCode, message} = await getWeb3State();
+  let contract;
+  let statusCode;
+  let message;
+	try {
+    const state = await getWeb3State();
+    contract = state.contract;
+    statusCode = state.statusCode;
+    message = state.message;
+  } catch (err) {
+    contract = null;
+    statusCode = 500;
+    message = err.message;
+  }
   let isBanned = false;
 	if (statusCode === 200){
 		try {
@@ -299,17 +311,15 @@ async function getWeb3Accounts(web3){
 	let accounts;
 	let statusCode;
 	let message;
-	await web3.eth.getAccounts()
-    .then((acc) => {
-      accounts = acc;
-      statusCode = 200;
-      message = 'Connected to web3 accounts.'
-    })
-    .catch((err) => {
-      accounts = [];
-      statusCode = 500;
-      message = 'Failed to get web3 accounts.'
-    });
+  try {
+	  accounts = await web3.eth.getAccounts();
+    statusCode = 200;
+    message = 'Connected to web3 accounts.'
+  } catch(err) {
+    accounts = [];
+    statusCode = 500;
+    message = 'Failed to get web3 accounts.'
+  };
   if (accounts.length === 0) {
     statusCode = 500;
     message = 'Could not find any accounts.'

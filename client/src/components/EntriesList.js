@@ -6,6 +6,7 @@ import "./EntriesList.css";
 
 
 class EntriesList extends Component {
+
 	constructor(props){
 		super(props);
     this.state = {
@@ -36,7 +37,7 @@ class EntriesList extends Component {
 	      });
 	 }
 	}
-  
+
   async handleEntryClick(location){
     window.open(location);
   }

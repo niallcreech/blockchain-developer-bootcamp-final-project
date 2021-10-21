@@ -19,26 +19,6 @@ describe("When voting on an entry", () => {
 			});
     });
     
-    async function createTestTrack() {
-      const _tx = await contract.addTrack("track_name", "track_description", { from: accounts[0] });
-      let _trackId;
-      truffleAssert.eventEmitted(_tx, 'TrackCreated', (ev) => {
-        _trackId = ev.trackId.toNumber();
-        return true;
-      });
-      return _trackId;
-    }
-
-    async function createTestEntry(_trackId) {
-      const _tx = await contract.addEntry(_trackId, "myentry", "mydescription", { from: accounts[0] }); 
-      let _id;
-      truffleAssert.eventEmitted(_tx, 'EntryCreated', (ev) => {
-        _id = ev.entryId.toNumber();
-        return true;
-      });
-      return _id;
-    }
- 
     it("...should initialise with 1 not 0 as track and entry numbers.", async () => {
       expect(await contract.nextTrackId().then(res => res.toString()) !== '2');
       expect(await contract.nextEntryId().then(res => res.toString()) !== '2');
@@ -69,22 +49,19 @@ describe("When voting on an entry", () => {
     });
   
     it("...should emit a vote event.", async () => {
-      const _trackId = await createTestTrack();
-      const _entryId = await createTestEntry(_trackId);
-      const _tx = await contract.vote(_entryId, { from: accounts[0] });
-			truffleAssert.eventEmitted(_tx, 'EntryVotedFor', (ev) => {
-    			expect(ev.entryId.toNumber()).to.equal(_entryId);
+      const tx1 = await contract.vote(entryId, { from: accounts[0] });
+			truffleAssert.eventEmitted(tx1, 'EntryVotedFor', (ev) => {
+    			expect(ev.entryId.toNumber()).to.equal(1);
         	return true;
     	});
     });
   	
     it("...should stop the address voting again for the same entry.", async () => {
-      const _trackId = await createTestTrack();
-      const _entryId = await createTestEntry(_trackId);
-      await contract.vote(_entryId, { from: accounts[1] });
-      await contract.vote(_entryId, { from: accounts[2] });
+      let res;
+      await contract.vote(entryId, { from: accounts[0] });
+      await contract.vote(entryId, { from: accounts[1] });
       try {
-        await contract.vote(_entryId, { from: accounts[1] });
+        await contract.vote(entryId, { from: accounts[0] });
         assert(false);
       } catch (e){}
     });

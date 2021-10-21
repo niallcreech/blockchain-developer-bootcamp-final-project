@@ -17,6 +17,8 @@ import {getTracks, getUserState, getVotesByTrack, getWeb3State} from "./helpers/
 
 
 class App extends Component {
+  _isMounted = false;
+
   constructor(props) {
 		super(props);
 		this.state = {
@@ -38,11 +40,20 @@ class App extends Component {
 	}
 
   async componentWillUnmount() {
-    window.ethereum.removeListener('accountsChanged', this.handleConnectionUpdate);
-    window.ethereum.removeListener('networkChanged', this.handleConnectionUpdate);
+    if (this._isMounted  && window.ethereum) {
+      try {
+        window.ethereum.removeListener('accountsChanged', this.handleConnectionUpdate);
+        window.ethereum.removeListener('networkChanged', this.handleConnectionUpdate);
+      } catch (err) {
+        console.debug(err);
+      }
+    }
+    clearInterval(this.timer);
+    this._isMounted = false;
   }
 
 	async componentDidMount() {
+      this._isMounted = true;
       const {statusCode, message} = await this.handleConnectionUpdate();
       if (this.state.connected){
         await this.handleTrackListUpdate();
@@ -68,56 +79,74 @@ class App extends Component {
 	
  
   async handleConnectionUpdate(){
-		console.debug("App::handleConnectionUpdate");
+    let account = null;
+    let banned = false;
 		const {accounts, statusCode, message, connected} = await getWeb3State();
-		const account = (accounts.length > 0)? accounts[0] : null;
-		const {banned}= await getUserState(account);
-	  this.setState({
-			account: account,
-			banned: banned,
-			connected: connected
-		});
+    if (accounts) {
+      account = (accounts.length > 0)? accounts[0] : null;
+      const state = await getUserState(account);
+      banned = state.banned;
+    }
+		if (this._isMounted) {
+    	  this.setState({
+    			account: account,
+    			banned: banned,
+    			connected: connected
+    		});
+    }
     return {connected, statusCode, message};
 }
   async handleTrackListUpdate(){
 		console.debug("App::handleTrackListUpdate");
     const {data, statusCode, message} = await getTracks();
     const _trackIds = data.map((track) => (track.trackId));
-		this.setState({
-			tracks: data,
-			trackVotes: await getVotesByTrack(_trackIds).then(results => results.data)});
+		if (this._isMounted) {
+      this.setState({
+  			tracks: data,
+  			trackVotes: await getVotesByTrack(_trackIds).then(results => results.data)});
+     }
     return {statusCode, message};
   }
   
   async handleNotificationMessageClick(){
+    if (this._isMounted) {
      this.setState({notificationMessages: ""});
+    }
   }
   
   async handleNotificationMessage(message, statusCode, delay=5){
-    if (this.state.notificationTimer) {
-      this.clearNotification();
-    }
-     
-     this.setState({notificationMessage: message, notificationStatusCode: statusCode, notificationCountdown: 5});
-     if (delay) {
-      this.startNotificationTimer(delay);
+    if (this._isMounted) {
+      if (this.state.notificationTimer) {
+        this.clearNotification();
+      }
+       
+       this.setState({notificationMessage: message, notificationStatusCode: statusCode, notificationCountdown: 5});
+       if (delay) {
+        this.startNotificationTimer(delay);
+       }
      }
   }
 
   async handleNotificationCountdown(){
-    this.setState({notificationCountdown: this.state.notificationCountdown - 1});
-     if (this.state.notificationCountdown < 0){
-      this.clearNotification();
-    }
+    if (this._isMounted) {
+      this.setState({notificationCountdown: this.state.notificationCountdown - 1});
+       if (this.state.notificationCountdown < 0){
+        this.clearNotification();
+      }
+     }
   }
 
   async startNotificationTimer(delay){
-    this.setState({notificationCountdown: delay});
-    this.timer = setInterval(this.handleNotificationCountdown, 1000);
+    if (this._isMounted) {
+      this.setState({notificationCountdown: delay});
+      this.timer = setInterval(this.handleNotificationCountdown, 1000);
+     }
   }
   
   async clearNotification(){
-    this.setState({notificationMessage: "", notificationStatusCode: null});
+    if (this._isMounted) {
+      this.setState({notificationMessage: "", notificationStatusCode: null});
+    }
     clearInterval(this.timer);
   }
 
