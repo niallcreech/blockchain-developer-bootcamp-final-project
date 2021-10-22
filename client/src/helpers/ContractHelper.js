@@ -74,25 +74,18 @@ export function isValidUrl(string){
 }
 
 export async function getVotesByTrack(_trackIds){
-
-	let tracks = {};
+	console.debug(`App::getVotesByTrack: ${_trackIds}`);
 	let {contract, statusCode, message} = await getWeb3State();
-  if (statusCode === 200){
-	    _trackIds.map(async (trackId) => {
-			await contract.methods.votesByTrack(trackId).call()
-			.then((result)=> {
-					tracks[trackId] = result;
-			})
-			.catch((err) => {
-				console.error(`getVotesByTrack: ${err}`);
-		    let parsedError = parseError(err);
-		    statusCode = parsedError.code;
-		    message = parsedError.message;
-			});
-		});
-  }
-	
-  return {data: tracks,
+  if (statusCode !== 200){
+		return {data: {},
+          statusCode: statusCode,
+          message: message};
+	}
+	let _data = {}
+	for (let i=0; i<_trackIds.length; i++){
+		_data[_trackIds[i]] = await contract.methods.votesByTrack(_trackIds[i]).call();
+	}
+  return {data: _data,
           statusCode: statusCode,
           message: message};
 }
@@ -286,9 +279,7 @@ async function getWeb3Contract(web3){
     networkId = await web3.eth.net.getId();
     networkName = networkIdMapping[networkId] || networkId;
     const deployedNetwork = TracksContract.networks[networkId];
-		console.debug(`getWeb3Contract: ${deployedNetwork}`);
-		console.debug(`getWeb3Contract: ${TracksContract.networks}`);
-		console.debug(TracksContract.networks);
+		console.debug(`getWeb3Contract`);
     contract = new web3.eth.Contract(
       TracksContract.abi,
       deployedNetwork && deployedNetwork.address,

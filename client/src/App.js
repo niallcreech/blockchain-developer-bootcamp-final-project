@@ -25,7 +25,6 @@ class App extends Component {
 		super(props);
 		this.state = {
 			tracks: [],
-			trackVotes: [],
       notificationMessage: "",
       notificationStatusCode: null,
       notificationCountdown: 0,
@@ -56,6 +55,7 @@ class App extends Component {
   }
 
 	async componentDidMount() {
+      console.debug(`App::componentDidMount`);
       this._isMounted = true;
       this.startTrackListUpdateTimer();
       const {statusCode, message} = await this.handleConnectionUpdate();
@@ -103,32 +103,17 @@ class App extends Component {
   
   async handleTrackListUpdate(){
 		console.debug("App::handleTrackListUpdate");
-    const {data, statusCode, message} = await getTracks();
-    const _trackIds = this.state.tracks.map((track) => (track.trackId));
-    await getVotesByTrack(_trackIds).then((rawVotes) => {
-      this.setState({
-        tracks: data,
-        trackVotes: rawVotes.data
-     });
-    });
-    return {statusCode, message};
-  }
-  
-  async handleTrackVotesUpdate(){
-    const _trackIds = this.state.tracks.map((track) => (track.trackId));
-    await getVotesByTrack(_trackIds).then((rawVotes) => {
-      debugger;
-        this.setState({
-          trackVotes: rawVotes.data
-        });
-    })
-  }
-
-  async handleTrackListEntriesUpdate(){
-      const {data, statusCode, message} = await getTracks();
-      this.setState({
-        tracks: data,
-     });
+		let statusCode;
+		let message;
+		const _newTracks = await getTracks().then(ret => {return ret.data});
+		const _trackIds = _newTracks.map((track) => (track.trackId));
+		const _newVotes = await getVotesByTrack(_trackIds).then(ret => {return ret.data;});
+		_newTracks.forEach((item) => {
+			item.votes = _newVotes[item.trackId];
+		});
+		this.setState({
+		 	tracks: _newTracks,
+		});
     return {statusCode, message};
   }
   
@@ -169,7 +154,8 @@ class App extends Component {
   
   async startTrackListUpdateTimer(delay){
     if (this._isMounted) {
-      this.trackListUpdatetimer = setInterval(this.handleTrackListUpdate, 60000);
+      console.debug(`App::startTrackListUpdateTimer`);
+      this.trackListUpdatetimer = setInterval(this.handleTrackListUpdate, 10000);
      }
   }
   
@@ -188,7 +174,6 @@ class App extends Component {
       <div className="MultipleTrackView">
         <TrackList 
           tracks={this.state.tracks}
-          trackVotes={this.state.trackVotes}
           handleNotificationMessage={(message, status_code)=>this.handleNotificationMessage(message, status_code)}
         />
         <TrackForm 

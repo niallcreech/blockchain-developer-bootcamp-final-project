@@ -27,12 +27,12 @@ class TrackList extends Component {
 						<div
 							className="rowGroupPinned"
 							key={item.trackId}
-							votes={this.props.trackVotes[item.trackId] || 0}
+							votes={item.votes || 0}
 							onClick={() => this.handleTrackView(item.trackId)}>
 	            <div className="row">
 	              <div className="bigCellName">{item.name}</div>
 	              <div className="bigCellDesc">{item.desc}</div>
-	              <div className="smallCell"><VoteCounter votes={this.props.trackVotes[item.trackId] || 0}/></div>
+	              <div className="smallCell"><VoteCounter votes={item.votes || 0}/></div>
 	            </div>
 	          </div>
 	        pinnedRows.push(row);
@@ -41,12 +41,12 @@ class TrackList extends Component {
 						<div
 							className="rowGroup"
 							key={item.trackId}
-							votes={this.props.trackVotes[item.trackId] || 0}
+							votes={item.votes || 0}
 							onClick={() => this.handleTrackView(item.trackId)}>
 	            <div className="row">
 	              <div className="bigCellName">{item.name}</div>
 	              <div className="bigCellDesc">{item.desc}</div>
-	              <div className="smallCell"><VoteCounter votes={this.props.trackVotes[item.trackId] || 0}/></div>
+	              <div className="smallCell"><VoteCounter votes={item.votes || 0}/></div>
 	            </div>
 	          </div>
 					unpinnedRows.push(row);
