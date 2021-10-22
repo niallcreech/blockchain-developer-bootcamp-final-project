@@ -18,6 +18,8 @@ import {getTracks, getUserState, getVotesByTrack, getWeb3State} from "./helpers/
 
 class App extends Component {
   _isMounted = false;
+  _trackListUpdateTimer = null;
+  _notificationTimer = null
 
   constructor(props) {
 		super(props);
@@ -48,12 +50,14 @@ class App extends Component {
         console.debug(err);
       }
     }
-    clearInterval(this.timer);
+    clearInterval(this._notificationTimer);
+    clearInterval(this._trackListUpdateTimer);
     this._isMounted = false;
   }
 
 	async componentDidMount() {
       this._isMounted = true;
+      this.startTrackListUpdateTimer();
       const {statusCode, message} = await this.handleConnectionUpdate();
       if (this.state.connected){
         await this.handleTrackListUpdate();
@@ -96,15 +100,35 @@ class App extends Component {
     }
     return {connected, statusCode, message};
 }
+  
   async handleTrackListUpdate(){
 		console.debug("App::handleTrackListUpdate");
     const {data, statusCode, message} = await getTracks();
-    const _trackIds = data.map((track) => (track.trackId));
-		if (this._isMounted) {
+    const _trackIds = this.state.tracks.map((track) => (track.trackId));
+    await getVotesByTrack(_trackIds).then((rawVotes) => {
       this.setState({
-  			tracks: data,
-  			trackVotes: await getVotesByTrack(_trackIds).then(results => results.data)});
-     }
+        tracks: data,
+        trackVotes: rawVotes.data
+     });
+    });
+    return {statusCode, message};
+  }
+  
+  async handleTrackVotesUpdate(){
+    const _trackIds = this.state.tracks.map((track) => (track.trackId));
+    await getVotesByTrack(_trackIds).then((rawVotes) => {
+      debugger;
+        this.setState({
+          trackVotes: rawVotes.data
+        });
+    })
+  }
+
+  async handleTrackListEntriesUpdate(){
+      const {data, statusCode, message} = await getTracks();
+      this.setState({
+        tracks: data,
+     });
     return {statusCode, message};
   }
   
@@ -139,15 +163,22 @@ class App extends Component {
   async startNotificationTimer(delay){
     if (this._isMounted) {
       this.setState({notificationCountdown: delay});
-      this.timer = setInterval(this.handleNotificationCountdown, 1000);
+      this._notificationTimer = setInterval(this.handleNotificationCountdown, 1000);
      }
   }
   
+  async startTrackListUpdateTimer(delay){
+    if (this._isMounted) {
+      this.trackListUpdatetimer = setInterval(this.handleTrackListUpdate, 60000);
+     }
+  }
+  
+
   async clearNotification(){
     if (this._isMounted) {
       this.setState({notificationMessage: "", notificationStatusCode: null});
     }
-    clearInterval(this.timer);
+    clearInterval(this._notificationTimer);
   }
 
 
