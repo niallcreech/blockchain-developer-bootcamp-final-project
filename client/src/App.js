@@ -4,7 +4,6 @@ import {
   Switch,
   Route,
 } from "react-router-dom";
-import CooldownStatus from "./components/CooldownStatus"
 import Notification from "./components/Notification"
 import TrackList from "./components/TrackList"
 import TrackView from "./components/TrackView"
@@ -19,13 +18,12 @@ import {getTracks, getUserState, getVotesByTrack, getWeb3State} from "./helpers/
 
 class App extends Component {
   _isMounted = false;
-  _trackListUpdateTimer = null;
-  _notificationTimer = null
 
   constructor(props) {
 		super(props);
 		this.state = {
 			tracks: [],
+			trackVotes: [],
       notificationMessage: "",
       notificationStatusCode: null,
       notificationCountdown: 0,
@@ -50,15 +48,12 @@ class App extends Component {
         console.debug(err);
       }
     }
-    clearInterval(this._notificationTimer);
-    clearInterval(this._trackListUpdateTimer);
+    clearInterval(this.timer);
     this._isMounted = false;
   }
 
 	async componentDidMount() {
-      console.debug(`App::componentDidMount`);
       this._isMounted = true;
-      this.startTrackListUpdateTimer();
       const {statusCode, message} = await this.handleConnectionUpdate();
       if (this.state.connected){
         await this.handleTrackListUpdate();
@@ -101,20 +96,15 @@ class App extends Component {
     }
     return {connected, statusCode, message};
 }
-  
   async handleTrackListUpdate(){
 		console.debug("App::handleTrackListUpdate");
-		let statusCode;
-		let message;
-		const _newTracks = await getTracks().then(ret => {return ret.data});
-		const _trackIds = _newTracks.map((track) => (track.trackId));
-		const _newVotes = await getVotesByTrack(_trackIds).then(ret => {return ret.data;});
-		_newTracks.forEach((item) => {
-			item.votes = _newVotes[item.trackId];
-		});
-		this.setState({
-		 	tracks: _newTracks,
-		});
+    const {data, statusCode, message} = await getTracks();
+    const _trackIds = data.map((track) => (track.trackId));
+		if (this._isMounted) {
+      this.setState({
+  			tracks: data,
+  			trackVotes: await getVotesByTrack(_trackIds).then(results => results.data)});
+     }
     return {statusCode, message};
   }
   
@@ -149,23 +139,15 @@ class App extends Component {
   async startNotificationTimer(delay){
     if (this._isMounted) {
       this.setState({notificationCountdown: delay});
-      this._notificationTimer = setInterval(this.handleNotificationCountdown, 1000);
+      this.timer = setInterval(this.handleNotificationCountdown, 1000);
      }
   }
   
-  async startTrackListUpdateTimer(delay){
-    if (this._isMounted) {
-      console.debug(`App::startTrackListUpdateTimer`);
-      this.trackListUpdatetimer = setInterval(this.handleTrackListUpdate, 10000);
-     }
-  }
-  
-
   async clearNotification(){
     if (this._isMounted) {
       this.setState({notificationMessage: "", notificationStatusCode: null});
     }
-    clearInterval(this._notificationTimer);
+    clearInterval(this.timer);
   }
 
 
@@ -175,6 +157,7 @@ class App extends Component {
       <div className="MultipleTrackView">
         <TrackList 
           tracks={this.state.tracks}
+          trackVotes={this.state.trackVotes}
           handleNotificationMessage={(message, status_code)=>this.handleNotificationMessage(message, status_code)}
         />
         <TrackForm 
@@ -198,7 +181,6 @@ class App extends Component {
               <Route exact path="/">
                 <div>
                   <HeaderView name="All Tracks" text="Find the track you want to explore."/>
-									<CooldownStatus visible={true}/>
                   <Notification
                     handleClick={() => this.handleNotificationMessageClick()}
                     message={this.state.notificationMessage}
@@ -212,7 +194,6 @@ class App extends Component {
                 <TrackHeaderView 
 									handleTrackListUpdate={() => this.handleTrackListUpdate()}
 								/>
-								<CooldownStatus visible={true}/>
                 <Notification
                   handleClick={() => this.handleNotificationMessageClick()}
                   message={this.state.notificationMessage}

@@ -25,7 +25,7 @@ class EntriesList extends Component {
 		console.debug("EntriesList::handleUpdate:");
 		if (this.props.open){
 	    this.setState({inProgress: true});
-			await sendVote(this.props.trackId, value)
+			await sendVote(value)
 				.then(async (result) => {
 	        this.props.handleNotificationMessage(result.message, result.statusCode);
 	        this.handleUpdate();

@@ -62,7 +62,6 @@ class TrackView extends Component {
 	    	<div className="TrackView">
 	        <EntriesList
 						open={(!this.state.exists || this.state.blocked || this.state.closed)? false : true}
-						trackId={this.props.match.params.trackId}
 	          votes={this.state.votes}
 	          entries={this.state.entries}
 	          name={this.props.name}
@@ -81,7 +80,6 @@ class TrackView extends Component {
 				<div className="TrackView">
 	        <EntriesList
 						open={(!this.state.exists || this.state.blocked || this.state.closed)? false : true}
-						trackId={this.props.match.params.trackId}
 	          votes={this.state.votes}
 	          entries={this.state.entries}
 	          name={this.props.name}
