@@ -4,6 +4,7 @@ import {
   Switch,
   Route,
 } from "react-router-dom";
+import CooldownStatus from "./components/CooldownStatus"
 import Notification from "./components/Notification"
 import TrackList from "./components/TrackList"
 import TrackView from "./components/TrackView"
@@ -197,6 +198,7 @@ class App extends Component {
               <Route exact path="/">
                 <div>
                   <HeaderView name="All Tracks" text="Find the track you want to explore."/>
+									<CooldownStatus visible={true}/>
                   <Notification
                     handleClick={() => this.handleNotificationMessageClick()}
                     message={this.state.notificationMessage}
@@ -210,6 +212,7 @@ class App extends Component {
                 <TrackHeaderView 
 									handleTrackListUpdate={() => this.handleTrackListUpdate()}
 								/>
+								<CooldownStatus visible={true}/>
                 <Notification
                   handleClick={() => this.handleNotificationMessageClick()}
                   message={this.state.notificationMessage}

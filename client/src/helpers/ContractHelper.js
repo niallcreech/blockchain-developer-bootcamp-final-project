@@ -260,6 +260,17 @@ export async function sendTrack(name, desc){
   return {data: [], statusCode: statusCode, message: message};
 }
 
+export async function getCooldownStatus(){
+  let {accounts, contract, statusCode, message} = await getWeb3State();
+	let inTrackCreationCooldown;
+	let inEntryCreationCooldown;
+	if (statusCode === 200){
+		inTrackCreationCooldown = await contract.methods.isSenderInTrackCreationCooldown().call();
+		inEntryCreationCooldown = await contract.methods.isSenderInEntryCreationCooldown().call();
+	}
+	return {inTrackCreationCooldown, inEntryCreationCooldown};
+}
+	
 export async function sendEntry(trackId, name, desc, location){
   // Send a contract call to vote for the entry
   let {accounts, contract, statusCode, message} = await getWeb3State();

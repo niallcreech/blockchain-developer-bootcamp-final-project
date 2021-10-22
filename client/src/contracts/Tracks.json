@@ -54150,10 +54150,16 @@
       "links": {},
       "address": "0x09c72775000ecB2a730fF41Af10812cd8b9E4efe",
       "transactionHash": "0x2f5438f7e37910601d059a4d8fc74ba1b03909b5549303f737d436042ebe027f"
+    },
+    "1634908260770": {
+      "events": {},
+      "links": {},
+      "address": "0xCB4c52D8aB429dC089AdCb8415f0Ad4075c1e00d",
+      "transactionHash": "0xcb44961bfb3f3031b66b4be4be1d4b6d46de0299e5d075c45180451ad55fc38d"
     }
   },
   "schemaVersion": "3.4.3",
-  "updatedAt": "2021-10-22T12:26:27.390Z",
+  "updatedAt": "2021-10-22T13:27:57.285Z",
   "devdoc": {
     "kind": "dev",
     "methods": {
