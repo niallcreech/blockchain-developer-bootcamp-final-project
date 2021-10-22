@@ -214,7 +214,7 @@ contract Tracks is Ownable {
       trackEventCooldownPeriod = 1 minutes;
       allTracksState = State.Open;
       allVotesState = State.Open;
-      enableCooldowns(true);
+      enableCooldowns(false);
       createHelpTrack();
   }
 
