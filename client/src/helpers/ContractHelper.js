@@ -14,7 +14,11 @@ export async function getTracks(){
     let {contract, statusCode, message} = await getWeb3State();
   if (statusCode === 200){
 			tracks = await contract.methods.getTracks().call();
-    } 
+    }
+	if (!tracks){
+		tracks = [];
+	}
+	console.debug(`getTracks: found ${tracks.length} tracks`);
     return {data: tracks,
             statusCode: statusCode,
             message: message};
@@ -196,22 +200,28 @@ export async function getEntries(trackId){
 }
 
 
-export async function sendVote(_entryId){
+export async function sendVote(_trackId, _entryId){
 	// Send a contract call to vote for the entry
 	let {accounts, contract, statusCode, message} = await getWeb3State();
 	if (statusCode === 200){
 	  const options = {from: accounts[0]}
-	  await contract.methods.vote(_entryId).send(options)
-	    .then(() => {
-	      message = "Successfully voted for entry";
-	      statusCode = 200;
-	    })
-	    .catch((err) => {
+		const _userInCooldown = await contract.methods.isSenderInVotingCooldown(_trackId).call();
+		try {
+			if (!_userInCooldown) {
+				const tx = await contract.methods.vote(_entryId).send(options);
+		    message = "Successfully voted for entry";
+		    statusCode = 200;
+				console.debug(`sendVote: ${message}, ${statusCode}`);
+		  } else {
+		      message = "Voting failed! You can only vote once for each entry, each track, during the cooldown period";
+		      statusCode = 500;
+					console.debug(`sendVote: ${message}, ${statusCode}`);
+		  } 
+		} catch(err) {
 	      const parsedError = parseError(err);
-	      message = parsedError.reason || "Voting failed! You can only vote once for each entry, each track, during the cooldown period";
+	      message = parsedError.message;
 	      statusCode = parsedError.code;
-	    });
-	  console.debug(`sendVote: ${message}, ${statusCode}`);
+	  }
 	}
   return {data: [], statusCode: statusCode, message: message};
 }
@@ -226,10 +236,22 @@ export async function sendTrack(name, desc){
 	    + desc  + ")"
 	  ); 
     try {
-      await contract.methods.addTrack(name, desc).send(options);
-      message = "Successfully created track";
-      statusCode = 200;
-	  } catch(err) {
+			const _userInCooldown = await contract.methods.isSenderInTrackCreationCooldown().call();
+			if (!_userInCooldown) {
+	      try {
+					await contract.methods.addTrack(name, desc).send(options);
+	      	message = "Successfully created track";
+	      	statusCode = 200;
+				} catch(err) {
+	      	const parsedError = parseError(err);
+	      	message = parsedError.message;
+	      	statusCode = parsedError.code;
+	  		}
+		  }  else {
+	      message = "Track creation failed! You can create a track once during the cooldown period";
+	      statusCode = 500;
+	  	}
+		} catch(err) {
 	      const parsedError = parseError(err);
 	      message = parsedError.message;
 	      statusCode = parsedError.code;
@@ -249,16 +271,21 @@ export async function sendEntry(trackId, name, desc, location){
 	    + desc + ", "
 	    + location + ")"
 	  ); 
-	  await contract.methods.addEntry(trackId, name, desc, location).send(options)
-	    .then(() => {
+		try {
+			const _userInCooldown = await contract.methods.isSenderInEntryCreationCooldown().call();
+			if (!_userInCooldown) {
+	      await contract.methods.addEntry(trackId, name, desc, location).send(options)
 	      message = "Successfully created entry";
 	      statusCode = 200;
-	    })
-	    .catch((err) => {
+		  }  else {
+	      message = "Entry creation failed! You can create an entry once during the cooldown period";
+	      statusCode = 500;
+	  	}
+		} catch(err) {
 	      const parsedError = parseError(err);
 	      message = parsedError.message;
 	      statusCode = parsedError.code;
-	    });	
+	  }
 	}
   return {data: [], statusCode: statusCode, message: message};
 }
