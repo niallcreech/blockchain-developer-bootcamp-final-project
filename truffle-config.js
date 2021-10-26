@@ -79,7 +79,7 @@ module.exports = {
     // },
     // Useful for deploying to a public network.
     // NB: It's important to wrap the provider as a function.
-    rinkeby: {
+    staging: {
       provider: () => new HDWalletProvider(mnemonic, wsNetworkEndpoint),
       network_id: networkId,       // Ropsten's id
       networkCheckTimeout: 1000000,

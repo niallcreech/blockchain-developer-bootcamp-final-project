@@ -452,8 +452,10 @@ contract Tracks is Ownable {
    * @return true if user is in cooldown, false otherwise.
    */ 
   function isSenderInTrackCreationCooldown() public view returns (bool) {
-      if (votingCooldownEnabled
-	        && ((trackEventsByUser[msg.sender].time + trackEventCooldownPeriod) < block.timestamp)){
+      if (trackCreationCooldownEnabled
+          	&& trackEventsByUser[msg.sender].time > 0
+	        	&& (trackEventsByUser[msg.sender].time + trackEventCooldownPeriod) > block.timestamp
+	      	){
 	            return true;
 	   	}
 	   	return false;
@@ -465,8 +467,10 @@ contract Tracks is Ownable {
    * @return true if user is in cooldown, false otherwise.
    */ 
 	function isSenderInEntryCreationCooldown() public view returns (bool) {
-      if (entryCreationCooldownEnabled
-	        && ((entryEventsByUser[msg.sender].time + entryEventCooldownPeriod) < block.timestamp)){
+	   	if (entryCreationCooldownEnabled
+          	&& entryEventsByUser[msg.sender].time > 0
+	        	&& (entryEventsByUser[msg.sender].time + entryEventCooldownPeriod) > block.timestamp
+	      	){
 	            return true;
 	   	}
 	   	return false;
@@ -478,8 +482,10 @@ contract Tracks is Ownable {
    * @return true if user is in cooldown, false otherwise.
    */ 
 	function isSenderInVotingCooldown(uint trackId) public view returns (bool) {
-      if (votingCooldownEnabled
-	        && ((lastVoteTime[msg.sender][trackId] + voteCooldownPeriod) > block.timestamp)){
+	   	if (votingCooldownEnabled
+          	&& lastVoteTime[msg.sender][trackId] > 0
+	        	&& (lastVoteTime[msg.sender][trackId] + voteCooldownPeriod) > block.timestamp
+	      	){
 	            return true;
 	   	}
 	   	return false;

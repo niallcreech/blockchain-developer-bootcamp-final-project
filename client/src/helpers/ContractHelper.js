@@ -1,14 +1,24 @@
 import TracksContract from "../contracts/Tracks.json";
 import Web3 from "web3";
 
-
+const networkIdMapping = {
+  "0": "rinkeby", //The default deployed network
+  "1": "mainnet",
+  "3": "ropsten",
+  "4": "rinkeby",
+  "5": "goerli",
+}
 
 export async function getTracks(){
     let tracks = [];
     let {contract, statusCode, message} = await getWeb3State();
   if (statusCode === 200){
 			tracks = await contract.methods.getTracks().call();
-    } 
+    }
+	if (!tracks){
+		tracks = [];
+	}
+	console.debug(`getTracks: found ${tracks.length} tracks`);
     return {data: tracks,
             statusCode: statusCode,
             message: message};
@@ -68,25 +78,18 @@ export function isValidUrl(string){
 }
 
 export async function getVotesByTrack(_trackIds){
-
-	let tracks = {};
+	console.debug(`App::getVotesByTrack: ${_trackIds}`);
 	let {contract, statusCode, message} = await getWeb3State();
-  if (statusCode === 200){
-	    _trackIds.map(async (trackId) => {
-			await contract.methods.votesByTrack(trackId).call()
-			.then((result)=> {
-					tracks[trackId] = result;
-			})
-			.catch((err) => {
-				console.error(`getVotesByTrack: ${err}`);
-		    let parsedError = parseError(err);
-		    statusCode = parsedError.code;
-		    message = parsedError.message;
-			});
-		});
-  }
-	
-  return {data: tracks,
+  if (statusCode !== 200){
+		return {data: {},
+          statusCode: statusCode,
+          message: message};
+	}
+	let _data = {}
+	for (let i=0; i<_trackIds.length; i++){
+		_data[_trackIds[i]] = await contract.methods.votesByTrack(_trackIds[i]).call();
+	}
+  return {data: _data,
           statusCode: statusCode,
           message: message};
 }
@@ -197,22 +200,28 @@ export async function getEntries(trackId){
 }
 
 
-export async function sendVote(_entryId){
+export async function sendVote(_trackId, _entryId){
 	// Send a contract call to vote for the entry
 	let {accounts, contract, statusCode, message} = await getWeb3State();
 	if (statusCode === 200){
 	  const options = {from: accounts[0]}
-	  await contract.methods.vote(_entryId).send(options)
-	    .then(() => {
-	      message = "Successfully voted for entry";
-	      statusCode = 200;
-	    })
-	    .catch((err) => {
+		const _userInCooldown = await contract.methods.isSenderInVotingCooldown(_trackId).call();
+		try {
+			if (!_userInCooldown) {
+				const tx = await contract.methods.vote(_entryId).send(options);
+		    message = "Successfully voted for entry";
+		    statusCode = 200;
+				console.debug(`sendVote: ${message}, ${statusCode}`);
+		  } else {
+		      message = "Voting failed! You can only vote once for each entry, each track, during the cooldown period";
+		      statusCode = 500;
+					console.debug(`sendVote: ${message}, ${statusCode}`);
+		  } 
+		} catch(err) {
 	      const parsedError = parseError(err);
-	      message = parsedError.reason || "Voting failed! You can only vote once for each entry, each track, during the cooldown period";
+	      message = parsedError.message;
 	      statusCode = parsedError.code;
-	    });
-	  console.debug(`sendVote: ${message}, ${statusCode}`);
+	  }
 	}
   return {data: [], statusCode: statusCode, message: message};
 }
@@ -227,11 +236,22 @@ export async function sendTrack(name, desc){
 	    + desc  + ")"
 	  ); 
     try {
-      await contract.methods.addTrack(name, desc).send(options);
-      debugger;
-      message = "Successfully created track";
-      statusCode = 200;
-	  } catch(err) {
+			const _userInCooldown = await contract.methods.isSenderInTrackCreationCooldown().call();
+			if (!_userInCooldown) {
+	      try {
+					await contract.methods.addTrack(name, desc).send(options);
+	      	message = "Successfully created track";
+	      	statusCode = 200;
+				} catch(err) {
+	      	const parsedError = parseError(err);
+	      	message = parsedError.message;
+	      	statusCode = parsedError.code;
+	  		}
+		  }  else {
+	      message = "Track creation failed! You can create a track once during the cooldown period";
+	      statusCode = 500;
+	  	}
+		} catch(err) {
 	      const parsedError = parseError(err);
 	      message = parsedError.message;
 	      statusCode = parsedError.code;
@@ -251,16 +271,21 @@ export async function sendEntry(trackId, name, desc, location){
 	    + desc + ", "
 	    + location + ")"
 	  ); 
-	  await contract.methods.addEntry(trackId, name, desc, location).send(options)
-	    .then(() => {
+		try {
+			const _userInCooldown = await contract.methods.isSenderInEntryCreationCooldown().call();
+			if (!_userInCooldown) {
+	      await contract.methods.addEntry(trackId, name, desc, location).send(options)
 	      message = "Successfully created entry";
 	      statusCode = 200;
-	    })
-	    .catch((err) => {
+		  }  else {
+	      message = "Entry creation failed! You can create an entry once during the cooldown period";
+	      statusCode = 500;
+	  	}
+		} catch(err) {
 	      const parsedError = parseError(err);
 	      message = parsedError.message;
 	      statusCode = parsedError.code;
-	    });	
+	  }
 	}
   return {data: [], statusCode: statusCode, message: message};
 }
@@ -275,13 +300,13 @@ async function getWeb3Contract(web3){
 	let statusCode;
 	let message;
   let networkId=null;
+  let networkName=null;
   
   try {
     networkId = await web3.eth.net.getId();
+    networkName = networkIdMapping[networkId] || networkId;
     const deployedNetwork = TracksContract.networks[networkId];
-		console.debug(`getWeb3Contract: ${deployedNetwork}`);
-		console.debug(`getWeb3Contract: ${TracksContract.networks}`);
-		console.debug(TracksContract.networks);
+		console.debug(`getWeb3Contract`);
     contract = new web3.eth.Contract(
       TracksContract.abi,
       deployedNetwork && deployedNetwork.address,
@@ -294,15 +319,14 @@ async function getWeb3Contract(web3){
 	    message = 'Failed to get web3 network connection.';
 	}
 	if (!contract){
-    message =  `Contract not found on network, please select the correct network`;
+    message =  `Contract not found on Ethereum '${networkName}', please select the '${networkIdMapping[0]}' network`;
     statusCode = 500;
-    debugger;
 	} else if (!contract._address){
-		    message =  `Contract not found on network ${contract.currentProvider.chainId}, please select the correct network`;
-		    statusCode = 500;
+    message =  `Contract not found on Ethereum '${networkName}', please select the '${networkIdMapping[0]}' network`;
+		statusCode = 500;
   } else {
     statusCode = 200;
-    message = `Found contract ${contract._address} on network ${networkId}.`;
+    message = `Found contract ${contract._address} on the Ethereum '${networkName}' network.`;
   }
 	return {contract, statusCode, message};
 }

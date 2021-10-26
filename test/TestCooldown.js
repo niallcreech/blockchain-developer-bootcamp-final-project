@@ -2,6 +2,12 @@ const Tracks = artifacts.require("./Tracks.sol");
 const truffleAssert = require('truffle-assertions');
 const common = require("./common.js");
 
+const {
+  BN,           // Big Number support
+  constants,    // Common constants, like the zero address and largest integers
+  time,  // Assertions for emitted events
+} = require('@openzeppelin/test-helpers');
+
 
 describe("When working with Tracks", () => {
   contract("Cooldown", accounts => {
@@ -20,7 +26,18 @@ describe("When working with Tracks", () => {
           contract = instance;
 			});
     });
-  
+
+	it("...should start a cooldown period.", async () => {
+		cooldownDuration = 60;
+		expect(!await contract.isSenderInTrackCreationCooldown(), { from: clientAddress });
+		expect(!await contract.isSenderInEntryCreationCooldown(), { from: clientAddress });
+    const {trackId, entryId}  = await common.getTestPair(contract, clientAddress);
+		time.increase(cooldownDuration);
+		expect(await contract.isSenderInTrackCreationCooldown(), { from: clientAddress });
+		expect(await contract.isSenderInEntryCreationCooldown(), { from: clientAddress });
+		expect(!await contract.isSenderInVotingCooldown(entryId), { from: clientAddress });
+  });
+
 	it("...should stop the address voting again during cooldown period.", async () => {
       const {trackId, entryId}  = await common.getTestPair(contract, accounts[0]);
       const secondEntryId  = await common.getTestEntry(contract, accounts[0], trackId);
