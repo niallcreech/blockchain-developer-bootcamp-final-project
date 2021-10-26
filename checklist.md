@@ -15,7 +15,7 @@ Please answer the following questions. Does your project:
 
 4. Contain a Markdown file named design_pattern_decisions.md and avoiding_common_attacks.md? YES/NO
 
-5. Have at least five smart contract unit tests that pass? YES/NO
+5. Have at least five smart contract unit tests that pass? **YES**/<s>NO</s>
 
 6. Contain a `deployed_address.txt` file which contains the testnet address and network where your contract(s) have been deployed? YES/NO
 
