@@ -71,6 +71,9 @@ contract Tracks is Ownable, Pausable{
   event TrackCreated(uint indexed trackId, string name, string desc);
   event EntryCreated(uint indexed trackId, uint indexed entryId, string name, string desc, string location);
   event EntryVotedFor(uint indexed trackId, uint indexed entryId);
+  event DonationToTrackOwner(uint indexed _trackId, address indexed _owner, uint _value);
+  event DonationToContractOwner(address indexed _owner, uint _value);
+  event CollectedDonations(address indexed _owner, uint _value);
 
 
   /**
@@ -537,6 +540,7 @@ contract Tracks is Ownable, Pausable{
   function donateToContractOwner() public payable whenNotPaused {
     require(msg.value > minDonation && msg.value < 1 ether);
     donations[owner()] += msg.value;
+    emit DonationToContractOwner(owner(), msg.value);
   }
   
   /**
@@ -548,8 +552,13 @@ contract Tracks is Ownable, Pausable{
     require(msg.value > (2 * minDonation), "the value of the donation is too small");
     require(msg.value < 1 ether, "the value of the donation is too large, maximum is 1 Ether");
     require(trackOwners[_trackId] != address(0), "the specified track owner doesnt exist");
-    donations[trackOwners[_trackId]] += (msg.value - minDonation);
-    donations[owner()] += minDonation;
+    address _trackOwner = trackOwners[_trackId];
+    uint _trackOwnerDonation = (msg.value - minDonation);
+    uint _contractOwnerDonation = minDonation;
+    donations[_trackOwner] += _trackOwnerDonation;
+    donations[owner()] += _contractOwnerDonation;
+    emit DonationToTrackOwner(_trackId, _trackOwner, _trackOwnerDonation);
+		emit DonationToContractOwner(owner(), msg.value);
   }
 
   /**
@@ -564,14 +573,9 @@ contract Tracks is Ownable, Pausable{
     address payable _author = payable(msg.sender);
     uint _val = donations[_author];
   	donations[_author] = 0;
-    (bool _success, bytes memory _data) = _author.call{value: _val}("");
-    //if (success)
-        //emit Execution(transactionId);
-    //else {
-        //emit ExecutionFailure(transactionId);
-    //}
-  	//(bool _success, bytes memory _data) = _author.call{value: _val}("");
+    (bool _success, ) = _author.call{value: _val}(""); //bytes memory _data
   	require(_success, "failed to transfer donations to author");
+    emit CollectedDonations(_author, _val);
    	return _val;
   }
 }

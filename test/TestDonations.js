@@ -17,7 +17,13 @@ describe("When working with Tracks", () => {
     it("...should donate to the author of a Track.", async () => {
       const _donation = Web3.utils.toWei('0.1', 'ether');
 			const {trackId, entryId}  = await common.getTestPair(contract, accounts[1]);
-      await contract.donateToTrackOwner(trackId, {from: accounts[9], value: _donation});
+			const tx = await contract.donateToTrackOwner(trackId, {from: accounts[9], value: _donation});
+			truffleAssert.eventEmitted(tx, 'DonationToTrackOwner', (ev) => {
+        	return true;
+    		});
+			truffleAssert.eventEmitted(tx, 'DonationToContractOwner', (ev) => {
+        	return true;
+    		});
 			const _contractOwner = accounts[0];
 			const _trackOwner = await contract.trackOwners(trackId);
 			const _minDonation = await contract.minDonation();
