@@ -1,13 +1,20 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
+
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/security/Pausable.sol";
+
+
 
 /**
    * @title The Tracks contract enables the storage of collections of 
    * text information with voting enabled on each memeber of the collection
    * through emitting events.
    */
-contract Tracks is Ownable {
+contract Tracks is Ownable, Pausable{
+  mapping(address => uint) public donations;
+  uint public minDonation;
+  uint public maxTrackCount; // Precent out of gas looping by restricting the amount of tracks to iterate
   mapping (uint => Track) public tracks;
   mapping (uint => uint[]) public trackEntries; //trackId => entryId[]
   mapping (uint => uint) public entriesTrack; //entryId => trackId
@@ -216,6 +223,8 @@ contract Tracks is Ownable {
       allVotesState = State.Open;
       enableCooldowns(true);
       createHelpTrack();
+			setMaxTrackCount(1000000); // Set max tracks to 1 million by default
+      setMinDonation(0.00001 ether);
   }
 
   /**
@@ -232,8 +241,10 @@ contract Tracks is Ownable {
    * @return array of all tracks by object
    */
   function getTracks() public view returns ( Track[] memory) {
+      assert(trackCount <= maxTrackCount);
       Track[] memory _tracks = new Track[](trackCount);
-      for (uint i=0; i<trackCount; i++) {
+      uint _startIndex = (trackCount < maxTrackCount) ? 0 : (_tracks.length - maxTrackCount);
+      for (uint i=_startIndex; i<_tracks.length; i++) {
           _tracks[i] = tracks[i];
       }
       return _tracks;
@@ -262,7 +273,7 @@ contract Tracks is Ownable {
    * @dev Set a specific track to the 'Open' state.
    * @param _trackId The id of the track
    */
-  function openTrack(uint _trackId) public checkTrackExists(_trackId) checkTrackClosed(_trackId) checkIfUserIsBanned(msg.sender){
+  function openTrack(uint _trackId) public checkTrackExists(_trackId) checkTrackClosed(_trackId) checkIfUserIsBanned(msg.sender) {
       tracks[_trackId].state = State.Open;
       tracks[_trackId].visible = true;
       emit TrackOpened(_trackId);
@@ -501,6 +512,56 @@ contract Tracks is Ownable {
     votingCooldownEnabled = enable;
     entryCreationCooldownEnabled = enable;
   }
+  
+  /**
+   * @dev set the maximum amount of tracks to iterate through
+   * @param _maxCount the maximum length of tracks
+   */
+   function setMaxTrackCount(uint _maxCount) public onlyOwner{
+       maxTrackCount = _maxCount;
+   }
+  /**
+   * @dev Set the minimum donation price.
+   * @param _minDonation min donation
+   */ 
+  function setMinDonation(uint _minDonation) public onlyOwner {
+    require(_minDonation > 0 && _minDonation < 0.001 ether); // Force min donation to not be excessive as a sanity check
+    minDonation = _minDonation;
+  }
+  
+  /**
+   * @dev Set the percentage of transaction fees to add to donations.
+   * 	Donations are restricted to (0, 1] ether.
+   * @param _donation in wei to donate
+   */ 
+  function donateToOwner(uint _donation) public payable whenNotPaused {
+    require(msg.value > minDonation && msg.value < 1 ether);
+    donations[owner()] += _donation;
+  }
+  
+  /**
+   * @dev Set the percentage of transaction fees to add to donations.
+   * 	Donations are restricted to (0, 1] ether.
+   * @param _trackId id of the track to donate to
+   * @param _donation in wei to donate
+   */ 
+  function donateToTrackOwner(uint _trackId, uint _donation) public payable whenNotPaused {
+    require(msg.value > (2 * minDonation), "the value of the donation is too small");
+    require(msg.value < 1 ether, "the value of the donation is too large, maximum is 1 Ether");
+    require(trackOwners[_trackId] != address(0), "the specified track owner doesnt exist");
+    donations[trackOwners[_trackId]] += (_donation - minDonation);
+    donations[owner()] += minDonation;
+  }
+
+  /**
+   * @dev Withdraw the donations to the senders address (if allowed)
+   * 	Donations are restricted to (0, 1] ether.
+   */ 
+  function withdraw() public  whenNotPaused{
+    require(donations[msg.sender] > 0);
+    payable(msg.sender).transfer(donations[msg.sender]);
+  }
+  
 }
 
 
