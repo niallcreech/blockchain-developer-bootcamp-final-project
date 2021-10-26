@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.0;
+pragma solidity 0.8.7;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/security/Pausable.sol";
@@ -223,7 +223,7 @@ contract Tracks is Ownable, Pausable{
       allVotesState = State.Open;
       enableCooldowns(true);
       createHelpTrack();
-			setMaxTrackCount(1000000); // Set max tracks to 1 million by default
+			setMaxTrackCount(1000); // Set max tracks to 1 million by default
       setMinDonation(0.00001 ether);
   }
 
@@ -237,13 +237,14 @@ contract Tracks is Ownable, Pausable{
   	blockTrack(trackId);
   }
 	/**
-   * @dev Get all tracks
+   * @dev Get all tracks.
+   * 	There is a hard cap on the amount of tracks that we will return
    * @return array of all tracks by object
    */
   function getTracks() public view returns ( Track[] memory) {
-      assert(trackCount <= maxTrackCount);
-      Track[] memory _tracks = new Track[](trackCount);
-      uint _startIndex = (trackCount < maxTrackCount) ? 0 : (_tracks.length - maxTrackCount);
+      uint _cappedTrackCount = (trackCount <= maxTrackCount) ? trackCount : maxTrackCount;
+      uint _startIndex = (trackCount - _cappedTrackCount);
+      Track[] memory _tracks = new Track[](_cappedTrackCount);
       for (uint i=_startIndex; i<_tracks.length; i++) {
           _tracks[i] = tracks[i];
       }
@@ -532,24 +533,22 @@ contract Tracks is Ownable, Pausable{
   /**
    * @dev Set the percentage of transaction fees to add to donations.
    * 	Donations are restricted to (0, 1] ether.
-   * @param _donation in wei to donate
    */ 
-  function donateToOwner(uint _donation) public payable whenNotPaused {
+  function donateToContractOwner() public payable whenNotPaused {
     require(msg.value > minDonation && msg.value < 1 ether);
-    donations[owner()] += _donation;
+    donations[owner()] += msg.value;
   }
   
   /**
    * @dev Set the percentage of transaction fees to add to donations.
    * 	Donations are restricted to (0, 1] ether.
    * @param _trackId id of the track to donate to
-   * @param _donation in wei to donate
    */ 
-  function donateToTrackOwner(uint _trackId, uint _donation) public payable whenNotPaused {
+  function donateToTrackOwner(uint _trackId) external  payable whenNotPaused {
     require(msg.value > (2 * minDonation), "the value of the donation is too small");
     require(msg.value < 1 ether, "the value of the donation is too large, maximum is 1 Ether");
     require(trackOwners[_trackId] != address(0), "the specified track owner doesnt exist");
-    donations[trackOwners[_trackId]] += (_donation - minDonation);
+    donations[trackOwners[_trackId]] += (msg.value - minDonation);
     donations[owner()] += minDonation;
   }
 
@@ -557,11 +556,24 @@ contract Tracks is Ownable, Pausable{
    * @dev Withdraw the donations to the senders address (if allowed)
    * 	Donations are restricted to (0, 1] ether.
    */ 
-  function withdraw() public  whenNotPaused{
-    require(donations[msg.sender] > 0);
-    payable(msg.sender).transfer(donations[msg.sender]);
+  function collectDonations() public whenNotPaused returns (uint){
+    require(msg.sender > address(0)
+        && donations[msg.sender] > 0,
+        "the track author has no donations."
+    );
+    address payable _author = payable(msg.sender);
+    uint _val = donations[_author];
+  	donations[_author] = 0;
+    (bool _success, bytes memory _data) = _author.call{value: _val}("");
+    //if (success)
+        //emit Execution(transactionId);
+    //else {
+        //emit ExecutionFailure(transactionId);
+    //}
+  	//(bool _success, bytes memory _data) = _author.call{value: _val}("");
+  	require(_success, "failed to transfer donations to author");
+   	return _val;
   }
-  
 }
 
 
