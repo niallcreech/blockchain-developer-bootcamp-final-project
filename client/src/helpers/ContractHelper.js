@@ -2,7 +2,7 @@ import TracksContract from "../contracts/Tracks.json";
 import Web3 from "web3";
 
 const networkIdMapping = {
-  "0": "rinkeby", //The default deployed network
+  "0": "ropsten", //The default deployed network
   "1": "mainnet",
   "3": "ropsten",
   "4": "rinkeby",
