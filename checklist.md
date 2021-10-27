@@ -9,7 +9,7 @@ Please answer the following questions. Does your project:
 3. Contain smart contract(s) which [**NO**]
   - [x] Are commented to the specs described by NatSpec Solidity documentation
   - [ ] Use at least two design patterns from the "Smart Contracts" section
-  - [ ] Protect against two attack vectors from the "Smart Contracts" section with its the SWC number
+  - [x] Protect against two attack vectors from the "Smart Contracts" section with its the SWC number
   	- SafeMath mitigated by pragma requiring > 0.8.0, https://swcregistry.io/docs/SWC-101
   	- Limit looping to a max to avoid DoS through out of gas https://swcregistry.io/docs/SWC-128
   	- Deploy with same compiler version https://swcregistry.io/docs/SWC-103

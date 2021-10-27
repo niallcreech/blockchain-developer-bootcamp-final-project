@@ -208,7 +208,7 @@ export async function sendVote(_trackId, _entryId){
 		const _userInCooldown = await contract.methods.isSenderInVotingCooldown(_trackId).call();
 		try {
 			if (!_userInCooldown) {
-				const tx = await contract.methods.vote(_entryId).send(options);
+				await contract.methods.vote(_entryId).send(options);
 		    message = "Successfully voted for entry";
 		    statusCode = 200;
 				console.debug(`sendVote: ${message}, ${statusCode}`);
