@@ -4,7 +4,8 @@
 
 * [Design Pattern Decisions](./design_pattern_decisions.md)
 * [Avoiding Common Attacks](./avoiding_common_attacks.md)
-* [Deployed Addresses](./deployed_addresses.txt)
+* [Deployed Addresses](./deployed_addresses.md)
+* [TODO](./TODO.md)
 
 ## Introduction
 

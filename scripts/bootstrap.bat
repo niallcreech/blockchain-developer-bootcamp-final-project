@@ -1,0 +1,5 @@
+@ECHO OFF
+ECHO When run locally, it builds or checks for the dependencies of your project
+
+docker compose build
+
