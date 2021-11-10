@@ -3,8 +3,8 @@ WORKDIR /app
 COPY package.json .
 COPY package-lock.json .
 RUN apk add git \
-  && npm install -g --silent ganache-cli truffle \
-  && npm install --silent
+  && npm install -g ganache-cli truffle \
+  && npm install 
 COPY run.sh .
 COPY contracts ./contracts
 COPY migrations ./migrations

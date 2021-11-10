@@ -1,0 +1,7 @@
+@ECHO OFF
+ECHO Used to run the test suite for your project
+docker build -t ganache .
+docker run -it --rm ganache -t
+
+docker build -t tracks-frontend ./client/
+docker run -it --rm tracks-frontend -t

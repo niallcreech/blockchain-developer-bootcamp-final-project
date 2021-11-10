@@ -1,13 +1,20 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.0;
+pragma solidity 0.8.7;
+
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/security/Pausable.sol";
+
+
 
 /**
    * @title The Tracks contract enables the storage of collections of 
    * text information with voting enabled on each memeber of the collection
    * through emitting events.
    */
-contract Tracks is Ownable {
+contract Tracks is Ownable, Pausable{
+  mapping(address => uint) public donations;
+  uint public minDonation;
+  uint public maxTrackCount; // Precent out of gas looping by restricting the amount of tracks to iterate
   mapping (uint => Track) public tracks;
   mapping (uint => uint[]) public trackEntries; //trackId => entryId[]
   mapping (uint => uint) public entriesTrack; //entryId => trackId
@@ -64,6 +71,9 @@ contract Tracks is Ownable {
   event TrackCreated(uint indexed trackId, string name, string desc);
   event EntryCreated(uint indexed trackId, uint indexed entryId, string name, string desc, string location);
   event EntryVotedFor(uint indexed trackId, uint indexed entryId);
+  event DonationToTrackOwner(uint indexed _trackId, address indexed _owner, uint _value);
+  event DonationToContractOwner(address indexed _owner, uint _value);
+  event CollectedDonations(address indexed _owner, uint _value);
 
 
   /**
@@ -216,6 +226,8 @@ contract Tracks is Ownable {
       allVotesState = State.Open;
       enableCooldowns(true);
       createHelpTrack();
+			setMaxTrackCount(1000); // Set max tracks to 1 million by default
+      setMinDonation(0.00001 ether);
   }
 
   /**
@@ -228,12 +240,15 @@ contract Tracks is Ownable {
   	blockTrack(trackId);
   }
 	/**
-   * @dev Get all tracks
+   * @dev Get all tracks.
+   * 	There is a hard cap on the amount of tracks that we will return
    * @return array of all tracks by object
    */
   function getTracks() public view returns ( Track[] memory) {
-      Track[] memory _tracks = new Track[](trackCount);
-      for (uint i=0; i<trackCount; i++) {
+      uint _cappedTrackCount = (trackCount <= maxTrackCount) ? trackCount : maxTrackCount;
+      uint _startIndex = (trackCount - _cappedTrackCount);
+      Track[] memory _tracks = new Track[](_cappedTrackCount);
+      for (uint i=_startIndex; i<_tracks.length; i++) {
           _tracks[i] = tracks[i];
       }
       return _tracks;
@@ -262,7 +277,7 @@ contract Tracks is Ownable {
    * @dev Set a specific track to the 'Open' state.
    * @param _trackId The id of the track
    */
-  function openTrack(uint _trackId) public checkTrackExists(_trackId) checkTrackClosed(_trackId) checkIfUserIsBanned(msg.sender){
+  function openTrack(uint _trackId) public checkTrackExists(_trackId) checkTrackClosed(_trackId) checkIfUserIsBanned(msg.sender) {
       tracks[_trackId].state = State.Open;
       tracks[_trackId].visible = true;
       emit TrackOpened(_trackId);
@@ -500,6 +515,68 @@ contract Tracks is Ownable {
     trackCreationCooldownEnabled = enable;
     votingCooldownEnabled = enable;
     entryCreationCooldownEnabled = enable;
+  }
+  
+  /**
+   * @dev set the maximum amount of tracks to iterate through
+   * @param _maxCount the maximum length of tracks
+   */
+   function setMaxTrackCount(uint _maxCount) public onlyOwner{
+       maxTrackCount = _maxCount;
+   }
+  /**
+   * @dev Set the minimum donation price.
+   * @param _minDonation min donation
+   */ 
+  function setMinDonation(uint _minDonation) public onlyOwner {
+    require(_minDonation > 0 && _minDonation < 0.001 ether); // Force min donation to not be excessive as a sanity check
+    minDonation = _minDonation;
+  }
+  
+  /**
+   * @dev Set the percentage of transaction fees to add to donations.
+   * 	Donations are restricted to (0, 1] ether.
+   */ 
+  function donateToContractOwner() public payable whenNotPaused {
+    require(msg.value > minDonation && msg.value < 1 ether);
+    donations[owner()] += msg.value;
+    emit DonationToContractOwner(owner(), msg.value);
+  }
+  
+  /**
+   * @dev Set the percentage of transaction fees to add to donations.
+   * 	Donations are restricted to (0, 1] ether.
+   * @param _trackId id of the track to donate to
+   */ 
+  function donateToTrackOwner(uint _trackId) external  payable whenNotPaused {
+    require(msg.value > (2 * minDonation), "the value of the donation is too small");
+    require(msg.value < 1 ether, "the value of the donation is too large, maximum is 1 Ether");
+    require(trackOwners[_trackId] != address(0), "the specified track owner doesnt exist");
+    address _trackOwner = trackOwners[_trackId];
+    uint _trackOwnerDonation = (msg.value - minDonation);
+    uint _contractOwnerDonation = minDonation;
+    donations[_trackOwner] += _trackOwnerDonation;
+    donations[owner()] += _contractOwnerDonation;
+    emit DonationToTrackOwner(_trackId, _trackOwner, _trackOwnerDonation);
+		emit DonationToContractOwner(owner(), msg.value);
+  }
+
+  /**
+   * @dev Withdraw the donations to the senders address (if allowed)
+   * 	Donations are restricted to (0, 1] ether.
+   */ 
+  function collectDonations() public whenNotPaused returns (uint){
+    require(msg.sender > address(0)
+        && donations[msg.sender] > 0,
+        "the track author has no donations."
+    );
+    address payable _author = payable(msg.sender);
+    uint _val = donations[_author];
+  	donations[_author] = 0;
+    (bool _success, ) = _author.call{value: _val}(""); //bytes memory _data
+  	require(_success, "failed to transfer donations to author");
+    emit CollectedDonations(_author, _val);
+   	return _val;
   }
 }
 
