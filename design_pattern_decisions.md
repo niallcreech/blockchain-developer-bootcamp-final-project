@@ -2,15 +2,15 @@
 
 ## High-level design
 
-![High-level diagram of the application architecture](./tracks_architecture.jpg)
-
 ### Application design
 
 The contract stores the state required to implement tracks, small text blobs to
 describe a topic, Ids for Entries, which are text descriptions and links to content
 to be associated with a Track, and Idds for Votes, who voted for which Entries.
 
-#### Behaviour
+![High-level diagram of the application architecture](./tracks_architecture.jpg)
+
+### Behaviour
 
 Users can create Tracks, and add Entries to an existing track. They can vote
 for existing entries. The application will display tracks. When users select a 
@@ -21,7 +21,7 @@ Track and Entry creation, as well as voting, have a cooldown period, which means
 that users cannot create these or vote for multiple entries in a short space of time.
 In addition, users are blocked from multiple votes on the same entry.
 
-#### Event-based storage
+### Event-based storage
 
 In order to restrict the amount of state stored on the blockchain, and reduce users
 gas fees, the minimal data required is stored. Track information is stored on-chain as
@@ -62,17 +62,18 @@ The application is a React app hosted as a container on the [Dfinity ICP](https:
 * Backoff time cooloff period on creation and voting mechanism.
 * Block on multiple votes.
 
-
 ## Future reworks
 
-## State-retention for upgrades
+Application is PoC and should implement at least the following functionality before any production use.
+
+### State-retention for upgrades
 
 Currently upgrading the contract will lose all state data, and Tracks and voting
 will be reset to default, losing user-contributed content. Before any production
 use, should utilise the [OpenZeppelin Proxy Upgrade Pattern](https://docs.openzeppelin.com/upgrades-plugins/1.x/proxies?utm_source=zos&utm_medium=blog&utm_campaign=proxy-pattern) to enable state retention on functionality
 upgrades to the contract.
 
-## Wallet support and retricted signer use
+### Wallet support and retricted signer use
 
 Tracks automatically connects to the Metamask wallet, and updates the status through
 the notification banner. A proper wallet connector should be used to allow for a
