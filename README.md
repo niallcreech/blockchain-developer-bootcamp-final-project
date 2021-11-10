@@ -2,6 +2,8 @@
 
 ## Contents
 
+* [Introduction](#introduction)
+* [Where to find it](#where-to-find-it)
 * [Design Pattern Decisions](./design_pattern_decisions.md)
 * [Avoiding Common Attacks](./avoiding_common_attacks.md)
 * [Deployed Addresses](./deployed_addresses.md)
@@ -9,7 +11,11 @@
 
 ## Introduction
 
-Tracks is....
+Tracks is an app that gives you the ability to post topics to the ethereum blockchain, 
+which everyone can then add links to their favourite sites that they think others
+will enjoy. Everyone can vote for their favourite links and organise the chaos!
+
+
 
 
 ## Where to find it

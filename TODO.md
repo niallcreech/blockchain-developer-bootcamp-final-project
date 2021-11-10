@@ -10,3 +10,6 @@
 
 * Owner roles are too simplistic.
     - One owner at the moment controls all admin functionality. We can move this to a broader range of roles for maintenance etc through Open Zeppelin access roles.
+
+* Batching transactions to save some  $$$
+
