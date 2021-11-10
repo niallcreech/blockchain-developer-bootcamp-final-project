@@ -2,7 +2,7 @@
 
 ## High-level design
 
-![High-level diagram of the application architecture](./tracks_archtecture.jpg)
+![High-level diagram of the application architecture](./tracks_architecture.jpg)
 
 ## Platforming
 
