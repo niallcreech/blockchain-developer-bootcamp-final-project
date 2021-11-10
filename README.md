@@ -77,7 +77,3 @@ can take a long time due to hacing to retrieve images from the internet.
   `./scripts/test` 
 3. Run the server
   `./scripts/server` 
-  
-To refresh the documentation run the docify script,
-`npm install -D solc-0.8@npm:solc@0.8.7`
-` npm run docify`
