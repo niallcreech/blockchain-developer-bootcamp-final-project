@@ -22,9 +22,9 @@ Please answer the following questions. Does your project:
     - [x] Inherits from at least one library or interface. [Uses 'Owner', 'Pausable' from OpenZepellin]
     - [x] Can be easily compiled, migrated and tested? [See 'scripts' directory]
 
-4. Contain a Markdown files named...? [**NO**]
+4. Contain a Markdown files named...? [**YES**]
     - [x] design_pattern_decisions.md
-    - [ ] avoiding_common_attacks.md
+    - [x] avoiding_common_attacks.md
 
 5. Have at least five smart contract unit tests that pass? [**YES**]
 
