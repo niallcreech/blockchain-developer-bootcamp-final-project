@@ -49,16 +49,20 @@ will enjoy. Everyone can vote for their favourite links and organise the chaos!
 Truffle and ganache have been used for application development. See [the Truffle website](XXX)
 for installation instructions for your platform. The application can be worked on locally by,
 
-1. [Installing Truffle and Ganache](https://www.trufflesuite.com).
-1. Starting the Ganache server. <br />
+1. Clone this repo.<br />
+		`git clone git@github.com:niallcreech/blockchain-developer-bootcamp-final-project.git`<br />
+		`cd blockchain-developer-bootcamp-final-project`
+2. [Installing Truffle and Ganache](https://www.trufflesuite.com).
+3. Starting the Ganache server. <br />
    	`ganache-cli --port 7545`
-2. Deploying the contract.<br />
+4. Deploying the contract.<br />
+	  `npm install`<br />
    	`truffle deploy --network development`
-3. Starting the client front-end application.<br />
+5. Starting the client front-end application.<br />
 	  `cd client`<br />
 	  `npm install`<br />
 	  `npm start`
-4. Navigating to the web address.<br />
+6. Navigating to the web address.<br />
   	`http://localhost:3000/`
 
 It can also be tested by,
