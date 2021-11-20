@@ -10,7 +10,7 @@
     font-weight:bold;
     background-color: #333333;
     font-size: calc(10px + 2vmin);
-    color: white;
+    color: #ff00ff;
 }
 .TrackListTable .rowGroup {
 	display:table-row-group;
@@ -66,4 +66,5 @@ display:table-cell;
     color: black;
     font-size: 20px;
     background: green;
+border-radius: 12px;
 }

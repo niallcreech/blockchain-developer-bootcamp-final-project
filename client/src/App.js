@@ -20,6 +20,7 @@ class App extends Component {
   _isMounted = false;
   _trackListUpdateTimer = null;
   _notificationTimer = null
+  _isBackgroundDark = true;
 
   constructor(props) {
 		super(props);
@@ -221,7 +222,7 @@ class App extends Component {
             </Switch>
       );
 		return (
-      <div className="App">
+      <div className={this._isBackgroundDark ? 'App-dark' : 'App'}>
          <Router>
          
           <div>

@@ -5,9 +5,13 @@
     font-size: calc(10px + 2vmin);
     color: white;
 }
-
 .App {
   text-align: center;
+}
+
+.App-dark {
+  text-align: center;
+  background-color: black;
 }
 
 .App-logo {
