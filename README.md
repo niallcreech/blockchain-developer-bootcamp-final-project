@@ -68,11 +68,11 @@ for installation instructions for your platform. The application can be worked o
   	`http://localhost:3000/`
 
 It can also be tested by,
-1. Running the contract tests.
-  `npm install`
+1. Running the contract tests.<br />
+  `npm install`<br />
   `truffle test`
-2. Running the front-end application tests.
-  `cd client`
+2. Running the front-end application tests.<br />
+  `cd client`<br />
   `npm test`
 
 Docker configurations and scripts are provided. Note, the initial container build 
