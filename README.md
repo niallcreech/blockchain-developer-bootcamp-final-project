@@ -50,16 +50,16 @@ Truffle and ganache have been used for application development. See [the Truffle
 for installation instructions for your platform. The application can be worked on locally by,
 
 1. [Installing Truffle and Ganache](https://www.trufflesuite.com).
-1. Starting the Ganache server.
-   `ganache-cli --port 7545`
-2. Deploying the contract.
-   `truffle deploy --network development`
+1. Starting the Ganache server. <br />
+   	`ganache-cli --port 7545`
+2. Deploying the contract.<br />
+   	`truffle deploy --network development`
 3. Starting the client front-end application.
-  `cd client`
-  `npm install`
-  `npm start`
-4. Navigating to the web address.
-  `http://localhost:3000/`
+	  `cd client`
+	  `npm install`
+	  `npm start`
+4. Navigating to the web address.<br />
+  	`http://localhost:3000/`
 
 It can also be tested by,
 1. Running the contract tests.
@@ -70,10 +70,10 @@ It can also be tested by,
   `npm test`
 
 Docker configurations and scripts are provided. Note, the initial container build 
-can take a long time due to hacing to retrieve images from the internet.
+can take a long time due to retrieving images from the internet.
 
 1. [Install Docker](https://docs.docker.com/get-docker/).
-2. Run the test suite
-  `./scripts/test` 
-3. Run the server
-  `./scripts/server` 
+2. Run the test suite. <br />
+  	`./scripts/test` 
+3. Run the server. <br />
+  	`./scripts/server` 
