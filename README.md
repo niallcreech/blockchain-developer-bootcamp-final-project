@@ -54,9 +54,9 @@ for installation instructions for your platform. The application can be worked o
    	`ganache-cli --port 7545`
 2. Deploying the contract.<br />
    	`truffle deploy --network development`
-3. Starting the client front-end application.
-	  `cd client`
-	  `npm install`
+3. Starting the client front-end application.<br />
+	  `cd client`<br />
+	  `npm install`<br />
 	  `npm start`
 4. Navigating to the web address.<br />
   	`http://localhost:3000/`
