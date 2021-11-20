@@ -50,6 +50,18 @@ describe("When working with a contract", () => {
       assert.equal(2, _tracks.length, "");
     });
 
+		it("...should restrict the amount of tracks to return to a maximum.", async () => {
+      await contract.setMaxTrackCount(2);
+			expect (await contract.maxTrackCount(), 2, "max track count is not set properly");
+			// Add 3 tracks, only get the last 2
+      await contract.addTrack("mytrack", "mydescription", { from: accounts[0] });
+      await contract.addTrack("mytrack", "mydescription", { from: accounts[0] });
+      await contract.addTrack("mytrack", "mydescription", { from: accounts[0] });
+      await contract.getTracks().then(ret => expect(ret.length, 2, ""))
+      await contract.setMaxTrackCount(1000);
+      await contract.getTracks().then(ret => expect(ret.length, 3, ""))
+    });
+
 		it("...should get track status.", async () => {
       const name = "mytrack"
 			expect(await contract.getTrackState("666") === "null");

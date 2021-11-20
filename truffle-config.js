@@ -81,7 +81,7 @@ module.exports = {
     // NB: It's important to wrap the provider as a function.
     staging: {
       provider: () => new HDWalletProvider(mnemonic, wsNetworkEndpoint),
-      network_id: networkId,       // Ropsten's id
+      network_id: networkId,       
       networkCheckTimeout: 1000000,
       timeoutBlocks: 200,
       from: ownerAddress,
