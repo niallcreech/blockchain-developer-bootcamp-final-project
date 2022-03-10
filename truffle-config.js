@@ -26,8 +26,9 @@ const networkName = process.env.NETWORK_NAME || "rinkeby";
 const networkId = process.env.NETWORK_ID || 4;
 const networkEndpoint = `https://${networkName}.infura.io/v3/${infuraProjectId}`;
 const wsNetworkEndpoint = `wss://${networkName}.infura.io/ws/v3/${infuraProjectId}`;
+const kilnNetworkId = 1337802;
+const kilnNetworkEndpoint = "https://rpc.kiln.themerge.dev"
 
-console.debug(`Connecting to endpoint ${wsNetworkEndpoint}`);
 // naive environment assertions, since these aren't present by default
 //if (infuraProjectId === undefined || infuraProjectId === '') {
 //  throw new Error('truffle-config.js needs the environment variable "INFURA_PROJECT_ID"');
@@ -79,6 +80,13 @@ module.exports = {
     // },
     // Useful for deploying to a public network.
     // NB: It's important to wrap the provider as a function.
+    kiln: {
+      provider: () => new HDWalletProvider(mnemonic, kilnNetworkEndpoint),
+      network_id: kilnNetworkId,       
+      networkCheckTimeout: 1000000,
+      timeoutBlocks: 200,
+      from: ownerAddress,
+    },
     staging: {
       provider: () => new HDWalletProvider(mnemonic, wsNetworkEndpoint),
       network_id: networkId,       
