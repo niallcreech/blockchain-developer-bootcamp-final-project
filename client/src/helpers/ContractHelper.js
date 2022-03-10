@@ -7,6 +7,7 @@ const networkIdMapping = {
   "3": "ropsten",
   "4": "rinkeby",
   "5": "goerli",
+  "1337802": "kiln",
 }
 
 export async function getTracks(){
