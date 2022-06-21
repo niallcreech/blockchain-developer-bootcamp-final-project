@@ -110,7 +110,7 @@ class App extends Component {
 		const _trackIds = _newTracks.map((track) => (track.trackId));
 		const _newVotes = await getVotesByTrack(_trackIds).then(ret => {return ret.data;});
 		_newTracks.forEach((item) => {
-			item.votes = _newVotes[item.trackId];
+			Object.assign({}, item, {votes: _newVotes[item.trackId]});
 		});
 		this.setState({
 		 	tracks: _newTracks,
