@@ -19,15 +19,19 @@
  */
 require('dotenv').config()
 const HDWalletProvider = require('@truffle/hdwallet-provider');
+const infuraProjectId = process.env.INFURA_PROJECT_ID;
+
+const networks = {
+	'kiln': {'id': '1337802', 'endpoint': 'https://rpc.kiln.themerge.dev'},
+	'sepolia': {'id': '11155111', 'endpoint': 'https://rpc.sepolia.dev'},
+	'goerli': {'id': '5', 'endpoint': '`https://goerli.infura.io/v3/${infuraProjectId}`'},
+}
+const defaultNetworkName = 'goerli'
+
 const mnemonic = process.env.MNEMONIC;
 const ownerAddress = process.env.OWNER_ADDRESS;
-const infuraProjectId = process.env.INFURA_PROJECT_ID;
-const networkName = process.env.NETWORK_NAME || "rinkeby";
-const networkId = process.env.NETWORK_ID || 4;
-const networkEndpoint = `https://${networkName}.infura.io/v3/${infuraProjectId}`;
-const wsNetworkEndpoint = `wss://${networkName}.infura.io/ws/v3/${infuraProjectId}`;
-const kilnNetworkId = 1337802;
-const kilnNetworkEndpoint = "https://rpc.kiln.themerge.dev"
+const networkName = process.env.NETWORK_NAME || defaultNetworkName;
+
 
 // naive environment assertions, since these aren't present by default
 //if (infuraProjectId === undefined || infuraProjectId === '') {
@@ -81,15 +85,22 @@ module.exports = {
     // Useful for deploying to a public network.
     // NB: It's important to wrap the provider as a function.
     kiln: {
-      provider: () => new HDWalletProvider(mnemonic, kilnNetworkEndpoint),
-      network_id: kilnNetworkId,       
+      provider: () => new HDWalletProvider(mnemonic, networks['kiln']['endpoint']),
+      network_id: networks['kiln']['id'],       
+      networkCheckTimeout: 1000000,
+      timeoutBlocks: 200,
+      from: ownerAddress,
+    },
+    sepolia: {
+      provider: () => new HDWalletProvider(mnemonic, networks['sepolia']['endpoint']),
+      network_id: networks['sepolia']['id'],
       networkCheckTimeout: 1000000,
       timeoutBlocks: 200,
       from: ownerAddress,
     },
     staging: {
-      provider: () => new HDWalletProvider(mnemonic, wsNetworkEndpoint),
-      network_id: networkId,       
+      provider: () => new HDWalletProvider(mnemonic, networks[networkName]['endpoint']),
+      network_id: networks[networkName]['id'],       
       networkCheckTimeout: 1000000,
       timeoutBlocks: 200,
       from: ownerAddress,

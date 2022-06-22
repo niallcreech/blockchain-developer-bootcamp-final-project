@@ -2,12 +2,13 @@ import TracksContract from "../contracts/Tracks.json";
 import Web3 from "web3";
 
 const networkIdMapping = {
-  "0": "rinkeby", //The default deployed network
+  "default": "goerli", //The default deployed network
   "1": "mainnet",
   "3": "ropsten",
   "4": "rinkeby",
   "5": "goerli",
   "1337802": "kiln",
+  "11155111": "sepolia",
 }
 
 export async function getTracks(){
@@ -320,10 +321,10 @@ async function getWeb3Contract(web3){
 	    message = 'Failed to get web3 network connection.';
 	}
 	if (!contract){
-    message =  `Contract not found on Ethereum '${networkName}', please select the '${networkIdMapping[0]}' network`;
+    message =  `Contract not found on Ethereum '${networkName}', please select the '${networkIdMapping['default']}' network`;
     statusCode = 500;
 	} else if (!contract._address){
-    message =  `Contract not found on Ethereum '${networkName}', please select the '${networkIdMapping[0]}' network`;
+    message =  `Contract not found on Ethereum '${networkName}', please select the '${networkIdMapping['default']}' network`;
 		statusCode = 500;
   } else {
     statusCode = 200;
