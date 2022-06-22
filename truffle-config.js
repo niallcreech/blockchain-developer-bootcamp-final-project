@@ -24,8 +24,9 @@ const infuraProjectId = process.env.INFURA_PROJECT_ID;
 const networks = {
 	'kiln': {'id': '1337802', 'endpoint': 'https://rpc.kiln.themerge.dev'},
 	'sepolia': {'id': '11155111', 'endpoint': 'https://rpc.sepolia.dev'},
-	'goerli': {'id': '5', 'endpoint': '`https://goerli.infura.io/v3/${infuraProjectId}`'},
+	'goerli': {'id': '5', 'endpoint': `https://goerli.infura.io/v3/${infuraProjectId}`},
 }
+console.log( `https://goerli.infura.io/v3/${infuraProjectId}`)
 const defaultNetworkName = 'goerli'
 
 const mnemonic = process.env.MNEMONIC;
@@ -94,6 +95,13 @@ module.exports = {
     sepolia: {
       provider: () => new HDWalletProvider(mnemonic, networks['sepolia']['endpoint']),
       network_id: networks['sepolia']['id'],
+      networkCheckTimeout: 1000000,
+      timeoutBlocks: 200,
+      from: ownerAddress,
+    },
+    goerli: {
+      provider: () => new HDWalletProvider(mnemonic, networks['goerli']['endpoint']),
+      network_id: networks['goerli']['id'],
       networkCheckTimeout: 1000000,
       timeoutBlocks: 200,
       from: ownerAddress,
